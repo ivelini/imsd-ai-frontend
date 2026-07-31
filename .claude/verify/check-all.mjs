@@ -6,7 +6,7 @@ const VPS = [
 const PAGES = [
   '/index.html', '/catalog/index.html', '/catalog/filter-params.html', '/catalog/filter-car.html',
   '/catalog/filter-applied.html', '/catalog/filter-mobile.html', '/product/index.html',
-  '/cart/index.html', '/order/index.html', '/popups/cart.html', '/popups/catalog-menu.html', '/popups/geo.html',
+  '/cart/index.html', '/order/index.html', '/user/login.html', '/user/register.html', '/article/index.html', '/article/view.html', '/popups/cart.html', '/popups/catalog-menu.html', '/popups/geo.html',
 ];
 const issues = [];
 for (const path of PAGES) {
