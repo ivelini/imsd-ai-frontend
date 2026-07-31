@@ -262,6 +262,55 @@ footer {
   margin-top: 25px;
   margin-bottom: 7px;
 }
+/* ===== Бейджи преимуществ в шапке ===== */
+.benefits {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  width: 100%;
+  max-width: 1360px;
+  box-sizing: border-box;
+  margin-top: 15px;
+  margin-bottom: 10px;
+}
+.search-query-blk {
+  width: 100%;
+  max-width: 1360px;
+  box-sizing: border-box;
+}
+.benefit {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px;
+  border-radius: 5px;
+  color: #fff;
+  text-decoration: none;
+
+  font-size: 13px;
+  font-style: normal;
+  font-weight: 600;
+  line-height: normal;
+  white-space: nowrap;
+}
+.benefit svg {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+}
+.benefit--red {
+  background: var(--color-red);
+}
+.benefit--gold {
+  background: #ffc10a;
+  color: #303030;
+}
+.benefit--blue {
+  background: #3059a8;
+}
+.benefit--green {
+  background: #178e42;
+}
 
 #get-catalog {
   color: var(--color-red);
@@ -861,6 +910,17 @@ input[type="checkbox"] {
   color: #383838;
   cursor: pointer;
   white-space: nowrap;
+}
+.parameters-list .p-badge {
+  display: table-cell;
+  text-align: center;
+  height: auto;
+}
+.payment-option .p-badge {
+  background: #fff;
+  font-weight: bold;
+  text-align: left;
+  white-space: normal;
 }
 .catalog-product-info {
   display: flex;
@@ -1636,6 +1696,12 @@ input[type="checkbox"] {
   display: flex;
   justify-content: space-between;
 }
+.parameter-dots {
+  flex: 1;
+  align-self: flex-end;
+  border-bottom: 2px dotted rgba(0, 0, 0, 0.2);
+  margin: 0 0 4px;
+}
 .price-payment-shipping {
   border-radius: 5px;
   box-sizing: border-box;
@@ -1680,6 +1746,7 @@ input[type="checkbox"] {
 }
 .payment-info {
   display: flex;
+  flex-direction: column;
   gap: 30px;
   margin-top: 30px;
   margin-bottom: 50px;
@@ -1744,12 +1811,10 @@ input[type="checkbox"] {
 }
 
 .parameter-name {
-  width: 160px;
-  text-align: start;
+  text-align: left;
 }
 .parameter-value {
-  width: 120px;
-  text-align: start;
+  text-align: right;
 }
 
 .section {
@@ -2212,11 +2277,29 @@ input[type="checkbox"] {
     height: 16px;
     width: 15px;
   }
-  .eu-label {
+  .catalog-product .eu-label {
     position: static;
   }
   .catalog-product-image img {
     display: block;
+  }
+  .benefits {
+    width: 100%;
+    flex-direction: column;
+    padding: 0 20px;
+    box-sizing: border-box;
+  }
+  .search-query-blk {
+    padding: 0 20px;
+  }
+  .product-parameters {
+    max-width: 100%;
+  }
+  .benefit {
+    display: flex;
+    width: 100%;
+    justify-content: center;
+    box-sizing: border-box;
   }
   .catalog-with-products {
     padding: 0;
@@ -2395,9 +2478,15 @@ input[type="checkbox"] {
     flex-direction: column;
   }
   .add-to-cart-button {
-    width: calc(100% - 40px);
-    position: absolute;
-    bottom: 10px;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    max-width: 100%;
+    height: 48px;
+    border-radius: 0;
+    z-index: 100;
+    box-sizing: border-box;
   }
   .payment-option:nth-child(2) {
     padding: 9px 0;
@@ -2725,6 +2814,10 @@ input[type="checkbox"] {
     align-items: center;
     justify-content: flex-end;
   }
+  .benefits,
+  .search-query-blk {
+    padding: 0 20px;
+  }
 }
 
 /* Каталог на узких экранах: строки карточки в колонку с отступами,
@@ -2909,6 +3002,10 @@ input[type="checkbox"] {
   .price-payment-shipping {
     padding: 20px;
     max-width: 540px;
+  }
+  .benefits,
+  .search-query-blk {
+    padding: 0 20px;
   }
 }
 @media (min-width: 1366px) {
