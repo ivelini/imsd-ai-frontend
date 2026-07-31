@@ -262,6 +262,263 @@ footer {
   margin-top: 25px;
   margin-bottom: 7px;
 }
+/* ===== Пагинация каталога ===== */
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  margin-top: 40px;
+}
+.pagination-link,
+.pagination-next {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-width: 36px;
+  height: 36px;
+  padding: 0 6px;
+  box-sizing: border-box;
+  border: 1px solid rgba(0, 0, 0, 0.15);
+  border-radius: 5px;
+  color: var(--color-text-dark);
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+}
+.pagination-link:hover,
+.pagination-next:hover {
+  border-color: var(--color-red);
+  color: var(--color-red);
+}
+.pagination-link_active {
+  background: var(--color-red);
+  border-color: var(--color-red);
+  color: var(--color-white);
+}
+.pagination-link_active:hover {
+  color: var(--color-white);
+}
+.pagination-dots {
+  color: var(--color-text);
+  font-size: 14px;
+}
+
+/* ===== Подбор шин по автомобилю ===== */
+.auto-select {
+  box-sizing: border-box;
+  padding: 20px;
+  margin-bottom: 25px;
+  border-radius: 5px;
+  background: var(--color-white);
+  box-shadow: 0px 0px 20px 1px var(--shadow-1);
+}
+.auto-select-title {
+  color: var(--color-text-dark);
+  font-size: 20px;
+  font-weight: 700;
+  margin-bottom: 15px;
+}
+.auto-select-form {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+}
+.auto-select-input {
+  min-width: 220px;
+  height: 40px;
+  padding: 0 12px;
+  box-sizing: border-box;
+  border: 1px solid rgba(0, 0, 0, 0.2);
+  border-radius: 5px;
+  color: var(--color-text-dark);
+  font-size: 14px;
+  background: var(--color-white);
+}
+.auto-select-submit {
+  height: 40px;
+  padding: 0 24px;
+  border: none;
+  border-radius: 5px;
+  background: var(--color-red);
+  color: var(--color-white);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.auto-select-submit:hover {
+  background: var(--color-red-light);
+}
+.auto-select-help {
+  display: flex;
+  gap: 20px;
+  margin-left: auto;
+}
+.auto-select-help a {
+  color: var(--color-text);
+  font-size: 13px;
+  text-decoration: none;
+  border-bottom: 1px dashed rgba(0, 0, 0, 0.3);
+}
+.auto-select-help a:hover {
+  color: var(--color-red);
+}
+/* Список моделей выбранной марки */
+.auto-models {
+  box-sizing: border-box;
+  padding: 20px;
+  border-radius: 5px;
+  background: var(--color-white);
+  box-shadow: 0px 0px 20px 1px var(--shadow-1);
+  margin-bottom: 25px;
+}
+.auto-models-title {
+  color: var(--color-text-dark);
+  font-size: 20px;
+  font-weight: 700;
+  margin-bottom: 12px;
+}
+.auto-models-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.auto-models-list a {
+  display: inline-block;
+  padding: 6px 14px;
+  border-radius: 5px;
+  border: 1px solid rgba(0, 0, 0, 0.15);
+  color: var(--color-text-dark);
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+}
+.auto-models-list a:hover {
+  border-color: var(--color-red);
+  color: var(--color-red);
+}
+
+/* ===== Блок авто: рекомендованные и альтернативные типоразмеры ===== */
+.car-block {
+  box-sizing: border-box;
+  padding: 20px;
+  border-radius: 5px;
+  background: var(--color-white);
+  box-shadow: 0px 0px 20px 1px var(--shadow-1);
+  margin-bottom: 20px;
+}
+.car-name {
+  color: var(--color-text-dark);
+  font-size: 20px;
+  font-weight: 700;
+  margin-bottom: 15px;
+}
+.car-sections {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+.car-section-name {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--color-text-dark);
+  font-size: 15px;
+  font-weight: 600;
+  margin-bottom: 10px;
+}
+.car-section-options {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 10px;
+}
+.custom-checkbox-container {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  border: 1px solid rgba(0, 0, 0, 0.15);
+  border-radius: 5px;
+  cursor: pointer;
+  background: var(--color-white);
+}
+.custom-checkbox-container:hover {
+  border-color: var(--color-red);
+}
+.custom-checkbox-container:has(input:checked) {
+  border-color: var(--color-red);
+  background: rgba(221, 6, 42, 0.06);
+}
+.custom-checkbox-container input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--color-red);
+  cursor: pointer;
+}
+.custom-checkbox-container label {
+  color: var(--color-text-dark);
+  font-size: 14px;
+  cursor: pointer;
+}
+
+/* ===== SEO-контент под списком каталога ===== */
+.seo-content {
+  box-sizing: border-box;
+  padding: 0 20px;
+}
+.seo-content-title {
+  color: var(--color-text-dark);
+  font-size: 26px;
+  font-weight: 400;
+  margin: 30px 0 15px;
+}
+.seo-content p {
+  color: var(--color-text);
+  font-size: 14px;
+  line-height: 1.6;
+  margin: 0 0 12px;
+}
+.seo-content-subtitle {
+  color: var(--color-text-dark);
+  font-size: 18px;
+  font-weight: 600;
+  margin: 20px 0 10px;
+}
+.seo-content-list {
+  margin: 0 0 12px;
+  padding-left: 20px;
+  color: var(--color-text);
+  font-size: 14px;
+  line-height: 1.6;
+}
+.seo-content-sizes {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-top: 20px;
+  font-size: 14px;
+  color: var(--color-text);
+}
+.seo-content-sizes b {
+  margin-right: 4px;
+}
+.seo-size-link {
+  display: inline-block;
+  padding: 6px 14px;
+  border-radius: 5px;
+  border: 1px solid rgba(0, 0, 0, 0.15);
+  color: var(--color-text-dark);
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+}
+.seo-size-link:hover {
+  border-color: var(--color-red);
+  color: var(--color-red);
+}
+
 /* ===== Страница модели: описание + список на всю ширину ===== */
 .model-page .catalog-with-products {
   max-width: 100%;
