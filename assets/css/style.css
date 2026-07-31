@@ -262,6 +262,113 @@ footer {
   margin-top: 25px;
   margin-bottom: 7px;
 }
+/* ===== Страница модели: описание + список на всю ширину ===== */
+.model-page .catalog-with-products {
+  max-width: 100%;
+}
+.model-description {
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+  margin-bottom: 30px;
+}
+.model-info {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 40px;
+  align-items: center;
+}
+.model-description-image {
+  flex-shrink: 0;
+}
+.model-description-image img {
+  width: 300px;
+  height: auto;
+  display: block;
+}
+/* ===== Типоразмеры в наличии (группировка по диаметрам) ===== */
+.model-sizes {
+  width: 100%;
+  margin-top: 30px;
+}
+.model-diameter {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+}
+.model-diameter + .model-diameter {
+  border-top: 1px solid rgba(0, 0, 0, 0.15);
+  padding-top: 30px;
+}
+.model-sizes-title {
+  color: var(--color-text-dark);
+  font-size: 24px;
+  font-weight: 700;
+  margin-bottom: 15px;
+}
+.model-sizes-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  list-style: none;
+  padding: 0;
+  margin: 0 0 25px;
+}
+.model-sizes-nav a {
+  display: inline-block;
+  padding: 6px 14px;
+  border-radius: 5px;
+  border: 1px solid var(--color-border-soft, #e0e0e0);
+  color: var(--color-text-dark);
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+}
+.model-sizes-nav a:hover {
+  border-color: var(--color-red);
+  color: var(--color-red);
+}
+.model-diameter {
+  margin-bottom: 30px;
+}
+.model-diameter-title {
+  color: var(--color-text-dark);
+  font-size: 20px;
+  font-weight: 700;
+  margin-bottom: 15px;
+}
+.model-description-text {
+  width: 100%;
+}
+.model-description-text p {
+  color: var(--color-text);
+  font-size: 14px;
+  line-height: 1.5;
+}
+.model-description-params {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex: 0 1 auto;
+  min-width: 360px;
+  max-width: 480px;
+}
+.model-param {
+  display: flex;
+  justify-content: space-between;
+}
+.model-param-name {
+  color: var(--color-gray);
+  font-size: 14px;
+}
+.model-param-value {
+  color: var(--color-text-dark);
+  font-size: 14px;
+  font-weight: 600;
+}
+
 /* ===== Бейджи преимуществ в шапке ===== */
 .benefits {
   display: flex;
@@ -928,7 +1035,8 @@ input[type="checkbox"] {
 }
 
 .catalog-product-title {
-  max-width: 430px;
+  flex: 1;
+  max-width: 100%;
   display: block;
   color: var(--color-text-dark);
   font-size: 18px;
@@ -2292,6 +2400,23 @@ input[type="checkbox"] {
   .search-query-blk {
     padding: 0 20px;
   }
+  .model-description {
+    gap: 20px;
+  }
+  .model-info {
+    flex-direction: column;
+    gap: 20px;
+  }
+  .model-description-params {
+    max-width: 100%;
+  }
+  .model-description-image img {
+    width: 100%;
+    max-width: 240px;
+  }
+  .model-sizes-title {
+    font-size: 20px;
+  }
   .product-parameters {
     max-width: 100%;
   }
@@ -2823,6 +2948,24 @@ input[type="checkbox"] {
 /* Каталог на узких экранах: строки карточки в колонку с отступами,
    кнопка «Купить» — под всеми строками */
 @media (max-width: 648px) {
+  .model-info {
+    flex-direction: column;
+    align-items: center;
+  }
+  .model-description-image {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+  }
+  .model-description-image img {
+    width: auto;
+    max-width: 100%;
+  }
+  .model-description-params {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+  }
   .catalog-product-flex-container {
     display: flex;
     flex-direction: column;
