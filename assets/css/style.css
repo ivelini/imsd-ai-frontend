@@ -649,6 +649,124 @@ input[type="checkbox"] {
   top: 0;
   left: 0;
 }
+/* ===== Буквенные обозначения EU-маркировки (rolling resistance / wet grip / шум) ===== */
+.eu-label {
+  background: #fff;
+  border-radius: 4px;
+  display: inline-flex;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  overflow: hidden;
+  box-shadow: inset 0 0 0 1px #0000001a;
+}
+.eu-label i {
+  text-align: center;
+  padding: 5px 6px 3px;
+  font-style: normal;
+  font-weight: 700;
+  line-height: 1.2;
+  display: block;
+  position: relative;
+}
+.eu-label i:before {
+  content: "";
+  width: 12px;
+  height: 12px;
+  margin: 0 auto 2px;
+  display: block;
+  background-size: 14px 12px !important;
+}
+.eu-label .rolling-resistance.category-A {
+  color: #fff;
+  background-color: #178e42;
+}
+.eu-label .rolling-resistance.category-B {
+  color: #fff;
+  background-color: #69a628;
+}
+.eu-label .rolling-resistance.category-C {
+  color: #000;
+  background-color: #c6bf10;
+}
+.eu-label .rolling-resistance.category-D {
+  color: #000;
+  background-color: #ffc302;
+}
+.eu-label .rolling-resistance.category-E {
+  color: #000;
+  background-color: #ff9f08;
+}
+.eu-label .rolling-resistance.category-F {
+  color: #fff;
+  background-color: #eb661b;
+}
+.eu-label .rolling-resistance.category-G {
+  color: #fff;
+  background-color: #d3392a;
+}
+.eu-label .wet-grip.category-A {
+  color: #fff;
+  background-color: #2464ac;
+}
+.eu-label .wet-grip.category-B {
+  color: #fff;
+  background-color: #2e7cbf;
+}
+.eu-label .wet-grip.category-C {
+  color: #fff;
+  background-color: #60a7dd;
+}
+.eu-label .wet-grip.category-D {
+  color: #000;
+  background-color: #83c1ed;
+}
+.eu-label .wet-grip.category-E,
+.eu-label .wet-grip.category-F,
+.eu-label .wet-grip.category-G {
+  color: #000;
+  background-color: #b4e1f6;
+}
+.eu-label .wet-grip {
+  padding-left: 7px;
+  position: relative;
+}
+.eu-label .noise-emission {
+  color: #000;
+  padding-left: 5px;
+  padding-right: 5px;
+  font-size: 13px;
+  font-weight: 700;
+}
+.eu-label .rolling-resistance:before {
+  background: url("data:image/svg+xml;utf8,<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 512 512\"><path fill=\"%2335332d\" d=\"M336 448H16c-8.8 0-16 7.2-16 16v32c0 8.8 7.2 16 16 16h320c8.8 0 16-7.2 16-16v-32c0-8.8-7.2-16-16-16zm157.2-340.7l-81-81c-6.2-6.2-16.4-6.2-22.6 0l-11.3 11.3c-6.2 6.2-6.2 16.4 0 22.6L416 97.9V160c0 28.1 20.9 51.3 48 55.2V376c0 13.2-10.8 24-24 24s-24-10.8-24-24v-32c0-48.6-39.4-88-88-88h-8V64c0-35.3-28.7-64-64-64H96C60.7 0 32 28.7 32 64v352h288V304h8c22.1 0 40 17.9 40 40v27.8c0 37.7 27 72 64.5 75.9 43 4.3 79.5-29.5 79.5-71.7V152.6c0-17-6.8-33.3-18.8-45.3zM256 192H96V64h160v128z\"/></svg>")
+    50% no-repeat;
+}
+.eu-label .wet-grip.category-A:before,
+.eu-label .wet-grip.category-B:before,
+.eu-label .wet-grip.category-C:before {
+  background: url("data:image/svg+xml;utf8,<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 512 512\"><path fill=\"%23fff\" d=\"M416 128c-.6 0-1.1.2-1.6.2 1.1-5.2 1.6-10.6 1.6-16.2 0-44.2-35.8-80-80-80-24.6 0-46.3 11.3-61 28.8C256.4 24.8 219.3 0 176 0 114.1 0 64 50.1 64 112c0 7.3.8 14.3 2.1 21.2C27.8 145.8 0 181.5 0 224c0 53 43 96 96 96h320c53 0 96-43 96-96s-43-96-96-96zM88 374.2c-12.8 44.4-40 56.4-40 87.7 0 27.7 21.5 50.1 48 50.1s48-22.4 48-50.1c0-31.4-27.2-43.1-40-87.7-2.2-8.1-13.5-8.5-16 0zm160 0c-12.8 44.4-40 56.4-40 87.7 0 27.7 21.5 50.1 48 50.1s48-22.4 48-50.1c0-31.4-27.2-43.1-40-87.7-2.2-8.1-13.5-8.5-16 0zm160 0c-12.8 44.4-40 56.4-40 87.7 0 27.7 21.5 50.1 48 50.1s48-22.4 48-50.1c0-31.4-27.2-43.1-40-87.7-2.2-8.1-13.5-8.5-16 0z\"/></svg>")
+    50% no-repeat;
+}
+.eu-label .wet-grip:before {
+  background: url("data:image/svg+xml;utf8,<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 512 512\"><path fill=\"%2335332d\" d=\"M416 128c-.6 0-1.1.2-1.6.2 1.1-5.2 1.6-10.6 1.6-16.2 0-44.2-35.8-80-80-80-24.6 0-46.3 11.3-61 28.8C256.4 24.8 219.3 0 176 0 114.1 0 64 50.1 64 112c0 7.3.8 14.3 2.1 21.2C27.8 145.8 0 181.5 0 224c0 53 43 96 96 96h320c53 0 96-43 96-96s-43-96-96-96zM88 374.2c-12.8 44.4-40 56.4-40 87.7 0 27.7 21.5 50.1 48 50.1s48-22.4 48-50.1c0-31.4-27.2-43.1-40-87.7-2.2-8.1-13.5-8.5-16 0zm160 0c-12.8 44.4-40 56.4-40 87.7 0 27.7 21.5 50.1 48 50.1s48-22.4 48-50.1c0-31.4-27.2-43.1-40-87.7-2.2-8.1-13.5-8.5-16 0zm160 0c-12.8 44.4-40 56.4-40 87.7 0 27.7 21.5 50.1 48 50.1s48-22.4 48-50.1c0-31.4-27.2-43.1-40-87.7-2.2-8.1-13.5-8.5-16 0z\"/></svg>")
+    50% no-repeat;
+}
+.eu-label .wet-grip:after {
+  content: "";
+  background: #00000026;
+  width: 1px;
+  display: block;
+  position: absolute;
+  top: 4px;
+  bottom: 4px;
+  left: 0;
+}
+.eu-label .noise-emission:before {
+  background: url("data:image/svg+xml;utf8,<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 576 480\"><path fill=\"%2335332d\" d=\"M215 55.1l-89 89H24c-13.3 0-24 10.7-24 24v144a24 24 0 0024 24h102.1l89 89c15 15 41 4.5 41-17V72C256 50.6 230 40 215 55.1zM448.4 4a24.2 24.2 0 10-26.5 40.5C488.1 87.9 527.6 161 527.6 240s-39.5 152.1-105.8 195.6a24.2 24.2 0 00-7 33.5c7 10.7 21.9 14.6 33.5 7C528.3 423.6 576 335.3 576 240S528.3 56.4 448.4 4zM480 240c0-63.5-32.1-121.9-85.8-156.2-11.2-7.1-26-3.8-33.1 7.5s-3.8 26.2 7.4 33.4C408.3 150 432 193.1 432 240s-23.7 90-63.5 115.4c-11.2 7.1-14.5 22.1-7.4 33.4 6.5 10.4 21.1 15.1 33.1 7.5C447.9 361.9 480 303.5 480 240zm-141.8-76.9a24.08 24.08 0 00-32.6 9.4 23.94 23.94 0 009.5 32.6C328 212.3 336 225.6 336 240c0 14.4-8 27.7-20.9 34.8-11.6 6.4-15.8 21-9.5 32.6 6.4 11.7 21 15.8 32.6 9.5 28.2-15.5 45.8-45 45.8-76.9s-17.5-61.3-45.8-76.9z\"/></svg>")
+    50% no-repeat;
+  width: 16px;
+}
 .wishlist,
 .location,
 .promotion-title,
@@ -734,6 +852,16 @@ input[type="checkbox"] {
   gap: 15px;
   width: 100%;
 }
+/* Имитация бейджей PrimeNG (p-badge) со страницы товара */
+.p-badge {
+  display: initial;
+  border-radius: 5px;
+  padding: 0 5px;
+  background: #f5f5f5;
+  color: #383838;
+  cursor: pointer;
+  white-space: nowrap;
+}
 .catalog-product-info {
   display: flex;
   justify-content: space-between;
@@ -746,6 +874,10 @@ input[type="checkbox"] {
   font-size: 18px;
   font-weight: 400;
   line-height: normal;
+}
+.catalog-product-title a {
+  color: inherit;
+  text-decoration: none;
 }
 .catalog-product-prices {
   display: flex;
@@ -2003,7 +2135,6 @@ input[type="checkbox"] {
   .star-rating,
   .location,
   .availability,
-  .buy-now p,
   .compare p,
   .wishlist {
     display: none;
@@ -2020,11 +2151,6 @@ input[type="checkbox"] {
     margin-bottom: 10px;
     margin-top: 5px;
   }
-  .buy-now img {
-    margin-left: 0 !important;
-    height: 17px;
-    width: 17px;
-  }
   .catalog-product-title {
     margin-bottom: 0 !important;
   }
@@ -2036,8 +2162,6 @@ input[type="checkbox"] {
   .buy-now {
     width: max-content;
     padding: 8px 10px;
-    width: 35px;
-    height: 35px;
   }
   .catalog-product-flex-item p {
     font-size: 10px;
@@ -2088,10 +2212,11 @@ input[type="checkbox"] {
     height: 16px;
     width: 15px;
   }
-  .star-mob {
-    max-width: 14px !important;
-    min-height: 14px !important;
-    min-width: 0 !important;
+  .eu-label {
+    position: static;
+  }
+  .catalog-product-image img {
+    display: block;
   }
   .catalog-with-products {
     padding: 0;
@@ -2602,6 +2727,27 @@ input[type="checkbox"] {
   }
 }
 
+/* Каталог на узких экранах: строки карточки в колонку с отступами,
+   кнопка «Купить» — под всеми строками */
+@media (max-width: 648px) {
+  .catalog-product-flex-container {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 20px;
+  }
+  .merge-block {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    width: 100%;
+  }
+  .catalog-product-purchase-actions {
+    order: 10;
+    align-self: stretch;
+  }
+}
+
 @media (min-width: 1024px) and (max-width: 1365px) {
   .catalog-with-products {
     padding-left: 20px;
@@ -2663,10 +2809,6 @@ input[type="checkbox"] {
   }
   .catalog-product-flex-container {
     align-items: start;
-  }
-
-  .catalog-product-location-info {
-    display: none;
   }
   .catalog-product-flex-item p {
     font-size: 12px;
