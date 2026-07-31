@@ -17,22 +17,22 @@ const VIEWPORTS = [
 ];
 
 const PAGES = [
-  ['index', '/index.html'],
-  ['catalog-index', '/catalog/index.html'],
-  ['catalog-filter-params', '/catalog/filter-params.html'],
-  ['catalog-filter-car', '/catalog/filter-car.html'],
-  ['catalog-filter-applied', '/catalog/filter-applied.html'],
-  ['catalog-filter-mobile', '/catalog/filter-mobile.html'],
-  ['product', '/product/index.html'],
-  ['cart', '/cart/index.html'],
-  ['order', '/order/index.html'],
-  ['user-login', '/user/login.html'],
-  ['article', '/article/index.html'],
-  ['article-view', '/article/view.html'],
-  ['user-register', '/user/register.html'],
-  ['popup-cart', '/popups/cart.html'],
-  ['popup-catalog-menu', '/popups/catalog-menu.html'],
-  ['popup-geo', '/popups/geo.html'],
+  ['index', '/.template/index.html'],
+  ['catalog-index', '/.template/catalog/index.html'],
+  ['catalog-filter-params', '/.template/catalog/filter-params.html'],
+  ['catalog-filter-car', '/.template/catalog/filter-car.html'],
+  ['catalog-filter-applied', '/.template/catalog/filter-applied.html'],
+  ['catalog-filter-mobile', '/.template/catalog/filter-mobile.html'],
+  ['product', '/.template/product/index.html'],
+  ['cart', '/.template/cart/index.html'],
+  ['order', '/.template/order/index.html'],
+  ['user-login', '/.template/user/login.html'],
+  ['article', '/.template/article/index.html'],
+  ['article-view', '/.template/article/view.html'],
+  ['user-register', '/.template/user/register.html'],
+  ['popup-cart', '/.template/popups/cart.html'],
+  ['popup-catalog-menu', '/.template/popups/catalog-menu.html'],
+  ['popup-geo', '/.template/popups/geo.html'],
 ];
 
 const browser = await chromium.launch();
