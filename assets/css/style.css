@@ -462,6 +462,32 @@ footer {
   cursor: pointer;
 }
 
+/* ===== Группа разношироких шин (рекомендация производителя) ===== */
+.category-section {
+  margin-bottom: 30px;
+}
+.category-section-header {
+  color: var(--color-text-dark);
+  font-size: 18px;
+  font-weight: 700;
+  margin-bottom: 5px;
+}
+.category-section-size {
+  color: var(--color-gray);
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 15px;
+}
+.pair-group {
+  border: 1px solid rgba(0, 0, 0, 0.15);
+  border-radius: 5px;
+  padding: 15px;
+  margin-bottom: 15px;
+}
+.pair-group .catalog-product + .catalog-product {
+  margin-top: 15px;
+}
+
 /* ===== SEO-контент под списком каталога ===== */
 .seo-content {
   box-sizing: border-box;
