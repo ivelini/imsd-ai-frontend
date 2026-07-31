@@ -1,0 +1,815 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>Товар</title>
+    <!-- Подключение jQuery -->
+    
+    
+    
+    <link rel="stylesheet" href="../assets/css/style.css" />
+  </head>
+  <body>
+    <div class="app">
+      <div class="wrapper">
+        <div class="geo-wrapper">
+          <div class="geo-window">
+            <div class="geo-window-panel">
+              <div class="geo-title">Ваш город</div>
+              <a href="#" class="geo-location-window-exit">
+                <img src="../assets/img/close.svg" />
+              </a>
+            </div>
+            <div class="geo-location-window-search">
+              <div class="geo-location-window-search-text">Выберите город</div>
+              <!--
+              --><input type="text" class="geo-location-window-search-input" value="" />
+            </div>
+            <div class="geo-location-window-list">
+              <div class="geo-location-window-list-item">
+                <a href="#" class="geo-location-window-list-item-link" data-id="1132" data-parse-value="Челябинск"
+                  ><span>Челябинская обл</span></a
+                >
+              </div>
+              <div class="geo-location-window-list-item">
+                <a href="#" class="geo-location-window-list-item-link" data-id="994" data-parse-value="Екатеринбург"
+                  ><span>Свердловская обл</span></a
+                >
+              </div>
+              <div class="geo-location-window-list-item">
+                <a href="#" class="geo-location-window-list-item-link" data-id="594" data-parse-value="Курган"
+                  ><span>Курганская обл</span></a
+                >
+              </div>
+            </div>
+            <div class="geo-location-window__location-list">
+              <div
+                class="geo-location-window__city-list geo-location-window__city-list-1"
+                id="selected-list"
+                data-cityid="1132"
+                data-regionid="1131"
+              >
+                <div class="geo-location-window__city"><span class="geo-location-window__link" title="Аша" data-id="1150">Аша</span></div>
+                <div class="geo-location-window__city">
+                  <span class="geo-location-window__link" title="Бакал" data-id="1155">Бакал</span>
+                </div>
+                <div class="geo-location-window__city">
+                  <span class="geo-location-window__link" title="Верхнеуральск" data-id="1157">Верхнеуральск</span>
+                </div>
+                <div class="geo-location-window__city">
+                  <span class="geo-location-window__link" title="Верхний Уфалей" data-id="1133">Верхний Уфалей</span>
+                </div>
+                <div class="geo-location-window__city">
+                  <span class="geo-location-window__link" title="Еманжелинск" data-id="1160">Еманжелинск</span>
+                </div>
+                <div class="geo-location-window__city">
+                  <span class="geo-location-window__link" title="Златоуст" data-id="1134">Златоуст</span>
+                </div>
+                <div class="geo-location-window__city">
+                  <span class="geo-location-window__link" title="Карабаш" data-id="1135">Карабаш</span>
+                </div>
+                <div class="geo-location-window__city">
+                  <span class="geo-location-window__link" title="Карталы" data-id="1151">Карталы</span>
+                </div>
+                <div class="geo-location-window__city">
+                  <span class="geo-location-window__link" title="Касли" data-id="1152">Касли</span>
+                </div>
+                <div class="geo-location-window__city">
+                  <span class="geo-location-window__link" title="Катав-Ивановск" data-id="1154">Катав-Ивановск</span>
+                </div>
+                <div class="geo-location-window__city">
+                  <span class="geo-location-window__link" title="Копейск" data-id="1136">Копейск</span>
+                </div>
+                <div class="geo-location-window__city">
+                  <span class="geo-location-window__link" title="Коркино" data-id="1161">Коркино</span>
+                </div>
+                <div class="geo-location-window__city"><span class="geo-location-window__link" title="Куса" data-id="1158">Куса</span></div>
+                <div class="geo-location-window__city">
+                  <span class="geo-location-window__link" title="Кыштым" data-id="1137">Кыштым</span>
+                </div>
+                <div class="geo-location-window__city">
+                  <span class="geo-location-window__link" title="Магнитогорск" data-id="1138">Магнитогорск</span>
+                </div>
+                <div class="geo-location-window__city">
+                  <span class="geo-location-window__link" title="Миасс" data-id="1139">Миасс</span>
+                </div>
+                <div class="geo-location-window__city">
+                  <span class="geo-location-window__link" title="Миньяр" data-id="1148">Миньяр</span>
+                </div>
+                <div class="geo-location-window__city">
+                  <span class="geo-location-window__link" title="Нязепетровск" data-id="1159">Нязепетровск</span>
+                </div>
+                <div class="geo-location-window__city">
+                  <span class="geo-location-window__link" title="Озерск" data-id="1140">Озерск</span>
+                </div>
+                <div class="geo-location-window__city">
+                  <span class="geo-location-window__link" title="Пласт" data-id="1162">Пласт</span>
+                </div>
+                <div class="geo-location-window__city">
+                  <span class="geo-location-window__link" title="Сатка" data-id="1156">Сатка</span>
+                </div>
+                <div class="geo-location-window__city"><span class="geo-location-window__link" title="Сим" data-id="1149">Сим</span></div>
+                <div class="geo-location-window__city">
+                  <span class="geo-location-window__link" title="Снежинск" data-id="1141">Снежинск</span>
+                </div>
+                <div class="geo-location-window__city">
+                  <span class="geo-location-window__link" title="Трехгорный" data-id="1142">Трехгорный</span>
+                </div>
+                <div class="geo-location-window__city">
+                  <span class="geo-location-window__link" title="Трехгорный-1" data-id="1145">Трехгорный-1</span>
+                </div>
+                <div class="geo-location-window__city">
+                  <span class="geo-location-window__link" title="Троицк" data-id="1147">Троицк</span>
+                </div>
+                <div class="geo-location-window__city">
+                  <span class="geo-location-window__link" title="Усть-Катав" data-id="1143">Усть-Катав</span>
+                </div>
+                <div class="geo-location-window__city">
+                  <span class="geo-location-window__link" title="Чебаркуль" data-id="1146">Чебаркуль</span>
+                </div>
+                <div class="geo-location-window__city">
+                  <span class="geo-location-window__link geo-location-window__link_active" title="Челябинск" data-id="1132">Челябинск</span>
+                </div>
+                <div class="geo-location-window__city">
+                  <span class="geo-location-window__link" title="Южноуральск" data-id="1144">Южноуральск</span>
+                </div>
+                <div class="geo-location-window__city">
+                  <span class="geo-location-window__link" title="Юрюзань" data-id="1153">Юрюзань</span>
+                </div>
+              </div>
+              <div class="geo-location-window__city-list geo-location-window__city-list-2" data-cityid="994" data-regionid="993">
+                <div class="geo-location-window__city">
+                  <span class="geo-location-window__link" title="Алапаевск" data-id="1015">Алапаевск</span>
+                </div>
+                <div class="geo-location-window__city">
+                  <span class="geo-location-window__link" title="Арамиль" data-id="1038">Арамиль</span>
+                </div>
+                <div class="geo-location-window__city">
+                  <span class="geo-location-window__link" title="Артемовский" data-id="1026">Артемовский</span>
+                </div>
+                <div class="geo-location-window__city">
+                  <span class="geo-location-window__link" title="Асбест" data-id="995">Асбест</span>
+                </div>
+                <div class="geo-location-window__city">
+                  <span class="geo-location-window__link" title="Березовский" data-id="996">Березовский</span>
+                </div>
+                <div class="geo-location-window__city">
+                  <span class="geo-location-window__link" title="Богданович" data-id="1027">Богданович</span>
+                </div>
+                <div class="geo-location-window__city">
+                  <span class="geo-location-window__link" title="Верхний Тагил" data-id="1021">Верхний Тагил</span>
+                </div>
+                <div class="geo-location-window__city">
+                  <span class="geo-location-window__link" title="Верхняя Пышма" data-id="997">Верхняя Пышма</span>
+                </div>
+                <div class="geo-location-window__city">
+                  <span class="geo-location-window__link" title="Верхняя Салда" data-id="1028">Верхняя Салда</span>
+                </div>
+                <div class="geo-location-window__city">
+                  <span class="geo-location-window__link" title="Верхняя Тура" data-id="1024">Верхняя Тура</span>
+                </div>
+                <div class="geo-location-window__city">
+                  <span class="geo-location-window__link" title="Верхотурье" data-id="1029">Верхотурье</span>
+                </div>
+                <div class="geo-location-window__city">
+                  <span class="geo-location-window__link" title="Волчанск" data-id="1023">Волчанск</span>
+                </div>
+                <div class="geo-location-window__city">
+                  <span class="geo-location-window__link" title="Дегтярск" data-id="1025">Дегтярск</span>
+                </div>
+                <div class="geo-location-window__city">
+                  <span class="geo-location-window__link geo-location-window__link_active" title="Екатеринбург" data-id="994"
+                    >Екатеринбург</span
+                  >
+                </div>
+                <div class="geo-location-window__city">
+                  <span class="geo-location-window__link" title="Заречный" data-id="998">Заречный</span>
+                </div>
+                <div class="geo-location-window__city">
+                  <span class="geo-location-window__link" title="Ивдель" data-id="999">Ивдель</span>
+                </div>
+                <div class="geo-location-window__city">
+                  <span class="geo-location-window__link" title="Ирбит" data-id="1017">Ирбит</span>
+                </div>
+                <div class="geo-location-window__city">
+                  <span class="geo-location-window__link" title="Каменск-Уральский" data-id="1013">Каменск-Уральский</span>
+                </div>
+                <div class="geo-location-window__city">
+                  <span class="geo-location-window__link" title="Камышлов" data-id="1018">Камышлов</span>
+                </div>
+                <div class="geo-location-window__city">
+                  <span class="geo-location-window__link" title="Карпинск" data-id="1000">Карпинск</span>
+                </div>
+                <div class="geo-location-window__city">
+                  <span class="geo-location-window__link" title="Качканар" data-id="1001">Качканар</span>
+                </div>
+                <div class="geo-location-window__city">
+                  <span class="geo-location-window__link" title="Кировград" data-id="1002">Кировград</span>
+                </div>
+                <div class="geo-location-window__city">
+                  <span class="geo-location-window__link" title="Краснотурьинск" data-id="1003">Краснотурьинск</span>
+                </div>
+                <div class="geo-location-window__city">
+                  <span class="geo-location-window__link" title="Красноуральск" data-id="1004">Красноуральск</span>
+                </div>
+                <div class="geo-location-window__city">
+                  <span class="geo-location-window__link" title="Красноуфимск" data-id="1019">Красноуфимск</span>
+                </div>
+                <div class="geo-location-window__city">
+                  <span class="geo-location-window__link" title="Кушва" data-id="1005">Кушва</span>
+                </div>
+                <div class="geo-location-window__city">
+                  <span class="geo-location-window__link" title="Лесной" data-id="1006">Лесной</span>
+                </div>
+                <div class="geo-location-window__city">
+                  <span class="geo-location-window__link" title="Михайловск" data-id="1033">Михайловск</span>
+                </div>
+                <div class="geo-location-window__city">
+                  <span class="geo-location-window__link" title="Невьянск" data-id="1030">Невьянск</span>
+                </div>
+                <div class="geo-location-window__city">
+                  <span class="geo-location-window__link" title="Нижние Серги" data-id="1032">Нижние Серги</span>
+                </div>
+                <div class="geo-location-window__city">
+                  <span class="geo-location-window__link" title="Нижние Серги-3" data-id="1031">Нижние Серги-3</span>
+                </div>
+                <div class="geo-location-window__city">
+                  <span class="geo-location-window__link" title="Нижний Тагил" data-id="1014">Нижний Тагил</span>
+                </div>
+                <div class="geo-location-window__city">
+                  <span class="geo-location-window__link" title="Нижняя Салда" data-id="1016">Нижняя Салда</span>
+                </div>
+                <div class="geo-location-window__city">
+                  <span class="geo-location-window__link" title="Нижняя Тура" data-id="1007">Нижняя Тура</span>
+                </div>
+                <div class="geo-location-window__city">
+                  <span class="geo-location-window__link" title="Новая Ляля" data-id="1034">Новая Ляля</span>
+                </div>
+                <div class="geo-location-window__city">
+                  <span class="geo-location-window__link" title="Новоуральск" data-id="1008">Новоуральск</span>
+                </div>
+                <div class="geo-location-window__city">
+                  <span class="geo-location-window__link" title="Первоуральск" data-id="1009">Первоуральск</span>
+                </div>
+                <div class="geo-location-window__city">
+                  <span class="geo-location-window__link" title="Полевской" data-id="1010">Полевской</span>
+                </div>
+                <div class="geo-location-window__city">
+                  <span class="geo-location-window__link" title="Ревда" data-id="1011">Ревда</span>
+                </div>
+                <div class="geo-location-window__city"><span class="geo-location-window__link" title="Реж" data-id="1035">Реж</span></div>
+                <div class="geo-location-window__city">
+                  <span class="geo-location-window__link" title="Североуральск" data-id="1012">Североуральск</span>
+                </div>
+                <div class="geo-location-window__city">
+                  <span class="geo-location-window__link" title="Серов" data-id="1020">Серов</span>
+                </div>
+                <div class="geo-location-window__city">
+                  <span class="geo-location-window__link" title="Среднеуральск" data-id="1022">Среднеуральск</span>
+                </div>
+                <div class="geo-location-window__city">
+                  <span class="geo-location-window__link" title="Сухой Лог" data-id="1036">Сухой Лог</span>
+                </div>
+                <div class="geo-location-window__city">
+                  <span class="geo-location-window__link" title="Сысерть" data-id="1037">Сысерть</span>
+                </div>
+                <div class="geo-location-window__city">
+                  <span class="geo-location-window__link" title="Тавда" data-id="1039">Тавда</span>
+                </div>
+                <div class="geo-location-window__city">
+                  <span class="geo-location-window__link" title="Талица" data-id="1040">Талица</span>
+                </div>
+                <div class="geo-location-window__city">
+                  <span class="geo-location-window__link" title="Туринск" data-id="1041">Туринск</span>
+                </div>
+              </div>
+              <div class="geo-location-window__city-list geo-location-window__city-list-3" data-cityid="594" data-regionid="593">
+                <div class="geo-location-window__city">
+                  <span class="geo-location-window__link" title="Далматово" data-id="596">Далматово</span>
+                </div>
+                <div class="geo-location-window__city">
+                  <span class="geo-location-window__link" title="Катайск" data-id="597">Катайск</span>
+                </div>
+                <div class="geo-location-window__city">
+                  <span class="geo-location-window__link geo-location-window__link_active" title="Курган" data-id="594">Курган</span>
+                </div>
+                <div class="geo-location-window__city">
+                  <span class="geo-location-window__link" title="Куртамыш" data-id="598">Куртамыш</span>
+                </div>
+                <div class="geo-location-window__city">
+                  <span class="geo-location-window__link" title="Макушино" data-id="599">Макушино</span>
+                </div>
+                <div class="geo-location-window__city">
+                  <span class="geo-location-window__link" title="Петухово" data-id="600">Петухово</span>
+                </div>
+                <div class="geo-location-window__city">
+                  <span class="geo-location-window__link" title="Шадринск" data-id="595">Шадринск</span>
+                </div>
+                <div class="geo-location-window__city">
+                  <span class="geo-location-window__link" title="Шумиха" data-id="601">Шумиха</span>
+                </div>
+                <div class="geo-location-window__city">
+                  <span class="geo-location-window__link" title="Щучье" data-id="602">Щучье</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="catalog-hidden-menu catalog-page-hide" id="catalog-menu">
+          <div class="catalog-page-panel">
+            <div></div>
+            <div class="catalog-page-logo">
+              <img src="../assets/img/logo.svg" alt="" />
+            </div>
+            <div class="catalog-page-close">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20" fill="none">
+                <path
+                  fill-rule="evenodd"
+                  clip-rule="evenodd"
+                  d="M2.89202 2.05729C2.60508 1.75857 2.13985 1.75857 1.8529 2.05729C1.56596 2.35602 1.56596 2.84035 1.8529 3.13907L8.2104 9.75755L2.03439 16.1834C1.74736 16.482 1.74736 16.9662 2.03439 17.2648C2.32142 17.5635 2.78679 17.5635 3.07382 17.2648L9.24953 10.8393L15.4214 17.2646C15.7084 17.5633 16.1736 17.5633 16.4605 17.2646C16.7475 16.9659 16.7475 16.4815 16.4605 16.1828L10.289 9.75788L16.6464 3.14326C16.9335 2.84462 16.9335 2.36043 16.6464 2.06179C16.3594 1.76315 15.894 1.76315 15.607 2.06179L9.24982 8.67609L2.89202 2.05729Z"
+                  fill="black"
+                />
+              </svg>
+            </div>
+          </div>
+          <div class="search-input catalog-page-seacrh-input">
+            <input type="text" placeholder="Поиск по товарам" />
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 14 14" fill="none">
+              <path
+                fill-rule="evenodd"
+                clip-rule="evenodd"
+                d="M13.741 12.5698L9.90857 8.73656C10.5943 7.79931 10.961 6.66679 10.9549 5.50558C10.9486 4.04929 10.368 2.65427 9.33907 1.62346C8.31017 0.592654 6.91608 0.009289 5.45954 5.30082e-05C4.74108 -0.00311958 4.02911 0.13615 3.36482 0.409807C2.70053 0.683464 2.09709 1.08608 1.5894 1.59437C1.08172 2.10266 0.679853 2.70654 0.407054 3.37108C0.134256 4.03563 -0.00406507 4.74765 9.09475e-05 5.46598C0.00617262 6.92304 0.587229 8.31881 1.61695 9.34988C2.64668 10.381 4.04184 10.964 5.49915 10.9722C6.66577 10.9774 7.80277 10.6052 8.74045 9.9112H8.74418L12.5729 13.7415C12.6488 13.8217 12.7401 13.886 12.8413 13.9303C12.9425 13.9747 13.0516 13.9984 13.162 13.9999C13.2725 14.0014 13.3822 13.9808 13.4846 13.9392C13.587 13.8976 13.68 13.8359 13.7581 13.7578C13.8362 13.6796 13.8979 13.5866 13.9394 13.4842C13.9809 13.3818 14.0015 13.2721 13.9999 13.1617C13.9983 13.0512 13.9746 12.9422 13.9301 12.841C13.8857 12.7399 13.8214 12.6487 13.741 12.5728V12.5698ZM5.49542 9.87458C4.3297 9.8679 3.21371 9.40159 2.3899 8.57695C1.56609 7.75231 1.10101 6.63597 1.09572 5.47046C1.09245 4.89578 1.20315 4.32615 1.4214 3.7945C1.63965 3.26285 1.96113 2.77973 2.36726 2.37305C2.77339 1.96637 3.25611 1.6442 3.78752 1.42517C4.31893 1.20614 4.88849 1.09459 5.46328 1.09697C6.62951 1.10307 7.74619 1.56923 8.57051 2.39409C9.39482 3.21895 9.86012 4.33582 9.86522 5.50184C9.86839 6.07646 9.75762 6.64601 9.53932 7.17757C9.32103 7.70913 8.99953 8.19217 8.59341 8.59877C8.18729 9.00537 7.70461 9.32747 7.17325 9.54645C6.64188 9.76544 6.07238 9.87696 5.49766 9.87458H5.49542Z"
+                fill="#EDEDED"
+              />
+            </svg>
+          </div>
+          <div class="catalog-page-link-group">
+            <h3 class="link-group-title">Каталог</h3>
+            <a href="#" class="link-group-item"
+              >Компания
+              <svg xmlns="http://www.w3.org/2000/svg" width="6" height="10" viewBox="0 0 6 10" fill="none">
+                <path d="M1 1L5 5L1 9" stroke="#5A5A5A" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+              </svg>
+            </a>
+            <a href="#" class="link-group-item"
+              >Новости и акции
+              <svg xmlns="http://www.w3.org/2000/svg" width="6" height="10" viewBox="0 0 6 10" fill="none">
+                <path d="M1 1L5 5L1 9" stroke="#5A5A5A" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+              </svg>
+            </a>
+            <a href="#" class="link-group-item"
+              >Статьи
+              <svg xmlns="http://www.w3.org/2000/svg" width="6" height="10" viewBox="0 0 6 10" fill="none">
+                <path d="M1 1L5 5L1 9" stroke="#5A5A5A" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+              </svg>
+            </a>
+            <a href="#" class="link-group-item"
+              >Доставка
+              <svg xmlns="http://www.w3.org/2000/svg" width="6" height="10" viewBox="0 0 6 10" fill="none">
+                <path d="M1 1L5 5L1 9" stroke="#5A5A5A" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+              </svg>
+            </a>
+            <a href="#" class="link-group-item"
+              >Оплата
+              <svg xmlns="http://www.w3.org/2000/svg" width="6" height="10" viewBox="0 0 6 10" fill="none">
+                <path d="M1 1L5 5L1 9" stroke="#5A5A5A" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+              </svg>
+            </a>
+          </div>
+          <div class="catalog-page-link-group">
+            <h3 class="link-group-title">Компания</h3>
+            <a href="#" class="link-group-item">Сервис</a>
+            <a href="#" class="link-group-item">Доставка и оплата</a>
+            <a href="#" class="link-group-item">Гарантия</a>
+            <a href="#" class="link-group-item">Отзывы</a>
+            <a href="#" class="link-group-item">Магазины </a>
+          </div>
+          <div class="catalog-page-footer">
+            <p class="catalog-page-num">8 (351) 7000-319</p>
+            <button class="catalog-page-btn">Заказать звонок</button>
+            <div class="social-links-blk">
+              <a href="#" class="social-links-item">
+                <img src="../assets/img/tg.svg" alt="" />
+              </a>
+              <a href="#" class="social-links-item">
+                <img src="../assets/img/wa.svg" alt="" />
+              </a>
+              <a href="#" class="social-links-item">
+                <img src="../assets/img/vib.svg" alt="" />
+              </a>
+              <a href="#" class="social-links-item">
+                <img src="../assets/img/vk.svg" alt="" />
+              </a>
+              <a href="#" class="social-links-item">
+                <img src="../assets/img/youtube.svg" alt="" />
+              </a>
+            </div>
+          </div>
+        </div>
+        <header class="container">
+          <div class="header-container">
+            <div class="header-location-block">
+              <p class="header-location-block-main">
+                <span class="choice-city-h">Ваш город:</span>
+                <a href="#">
+                  <svg class="show-on-sm" xmlns="http://www.w3.org/2000/svg" width="11" height="12" viewBox="0 0 11 12" fill="none">
+                    <path
+                      d="M1.61098 1.53151C2.64242 0.550899 4.04136 0 5.50004 0C6.95872 0 8.35766 0.550899 9.3891 1.53151C10.4205 2.51211 11 3.8421 11 5.22889C11 6.61568 10.4205 7.94566 9.3891 8.92627L8.63933 9.63128C8.08664 10.1465 7.36972 10.8095 6.48794 11.6202C6.22292 11.8638 5.86869 12 5.50004 12C5.13139 12 4.77716 11.8638 4.51214 11.6202L2.30706 9.58084C2.02977 9.32201 1.79795 9.10402 1.61098 8.92627C1.10024 8.44074 0.695096 7.86431 0.418682 7.22991C0.142269 6.59551 0 5.91556 0 5.22889C0 4.54222 0.142269 3.86226 0.418682 3.22787C0.695096 2.59347 1.10024 2.01704 1.61098 1.53151ZM8.71892 2.16805C7.86505 1.35643 6.70703 0.900527 5.49959 0.900639C4.29216 0.900752 3.13423 1.35687 2.28053 2.16865C1.42683 2.98044 0.947293 4.08139 0.947411 5.22931C0.947529 6.37724 1.42729 7.4781 2.28116 8.28972L3.21979 9.17128C3.86816 9.77356 4.51834 10.3741 5.17032 10.9728C5.25867 11.0541 5.37679 11.0995 5.49972 11.0995C5.62266 11.0995 5.74078 11.0541 5.82913 10.9728L7.97294 8.99113C8.26982 8.71429 8.51805 8.48069 8.71829 8.28972C9.57196 7.47809 10.0515 6.37729 10.0515 5.22949C10.0515 4.08169 9.57196 2.98089 8.71829 2.16926L8.71892 2.16805ZM5.50004 3.59188C5.74905 3.59188 5.99563 3.63851 6.22569 3.72911C6.45575 3.8197 6.66478 3.95249 6.84086 4.11989C7.01694 4.28729 7.15661 4.48603 7.25191 4.70475C7.3472 4.92347 7.39625 5.15789 7.39625 5.39463C7.39625 5.63137 7.3472 5.8658 7.25191 6.08452C7.15661 6.30324 7.01694 6.50197 6.84086 6.66937C6.66478 6.83677 6.45575 6.96956 6.22569 7.06016C5.99563 7.15075 5.74905 7.19738 5.50004 7.19738C5.00321 7.18876 4.52979 6.99507 4.18165 6.65798C3.8335 6.3209 3.63844 5.86735 3.63844 5.39493C3.63844 4.92251 3.8335 4.46897 4.18165 4.13188C4.52979 3.79479 5.00321 3.6005 5.50004 3.59188ZM5.50004 4.49266C5.37545 4.49266 5.25208 4.51599 5.13697 4.56131C5.02187 4.60664 4.91728 4.67308 4.82918 4.75684C4.74108 4.84059 4.6712 4.94003 4.62352 5.04946C4.57584 5.15889 4.5513 5.27618 4.5513 5.39463C4.5513 5.51308 4.57584 5.63037 4.62352 5.7398C4.6712 5.84924 4.74108 5.94867 4.82918 6.03243C4.91728 6.11618 5.02187 6.18262 5.13697 6.22795C5.25208 6.27328 5.37545 6.29661 5.50004 6.29661C5.75158 6.29661 5.99281 6.20161 6.17067 6.03251C6.34854 5.86342 6.44846 5.63407 6.44846 5.39493C6.44846 5.15579 6.34854 4.92645 6.17067 4.75735C5.99281 4.58825 5.75158 4.49266 5.50004 4.49266Z"
+                      fill="#DD062A"
+                    />
+                  </svg>
+                  <span class="city-in-header">Челябинск</span>
+                  <svg xmlns="http://www.w3.org/2000/svg" width="9" height="6" viewBox="0 0 9 6" fill="none">
+                    <path d="M8 1L4.5 5L1 0.999999" stroke="#DD062A" stroke-linecap="round" />
+                  </svg>
+                </a>
+              </p>
+              <p class="header-number">+7 (351) 70-00-319</p>
+            </div>
+            <div class="navigation-block">
+              <ul>
+                <li><a href="#">Отзывы о нас</a></li>
+                <li><a href="#">Новости и акции</a></li>
+                <li><a href="#">Статьи</a></li>
+                <li><a href="#">Доставка</a></li>
+                <li><a href="#">Оплата</a></li>
+                <li><a href="#">Возврат</a></li>
+                <li><a href="#">Контакты</a></li>
+              </ul>
+            </div>
+          </div>
+
+          <!-- Дополнительное меню -->
+          <div class="additional-menu">
+            <div class="gr1">
+              <div id="hide-show-catalog">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="17" viewBox="0 0 20 17" fill="none">
+                  <path
+                    d="M6.56818 3.36842H18.5M1 9.68421H18.5M1 16H18.5M1 5.73684L3.38636 3.36842L1 1"
+                    stroke="#303030"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  />
+                </svg>
+              </div>
+              <div class="logo">
+                <img src="../assets/img/logo.svg" alt="" />
+              </div>
+              <div class="catalog-button">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="12" viewBox="0 0 16 12" fill="none">
+                  <path
+                    d="M0.5 0.666667C0.5 0.489856 0.579018 0.320286 0.71967 0.195262C0.860322 0.0702379 1.05109 0 1.25 0H14.75C14.9489 0 15.1397 0.0702379 15.2803 0.195262C15.421 0.320286 15.5 0.489856 15.5 0.666667C15.5 0.843478 15.421 1.01305 15.2803 1.13807C15.1397 1.2631 14.9489 1.33333 14.75 1.33333H1.25C1.05109 1.33333 0.860322 1.2631 0.71967 1.13807C0.579018 1.01305 0.5 0.843478 0.5 0.666667ZM1.25 6.66667H14.75C14.9489 6.66667 15.1397 6.59643 15.2803 6.4714C15.421 6.34638 15.5 6.17681 15.5 6C15.5 5.82319 15.421 5.65362 15.2803 5.5286C15.1397 5.40357 14.9489 5.33333 14.75 5.33333H1.25C1.05109 5.33333 0.860322 5.40357 0.71967 5.5286C0.579018 5.65362 0.5 5.82319 0.5 6C0.5 6.17681 0.579018 6.34638 0.71967 6.4714C0.860322 6.59643 1.05109 6.66667 1.25 6.66667ZM1.25 12H14.75C14.9489 12 15.1397 11.9298 15.2803 11.8047C15.421 11.6797 15.5 11.5101 15.5 11.3333C15.5 11.1565 15.421 10.987 15.2803 10.8619C15.1397 10.7369 14.9489 10.6667 14.75 10.6667H1.25C1.05109 10.6667 0.860322 10.7369 0.71967 10.8619C0.579018 10.987 0.5 11.1565 0.5 11.3333C0.5 11.5101 0.579018 11.6797 0.71967 11.8047C0.860322 11.9298 1.05109 12 1.25 12Z"
+                    fill="#DD062A"
+                  />
+                </svg>
+                <a href="#" id="get-catalog">Каталог</a>
+              </div>
+            </div>
+            <div class="gr2">
+              <div class="search-input">
+                <input type="text" placeholder="Поиск по товарам" />
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 14 14" fill="none">
+                  <path
+                    fill-rule="evenodd"
+                    clip-rule="evenodd"
+                    d="M13.741 12.5698L9.90857 8.73656C10.5943 7.79931 10.961 6.66679 10.9549 5.50558C10.9486 4.04929 10.368 2.65427 9.33907 1.62346C8.31017 0.592654 6.91608 0.009289 5.45954 5.30082e-05C4.74108 -0.00311958 4.02911 0.13615 3.36482 0.409807C2.70053 0.683464 2.09709 1.08608 1.5894 1.59437C1.08172 2.10266 0.679853 2.70654 0.407054 3.37108C0.134256 4.03563 -0.00406507 4.74765 9.09475e-05 5.46598C0.00617262 6.92304 0.587229 8.31881 1.61695 9.34988C2.64668 10.381 4.04184 10.964 5.49915 10.9722C6.66577 10.9774 7.80277 10.6052 8.74045 9.9112H8.74418L12.5729 13.7415C12.6488 13.8217 12.7401 13.886 12.8413 13.9303C12.9425 13.9747 13.0516 13.9984 13.162 13.9999C13.2725 14.0014 13.3822 13.9808 13.4846 13.9392C13.587 13.8976 13.68 13.8359 13.7581 13.7578C13.8362 13.6796 13.8979 13.5866 13.9394 13.4842C13.9809 13.3818 14.0015 13.2721 13.9999 13.1617C13.9983 13.0512 13.9746 12.9422 13.9301 12.841C13.8857 12.7399 13.8214 12.6487 13.741 12.5728V12.5698ZM5.49542 9.87458C4.3297 9.8679 3.21371 9.40159 2.3899 8.57695C1.56609 7.75231 1.10101 6.63597 1.09572 5.47046C1.09245 4.89578 1.20315 4.32615 1.4214 3.7945C1.63965 3.26285 1.96113 2.77973 2.36726 2.37305C2.77339 1.96637 3.25611 1.6442 3.78752 1.42517C4.31893 1.20614 4.88849 1.09459 5.46328 1.09697C6.62951 1.10307 7.74619 1.56923 8.57051 2.39409C9.39482 3.21895 9.86012 4.33582 9.86522 5.50184C9.86839 6.07646 9.75762 6.64601 9.53932 7.17757C9.32103 7.70913 8.99953 8.19217 8.59341 8.59877C8.18729 9.00537 7.70461 9.32747 7.17325 9.54645C6.64188 9.76544 6.07238 9.87696 5.49766 9.87458H5.49542Z"
+                    fill="#EDEDED"
+                  />
+                </svg>
+              </div>
+              <div class="user-panel">
+                <div class="status-order header-icon-and-btn" id="order-status">
+                  <img src="../assets/img/note.svg" alt="" />
+                  <p class="header-icon-and-btn-text hide-on-mobile">Статус заказа</p>
+                  <p class="header-icon-and-btn-text show-on-mobile">Мой заказ</p>
+                </div>
+                <div class="login header-icon-and-btn" id="header-login">
+                  <img src="../assets/img/login.svg" alt="" />
+                  <p class="header-icon-and-btn-text">Войти</p>
+                </div>
+                <div class="cart header-icon-and-btn" id="busket">
+                  <img src="../assets/img/busket.svg" alt="" />
+                  <p class="header-icon-and-btn-text">Корзина</p>
+                  <span id="count-in-busket">2</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="search-query-blk">
+            <p class="search-query">Главная / Каталог шин / Viatti / Viatti V-130 Strada Asimmetrico 185/60 R15 84H</p>
+          </div>
+        </header>
+        <div class="container product-container">
+          <div class="gallery">
+            <div class="gallery-panel">
+              <svg xmlns="http://www.w3.org/2000/svg" width="44" height="44" viewBox="0 0 44 44" fill="none">
+                <path
+                  d="M22 34C24.3734 34 26.6935 33.2962 28.6668 31.9776C30.6402 30.6591 32.1783 28.7849 33.0866 26.5922C33.9948 24.3995 34.2324 21.9867 33.7694 19.6589C33.3064 17.3311 32.1635 15.1929 30.4853 13.5147C28.8071 11.8365 26.6689 10.6936 24.3411 10.2306C22.0133 9.76755 19.6005 10.0052 17.4078 10.9134C15.2151 11.8217 13.3409 13.3598 12.0224 15.3332C10.7038 17.3065 10 19.6266 10 22C10.0032 25.1816 11.2685 28.232 13.5182 30.4818C15.768 32.7315 18.8184 33.9968 22 34ZM22 14C23.5823 14 25.129 14.4692 26.4446 15.3482C27.7602 16.2273 28.7855 17.4767 29.391 18.9385C29.9965 20.4003 30.155 22.0089 29.8463 23.5607C29.5376 25.1126 28.7757 26.538 27.6569 27.6569C26.538 28.7757 25.1126 29.5376 23.5607 29.8463C22.0089 30.155 20.4003 29.9965 18.9385 29.391C17.4767 28.7855 16.2273 27.7602 15.3482 26.4446C14.4692 25.129 14 23.5823 14 22C14 19.8783 14.8429 17.8434 16.3431 16.3431C17.8434 14.8429 19.8783 14 22 14ZM20 4V2C20 1.46957 20.2107 0.960859 20.5858 0.585786C20.9609 0.210714 21.4696 0 22 0C22.5304 0 23.0391 0.210714 23.4142 0.585786C23.7893 0.960859 24 1.46957 24 2V4C24 4.53043 23.7893 5.03914 23.4142 5.41421C23.0391 5.78929 22.5304 6 22 6C21.4696 6 20.9609 5.78929 20.5858 5.41421C20.2107 5.03914 20 4.53043 20 4ZM22 38C22.5304 38 23.0391 38.2107 23.4142 38.5858C23.7893 38.9609 24 39.4696 24 40V42C24 42.5304 23.7893 43.0391 23.4142 43.4142C23.0391 43.7893 22.5304 44 22 44C21.4696 44 20.9609 43.7893 20.5858 43.4142C20.2107 43.0391 20 42.5304 20 42V40C20 39.4696 20.2107 38.9609 20.5858 38.5858C20.9609 38.2107 21.4696 38 22 38ZM33.314 10.686C32.9391 10.3109 32.7284 9.80233 32.7284 9.272C32.7284 8.74167 32.9391 8.23306 33.314 7.858L34.728 6.444C35.1052 6.07968 35.6104 5.8781 36.1348 5.88265C36.6592 5.88721 37.1608 6.09755 37.5316 6.46836C37.9025 6.83918 38.1128 7.3408 38.1173 7.8652C38.1219 8.38959 37.9203 8.8948 37.556 9.272L36.142 10.686C35.7669 11.0609 35.2583 11.2716 34.728 11.2716C34.1977 11.2716 33.6891 11.0609 33.314 10.686ZM10.686 33.314C11.0609 33.6891 11.2716 34.1977 11.2716 34.728C11.2716 35.2583 11.0609 35.7669 10.686 36.142L9.272 37.556C8.8948 37.9203 8.38959 38.1219 7.8652 38.1173C7.3408 38.1128 6.83918 37.9025 6.46836 37.5316C6.09755 37.1608 5.88721 36.6592 5.88265 36.1348C5.8781 35.6104 6.07968 35.1052 6.444 34.728L7.858 33.314C8.23306 32.9391 8.74167 32.7284 9.272 32.7284C9.80233 32.7284 10.3109 32.9391 10.686 33.314ZM44 22C44 22.5304 43.7893 23.0391 43.4142 23.4142C43.0391 23.7893 42.5304 24 42 24H40C39.4696 24 38.9609 23.7893 38.5858 23.4142C38.2107 23.0391 38 22.5304 38 22C38 21.4696 38.2107 20.9609 38.5858 20.5858C38.9609 20.2107 39.4696 20 40 20H42C42.5304 20 43.0391 20.2107 43.4142 20.5858C43.7893 20.9609 44 21.4696 44 22ZM0 22C0 21.4696 0.210714 20.9609 0.585786 20.5858C0.960859 20.2107 1.46957 20 2 20H4C4.53043 20 5.03914 20.2107 5.41421 20.5858C5.78929 20.9609 6 21.4696 6 22C6 22.5304 5.78929 23.0391 5.41421 23.4142C5.03914 23.7893 4.53043 24 4 24H2C1.46957 24 0.960859 23.7893 0.585786 23.4142C0.210714 23.0391 0 22.5304 0 22ZM36.142 33.314L37.556 34.728C37.747 34.9125 37.8994 35.1332 38.0042 35.3772C38.109 35.6212 38.1642 35.8836 38.1665 36.1492C38.1688 36.4148 38.1182 36.6781 38.0176 36.9239C37.9171 37.1697 37.7686 37.393 37.5808 37.5808C37.393 37.7686 37.1697 37.9171 36.9239 38.0176C36.6781 38.1182 36.4148 38.1688 36.1492 38.1665C35.8836 38.1642 35.6212 38.109 35.3772 38.0042C35.1332 37.8994 34.9125 37.747 34.728 37.556L33.314 36.142C32.9497 35.7648 32.7481 35.2596 32.7527 34.7352C32.7572 34.2108 32.9675 33.7092 33.3384 33.3384C33.7092 32.9675 34.2108 32.7572 34.7352 32.7527C35.2596 32.7481 35.7648 32.9497 36.142 33.314ZM6.444 9.272C6.07968 8.8948 5.8781 8.38959 5.88265 7.8652C5.88721 7.3408 6.09755 6.83918 6.46836 6.46836C6.83918 6.09755 7.3408 5.88721 7.8652 5.88265C8.38959 5.8781 8.8948 6.07968 9.272 6.444L10.686 7.858C10.877 8.04249 11.0294 8.26318 11.1342 8.50719C11.239 8.7512 11.2942 9.01364 11.2965 9.2792C11.2988 9.54476 11.2482 9.80812 11.1476 10.0539C11.0471 10.2997 10.8986 10.523 10.7108 10.7108C10.523 10.8986 10.2997 11.0471 10.0539 11.1476C9.80812 11.2482 9.54476 11.2988 9.2792 11.2965C9.01364 11.2942 8.7512 11.239 8.50719 11.1342C8.26318 11.0294 8.04249 10.877 7.858 10.686L6.444 9.272Z"
+                  fill="#FFC10A"
+                />
+              </svg>
+              <svg xmlns="http://www.w3.org/2000/svg" width="44" height="44" viewBox="0 0 44 44" fill="none">
+                <path
+                  d="M44 22C44 22.5304 43.7893 23.0391 43.4142 23.4142C43.0391 23.7893 42.5304 24 42 24H34.828L39.414 28.586C39.7783 28.9632 39.9799 29.4684 39.9753 29.9928C39.9708 30.5172 39.7605 31.0188 39.3896 31.3896C39.0188 31.7605 38.5172 31.9708 37.9928 31.9753C37.4684 31.9799 36.9632 31.7783 36.586 31.414L29.172 24H24V29.172L31.414 36.586C31.7783 36.9632 31.9799 37.4684 31.9753 37.9928C31.9708 38.5172 31.7605 39.0188 31.3896 39.3896C31.0188 39.7605 30.5172 39.9708 29.9928 39.9753C29.4684 39.9799 28.9632 39.7783 28.586 39.414L24 34.828V42C24 42.5304 23.7893 43.0391 23.4142 43.4142C23.0391 43.7893 22.5304 44 22 44C21.4696 44 20.9609 43.7893 20.5858 43.4142C20.2107 43.0391 20 42.5304 20 42V34.828L15.414 39.414C15.2295 39.605 15.0088 39.7574 14.7648 39.8622C14.5208 39.967 14.2584 40.0222 13.9928 40.0245C13.7272 40.0268 13.4639 39.9762 13.2181 39.8756C12.9723 39.7751 12.749 39.6266 12.5612 39.4388C12.3734 39.251 12.2249 39.0277 12.1244 38.7819C12.0238 38.5361 11.9732 38.2728 11.9755 38.0072C11.9778 37.7416 12.033 37.4792 12.1378 37.2352C12.2426 36.9912 12.395 36.7705 12.586 36.586L20 29.172V24H14.828L7.414 31.414C7.0368 31.7783 6.53159 31.9799 6.0072 31.9753C5.4828 31.9708 4.98118 31.7605 4.61036 31.3896C4.23955 31.0188 4.02921 30.5172 4.02465 29.9928C4.0201 29.4684 4.22168 28.9632 4.586 28.586L9.172 24H2C1.46957 24 0.960859 23.7893 0.585786 23.4142C0.210714 23.0391 0 22.5304 0 22C0 21.4696 0.210714 20.9609 0.585786 20.5858C0.960859 20.2107 1.46957 20 2 20H9.172L4.586 15.414C4.39498 15.2295 4.24262 15.0088 4.1378 14.7648C4.03298 14.5208 3.97781 14.2584 3.9755 13.9928C3.97319 13.7272 4.0238 13.4639 4.12436 13.2181C4.22492 12.9723 4.37342 12.749 4.56121 12.5612C4.749 12.3734 4.9723 12.2249 5.21809 12.1244C5.46388 12.0238 5.72724 11.9732 5.9928 11.9755C6.25836 11.9778 6.5208 12.033 6.76481 12.1378C7.00882 12.2426 7.22951 12.395 7.414 12.586L14.828 20H20V14.828L12.586 7.414C12.395 7.22951 12.2426 7.00882 12.1378 6.76481C12.033 6.5208 11.9778 6.25836 11.9755 5.9928C11.9732 5.72724 12.0238 5.46388 12.1244 5.21809C12.2249 4.9723 12.3734 4.749 12.5612 4.56121C12.749 4.37342 12.9723 4.22492 13.2181 4.12436C13.4639 4.0238 13.7272 3.97319 13.9928 3.9755C14.2584 3.97781 14.5208 4.03298 14.7648 4.1378C15.0088 4.24262 15.2295 4.39498 15.414 4.586L20 9.172V2C20 1.46957 20.2107 0.960859 20.5858 0.585786C20.9609 0.210714 21.4696 0 22 0C22.5304 0 23.0391 0.210714 23.4142 0.585786C23.7893 0.960859 24 1.46957 24 2V9.172L28.586 4.586C28.7705 4.39498 28.9912 4.24262 29.2352 4.1378C29.4792 4.03298 29.7416 3.97781 30.0072 3.9755C30.2728 3.97319 30.5361 4.0238 30.7819 4.12436C31.0277 4.22492 31.251 4.37342 31.4388 4.56121C31.6266 4.749 31.7751 4.9723 31.8756 5.21809C31.9762 5.46388 32.0268 5.72724 32.0245 5.9928C32.0222 6.25836 31.967 6.5208 31.8622 6.76481C31.7574 7.00882 31.605 7.22951 31.414 7.414L24 14.828V20H29.172L36.586 12.586C36.7705 12.395 36.9912 12.2426 37.2352 12.1378C37.4792 12.033 37.7416 11.9778 38.0072 11.9755C38.2728 11.9732 38.5361 12.0238 38.7819 12.1244C39.0277 12.2249 39.251 12.3734 39.4388 12.5612C39.6266 12.749 39.7751 12.9723 39.8756 13.2181C39.9762 13.4639 40.0268 13.7272 40.0245 13.9928C40.0222 14.2584 39.967 14.5208 39.8622 14.7648C39.7574 15.0088 39.605 15.2295 39.414 15.414L34.828 20H42C42.5304 20 43.0391 20.2107 43.4142 20.5858C43.7893 20.9609 44 21.4696 44 22Z"
+                  fill="#3059A8"
+                />
+              </svg>
+            </div>
+            <div class="main-image">
+              <img src="../assets/img/large.png" alt="Viatti V-130 Strada Asimmetrico" />
+            </div>
+            <div class="thumbnails">
+              <img src="../assets/img/large.png" alt="Фото 1" class="thumbnails_active" />
+              <img src="../assets/img/disk-1.png" alt="Фото 2" />
+              <img src="../assets/img/wheel-product.png" alt="Фото 3" />
+              <img src="../assets/img/disk-2.png" alt="Фото 4" />
+            </div>
+          </div>
+          <div class="details">
+            <h1 class="details-name">Viatti V-130 Strada Asimmetrico 185/60 R15 84H</h1>
+            <div class="rating">
+              <div class="star-rating">
+                <img src="../assets/img/star.svg" alt="Star" class="star" /> <span class="rating-value">4.8</span>
+              </div>
+              <span class="review"><span class="review-count">25</span> отзывов</span>
+            </div>
+
+            <div class="product-info">
+              <div class="product-parameters">
+                <h2>Параметры</h2>
+                <ul class="parameters-list">
+                  <li class="parameter-item">
+                    <span class="parameter-name">Производитель:</span>
+                    <span class="parameter-value">Roadcruza</span>
+                  </li>
+                  <li class="parameter-item">
+                    <span class="parameter-name">Модель автошины:</span>
+                    <span class="parameter-value">RA3200</span>
+                  </li>
+                  <li class="parameter-item">
+                    <span class="parameter-name">Ширина профиля:</span>
+                    <span class="parameter-value">215</span>
+                  </li>
+                  <li class="parameter-item">
+                    <span class="parameter-name">Высота профиля:</span>
+                    <span class="parameter-value">75</span>
+                  </li>
+                  <li class="parameter-item">
+                    <span class="parameter-name">Посадочный диаметр:</span>
+                    <span class="parameter-value">R15</span>
+                  </li>
+                  <li class="parameter-item">
+                    <span class="parameter-name">Индекс нагрузки:</span>
+                    <span class="parameter-value"></span>
+                  </li>
+                  <li class="parameter-item">
+                    <span class="parameter-name">Индекс скорости:</span>
+                    <span class="parameter-value">Q (до 160 км/ч)</span>
+                  </li>
+                  <li class="parameter-item">
+                    <span class="parameter-name">Сезонность:</span>
+                    <span class="parameter-value">Летние</span>
+                  </li>
+                </ul>
+                <a href="#" class="show-more-parameters">
+                  Показать все параметры
+                  <svg xmlns="http://www.w3.org/2000/svg" width="9" height="6" viewBox="0 0 9 6" fill="none">
+                    <path d="M8 1L4.5 5L1 0.999999" stroke="#303030" stroke-linecap="round" />
+                  </svg>
+                </a>
+              </div>
+
+              <div class="price-payment-shipping">
+                <div class="price-info">
+                  <span class="current-price">29 999 ₽</span>
+                  <span class="old-price">32 200 ₽</span>
+                </div>
+
+                <div class="options">
+                  <select id="quantity-select" class="quantity-select">
+                    <option class="quantity-select-option" value="4">129 999 ₽ - 4 шт.</option>
+                    <option class="quantity-select-option" value="8">259 999 ₽ - 8 шт.</option>
+                  </select>
+                </div>
+
+                <div class="payment-info">
+                  <div class="payment-option">
+                    <span class="payment-title">Оплата при получении</span>
+                    <span class="payment-details">Наличие >12 шт.</span>
+                    <span class="payment-details">Самовывоз <span class="highlight-text">сегодня</span></span>
+                    <span class="payment-details">Доставка <span class="highlight-text">бесплатно</span></span>
+                  </div>
+
+                  <div class="payment-option">
+                    <span class="payment-title">Шиномонтаж в подарок</span>
+                    <span class="payment-details">Расширенная гарантия</span>
+                  </div>
+                </div>
+                <button class="add-to-cart-button primary-button">Добавить в корзину</button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="container menu-block">
+          <ul class="menu">
+            <li class="menu-item"><a href="#" class="menu-item_active" id="link-description">Описание</a></li>
+            <li class="menu-item"><a href="#" id="link-availability">НАЛИЧИЕ</a></li>
+            <li class="menu-item"><a href="#" id="link-delivery">Доставка</a></li>
+            <li class="menu-item hide-on-mobile"><a href="#" id="link-warranty">Гарантия</a></li>
+            <li class="menu-item hide-on-mobile"><a href="#" id="link-payment">Оплата</a></li>
+            <li class="menu-item hide-on-mobile">
+              <a href="#" id="link-reviews">Отзывы (<span id="review-count">25</span>)</a>
+            </li>
+          </ul>
+        </div>
+
+        <div class="container section" id="description">
+          <h2 class="section-title">Описание</h2>
+          <p class="section-content">
+            Altenzo Sports Navigator одна из новинок 2011 года от компании PDW Group. Несмотря на то, что данные шины создаются в Китае, их
+            качество на порядок лучше отечественных аналогов, а по цене конкуренцию с ними смогут выдержать не многие.
+          </p>
+          <p class="section-content">
+            В первую очередь, модель Sports Navigator приглянётся тем, кто хочет существенно сэкономить. Крайне редко можно встретить шины с
+            20 радиусом с ценой менее 7 тысяч рублей.
+          </p>
+          <p class="section-content">
+            В данной шине Sports Navigator используются австралийские инновационные технологии. Рисунок протектора шины очень похож на
+            дизайн популярных немецкий <a href="/catalog/tyre/continental/">Континенталей</a>. На шине расположены четыре продольные канавки
+            для отвода воды из-под пятны контакта, сокращая риск возникновения аквапланирования.
+          </p>
+          <p class="section-content">
+            Резиновые блоки на протекторе исполнены в разных размерах, что позволяет значительно улучшить акустический комфорт при движении
+            на данной шине.
+          </p>
+          <p class="section-content">
+            Стоит также отметить плавные скругления боковины, позволяющие австралийской шине эффективно входить в повороты.
+          </p>
+          <p class="section-content">
+            По своей концепции, <strong>Sports Navigator</strong> не сможет спорить с популярными немецкими и японскими аналогами, зато
+            легко составит конкуренцию корейским Marshal, Kumho и Hankook.
+          </p>
+          <p class="section-content">* Внимание: летние шины не российского происхождения могут быть промаркированы обозначением M+S</p>
+          <div class="show-hide-btn-description">
+            <span class="btn-text">Показать всё</span>
+            <svg class="checkmark-svg" xmlns="http://www.w3.org/2000/svg" width="9" height="6" viewBox="0 0 9 6" fill="none">
+              <path d="M8 1L4.5 5L1 0.999999" stroke="#303030" stroke-linecap="round" />
+            </svg>
+          </div>
+        </div>
+
+        <div class="container section" id="availability">
+          <h2 class="section-title">НАЛИЧИЕ</h2>
+          <p class="section-content">Информация о наличии продукта...</p>
+        </div>
+
+        <div class="container section" id="delivery">
+          <h2 class="section-title">Доставка</h2>
+
+          <p class="section-content">
+            Самовывоз заказа со склада г. Челябинск, Свердловский тракт 3н. Режим работы склада пн-пт: 9:00-19:00, сб-вс: 9:00-17:00.
+          </p>
+
+          <p class="section-content">
+            Доставка по Челябинску осуществляется по согласованию с заказчиком в удобное время. Доставка осуществляется во временные
+            промежутки с 16:00 до 22:00. Доставка осуществляется в пределах территориальных границ г. Челябинска по согласованию сторон.
+            Стоимость доставки: Челябинск-300р, Новосинеглазово, Чурилово, посёлок Западный - 400р, Копейск - 450р.
+          </p>
+
+          <p class="section-content">
+            После оплаты заказа курьер выдаст товарный чек. Если у Вас возникнут разногласия по качеству товара, Вы можете отказаться от
+            заказа.
+          </p>
+
+          <p class="section-content">
+            Ежедневная отправка. Расчетная стоимость указана за доставку 4-х шин в размере r13-r18. В стоимость не включена услуга
+            наложенного платежа, равная 1,5% от стоимости заказа.
+          </p>
+
+          <p class="section-content">
+            Тариф 300р за 4 шины – Екатеринбург, Уфа, Курган, Челябинская область (Златоуст, Копейск, Кыштым, Магнитогорск, Миасс, Озерск,
+            Снежинск, Трехгорный, Южноуральск, Чебаркуль, Троицк, Касли, Бакал, Сатка, Еманжелинск, Коркино, Пласт), Курганская область
+            (Шадринск, Макушино, Шумиха, Щучье).
+          </p>
+
+          <p class="section-content">
+            Тариф 400р за 4 шины– Тюмень, Уфа, Пермь . Челябинская область (Верхний Уфалей, Усть-Катав, Миньяр, Сим, Аша, Карталы, Юрюзань,
+            Катав-Ивановск, Куса). Свердловская область (Каменск-Уральский, Нижний Тагил, Среднеуральск, Сухой Лог, Верхняя Пышма, Арамиль)
+          </p>
+
+          <p class="section-content">
+            Тариф 600р за 4 шины– Тобольск , Стерлитамак, Березники, Кунгур, Костанай (Казахстан), Петропавловск (Казахстан), Челябинска
+            область (Карабаш, Верхнеуральск, Нязепетровск)
+          </p>
+
+          <p class="section-content">
+            Отгрузка осуществляется из г. Челябинск ежедневно транспортной компанией "Луч" , уточнить стоимость можно на официальном сайте
+            компании. В направлении основных городов возможны отгрузки в населенные пункты: Тимирязевский, Травники, Саргазы, Полетаево,
+            Полетаево2.,воен городок (ДОЗ), Мисяш, Большие Харлуши, Южноур ГРЭС, Увельский, пос.Красногорский, Кичигино, пос Синий бор,
+            Троицкая ГРЭС, Бобровка, Кварцитный, Золотая Сопка, Ниж.Санарка, п.Ясные Поляны., село Ключевка, Тюбук, Вишневогорск,
+            Нязепетровск, Кунашак, Новогорный, Аргаяш, Ишалино, пос.Увильды, Тайгинка, Татыш, Еткуль, Роза , Первомайский, Зауральский, село
+            Еманжелинка, Верх.Санарка, Демарино, Степное, Борисовка, Чулковка, Айлино, Межевой, Бердяуш, Сулея, Бакал, Иркускан, пос Пороги,
+            Кизильское, Агаповка, Каргаполье, Черёмуховой, Введенское, Кетово, Балки, Варгаши, Шумово, Шибаново, Русская Теча, Уксянское,
+            Бродокалмак.
+          </p>
+
+          <p class="section-content">
+            Информация на сайте не является публичной офертой. На сайте не указываются конкретные условия стоимости продукции, сроков
+            передачи товара, доставки, прочие условия. Предоставляется общее описание товара и его характеристики с призывом к клиенту
+            прийти в магазин и заключить реальную сделку. Цены на сайте указана при условии наличного расчета. При условии расчета
+            банковскими картами дополнительная комиссия 2% к стоимости товаров. Данное условие обязательно согласовывается при совершении
+            сделки.
+          </p>
+        </div>
+
+        <div class="container section" id="warranty">
+          <h2 class="section-title">Гарантия</h2>
+
+          <p class="section-content">
+            На все шины интернет-магазина «Автоальянс» распространяются гарантийные обязательства заводов-изготовителей при обязательном
+            выполнении условий эксплуатации автомобильных шин.
+          </p>
+
+          <p class="section-content">Гарантийный срок — 12 месяцев со дня продажи. Сохраняйте чек в течение одного года.</p>
+
+          <p class="section-content">Изготовитель гарантирует:</p>
+
+          <ul class="section-list">
+            <li>Соответствие шин требованиям стандарта при соблюдении правил транспортирования, хранения и эксплуатации;</li>
+            <li>
+              Отсутствие производственных дефектов и работоспособность шин до предельного износа рисунка протектора, соответствующего высоте
+              индикатора износа, в пределах гарантийного срока службы.
+            </li>
+          </ul>
+
+          <p class="section-content">
+            Гарантийный срок службы шины — 5 лет с даты изготовления. Возможность дальнейшей эксплуатации шины определяет потребитель в
+            соответствии с её техническим состоянием.
+          </p>
+
+          <p class="section-content">
+            Производственный брак, выявленный в процессе эксплуатации автошин, может быть принят как рекламационный случай при наличии
+            заключения независимой экспертизы. Органом, который осуществляет данную процедуру, является Научно-исследовательский институт
+            шинной промышленности (НИИШП) либо другая уполномоченная на то организация с правом проведения независимой экспертизы
+            автомобильных шин.
+          </p>
+        </div>
+
+        <div class="container section" id="reviews">
+          <h2 class="section-title">Отзывы</h2>
+        </div>
+        <footer>
+          <div class="footer-content container">
+            <div class="footer-group footer-group-center">
+              <p class="footer-grup-num">8-351-700-03-19</p>
+              <button class="footer-get-call" type="button">Заказать звонок</button>
+              <div class="footer-group-city">2023 г. Автоальянс</div>
+            </div>
+            <div class="footer-group fg-hide">
+              <a href="#" class="footer-group-link">Каталог</a>
+              <a href="#" class="footer-group-link">Компания</a>
+              <a href="#" class="footer-group-link">Новости и акции</a>
+              <a href="#" class="footer-group-link">Статьи</a>
+              <a href="#" class="footer-group-link">Доставка</a>
+              <a href="#" class="footer-group-link">Оплата</a>
+            </div>
+            <div class="footer-group fg-hide">
+              <a href="#" class="footer-group-link">Компания</a>
+              <a href="#" class="footer-group-link">Сервис</a>
+              <a href="#" class="footer-group-link">Доставка и оплата</a>
+              <a href="#" class="footer-group-link">Гарантия</a>
+              <a href="#" class="footer-group-link">Отзывы</a>
+              <a href="#" class="footer-group-link">Магазины</a>
+            </div>
+            <div class="footer-group"></div>
+            <div class="footer-group footer-group-center fg-hide-2">
+              <p class="we-are-in-social">Мы в соцсетях</p>
+              <div class="social-row">
+                <img src="../assets/img/tg.svg" alt="" class="social-row-item" />
+                <img src="../assets/img/wa.svg" alt="" class="social-row-item" />
+                <img src="../assets/img/vib.svg" alt="" class="social-row-item" />
+                <img src="../assets/img/vk.svg" alt="" class="social-row-item" />
+                <img src="../assets/img/fb.svg" alt="" class="social-row-item" />
+                <img src="../assets/img/inst.svg" alt="" class="social-row-item" />
+                <img src="../assets/img/youtube.svg" alt="" class="social-row-item" />
+              </div>
+            </div>
+          </div>
+        </footer>
+
+      </div>
+    </div>
+  </body>
+  
+  
+  
+
+  
+  
+
+  
+  
+</html>

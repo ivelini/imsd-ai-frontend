@@ -1,0 +1,7 @@
+# Зависимости и артефакты
+node_modules/
+.claude/verify/screenshots/
+.claude/settings.local.json
+
+# IDE
+.idea/
