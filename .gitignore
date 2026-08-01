@@ -39,11 +39,3 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
-
-# Template и инструменты проверки
-.template/node_modules/
-.claude/verify/screenshots/
-.claude/settings.local.json
-
-# IDE
-.idea/

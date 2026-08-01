@@ -1,6 +1,6 @@
 # План: разделение шаблона на модули для внедрения в frontend (Next.js)
 
-**Цель:** декомпозировать статичный HTML-мокап (14 страниц, `style.css` 4611 строк) на переиспользуемые React-компоненты и перенести их в `/home/perminoviv/my/imsd-ai/frontend` (Next.js 16, Tailwind v4, пока пустой каркас), сохранив вёрстку и стили 1-в-1.
+**Цель:** декомпозировать статичный HTML-мокап (16 страниц, `style.css` 4611 строк) на переиспользуемые React-компоненты и перенести их в Next.js 16 приложение (App Router, `src/`), сохранив вёрстку и стили 1-в-1.
 
 **Принятые решения (подтверждены пользователем 31.07.2026):**
 1. CSS: глобальный `style.css` переносится целиком (BEM-классы сохраняются, `:root`-токены переходят автоматически).
@@ -10,7 +10,8 @@
 5. Данные: строим на **моках** (TS-типы + мок-данные из разметки), API (Laravel) подключится позже.
 6. Ассеты: в `public/assets/`, пути в CSS `../img/...` → `/assets/img/...`.
 7. Верификация: **визуальная** (скриншоты/глазами на 5 разрешениях), не автосравнение.
-8. `frontend/` удалён — внедрение начинается с чистого Next.js (create-next-app заново).
+8. Next.js развёрнут в корне репозитория, `src/`-scaffold (create-next-app --src-dir).
+9. Структура — сразу целевая: `src/app/` (роутинг), `src/features/<domain>/` (компоненты/типы/хуки/API домена), `src/shared/ui/` (примитивы), `src/shared/layout/` (Header/Footer/попапы), `src/data/` (моки), `src/stores/` (Zustand). Без промежуточной `src/components/`.
 
 **Ресурсы шаблона (проверено 31.07.2026):** битых ссылок на img/fonts нет; из 51 файла `assets/img/` используются 29; fancybox в `assets/` отсутствует (заявлен в CLAUDE.md, но не нужен в React). Страниц compare / ЛК (account/*) / restore в шаблоне НЕТ — верстать по образцу существующих или отложить.
 
@@ -18,7 +19,7 @@
 
 ## 1. Карта модулей (декомпозиция шаблона)
 
-### A. Layout-модули (общие для ВСЕХ 14 страниц — дублируются байт-в-байт)
+### A. Layout-модули (общие для ВСЕХ страниц — дублируются байт-в-байт)
 
 | Модуль | Источник | Ключевые классы |
 |---|---|---|
@@ -82,7 +83,7 @@
 | `filter-applied.html` (выбранные option, цены 8 000–25 000, слайдер left/right, checked чекбоксы, 2 товара) | state фильтра + выборка товаров |
 | `.calatog-select-col-hide` (колонка авто) | условный рендер по activeTab |
 | `.product-pair` (2-я карточка пары) | prop `pair` у ProductCard |
-| Попапы `catalog-page-hide`/`catalog-page-open`, `.geo-wrapper` | boolean state в layout (Context/Zustand) |
+| Попапы `catalog-page-hide`/`catalog-page-open`, `.geo-wrapper` | boolean state в layout (Zustand) |
 | `:has(#cat-wheels:checked)` — переключатель Шины/Диски | state `category` |
 | `#count-in-busket` = 2, суммы, количества — захардкожены | стор корзины |
 | `filter-mobile.html` — полный дубль filter-params | CSS-адаптив, отдельная страница не нужна |
@@ -92,65 +93,70 @@
 
 ## 2. Стратегия стилей
 
-1. Скопировать `assets/css/style.css` в `frontend/src/app/style.css` (или `src/styles/`), импортировать в root layout после tailwind.
-2. Скопировать `assets/fonts/` (4 woff2) и `assets/img/` (~51 шт) в `frontend/public/`; пути в CSS (`../img/...`, `../fonts/...`) переписать на `/img/...`, `/fonts/...` (или переносить в `public/assets/` чтобы не трогать пути).
+1. Скопировать `.template/assets/css/style.css` в `src/app/style.css`, импортировать в root layout.
+2. Скопировать `assets/fonts/` (4 woff2) и `assets/img/` (~51 шт) в `public/assets/`; пути в CSS переписать: `../img/` → `/assets/img/`, `../fonts/` → `/assets/fonts/`.
 3. Дизайн-токены `:root` (строки 36–54) — оставить как есть; дублирование в Tailwind `@theme` не требуется.
-4. Tailwind: подключён, но используется только для служебных вещей; весь шаблонный UI на BEM-классах.
-5. Брейкпоинты мокапа (640/1024/1366, каталог 648) — уже в CSS; сверяться с конвенцией frontend CLAUDE.md (4 диапазона) при добавлении нового.
+4. Tailwind не используется — вся стилизация на BEM-классах из `style.css` (см. `ui-porting.md` п.6).
+5. Брейкпоинты мокапа (640/1024/1366, каталог 648) — уже в CSS; сверяться с конвенцией frontend (4 диапазона) при добавлении нового.
+
+---
 
 ## 3. Фазы внедрения
 
-**Фаза 0 — Подготовка** — ✅ ВЫПОЛНЕНО 31.07.2026
-- Next.js 16.2 развёрнут в корне каталога (TS + Tailwind + App Router + src/ + Turbopack); мокап перенесён в `.template/` (git mv), verify-скрипты указывают на `.template/`; .gitignore смержен; playwright в devDeps.
-- `assets/css/style.css` → `src/app/style.css` (импорт в layout после globals.css), img+fonts → `public/assets/`, пути в CSS: `../img` → `/assets/img`, `../fonts` → `/assets/fonts`.
-- Geist-шрифты удалены (Noto Sans/Nunito через `@font-face`), `lang="ru"`; заглушка главной с `.benefits` — `npm run build` зелёный.
+**Фаза 0 — Подготовка**
+- Установить зависимости: `zustand`.
+- Скопировать `.template/assets/css/style.css` → `src/app/style.css`, импортировать в layout.
+- Скопировать `assets/fonts/` и `assets/img/` → `public/assets/`, поправить пути в CSS.
+- Удалить Geist-шрифты из layout, `lang="ru"`.
+- Обновить `.gitignore`: добавить `.template/node_modules/`, `.claude/verify/screenshots/`, `.claude/settings.local.json`, `.idea/`.
+- Убедиться что `npm run build` проходит.
 
-**Фаза 1 — Каркас (layout на всех страницах)** — ✅ ВЫПОЛНЕНО 31.07.2026
-- Компоненты: `Header`, `Footer`, `CatalogMenu`, `GeoPopup`, `Benefits`, `Breadcrumbs`, `AddToCartPopup`.
-- Zustand: стор UI (город, попапы, меню открыто) + базовый стор корзины (items, count, totals; счётчик в шапке).
-- Данные: регионы/города из geo-попапа → TS-модуль (~85 городов, data-id), меню/навигация — константы.
+**Фаза 1 — Каркас (layout на всех страницах)**
+- Компоненты: `Header`, `Footer`, `CatalogMenu`, `GeoPopup`, `Benefits`, `Breadcrumbs`, `AddToCartPopup` — в `src/shared/layout/`.
+- UI-примитивы (список B): `Button`, `Price`, `Rating`, `Pagination`, `EuLabel`, `PBadge`, `QuantitySelect`, `Checkbox`, `Select`, `Input` — в `src/shared/ui/`.
+- Zustand: стор UI (город, попапы, меню открыто) + стор корзины (items, count, totals; счётчик в шапке) — в `src/stores/`.
+- Данные: регионы/города из geo-попапа → `src/data/geo.ts` (~85 городов, data-id), меню/навигация — `src/data/nav.ts`.
 - Порядок сборки: главная страница целиком на React → затем роуты-заглушки с каркасом.
 - **Схема роутов (утверждена 31.07.2026, slug вместо id):**
-  - Каталог шин: `/catalog/tires/[[season]/[brand]/[width]/[profile]/[r-diameter]]` — необязательные сегменты (winter|summer|all-season, slug бренда, числа, rN); остальное — query (`price_min`, `price_max`, `delivery[]`, `page`). Состояния мокапа: index=базовый, filter-params/car=state, filter-applied=типоразмерный сегмент, filter-mobile=CSS.
-  - Авто: `/catalog/tires/auto`, `/catalog/tires/auto/[brand]/[model]/[year]/[modification]`.
-  - Модель/товар: `/tires/[modelSlug]`, `/tires/[modelSlug]/[sizeSlug]` (185-60-r15-84h); диски — `/catalog/wheels/...`, `/wheels/...`.
+  - Каталог шин: `/catalog/tires/[[...params]]` — catch-all сегменты `season(winter|summer|all-season)/brand/width/profile/rN` + query (`price_min`, `price_max`, `delivery[]`, `page`). Парсер сегментов в `catalog/tires/[[...params]]/page.tsx` (распознавание по типу: сезон — по Set, бренд — первый не-сезон/не-число/не-rN, числа — ширина→профиль, `rN` — диаметр; порядок сегментов не важен). Сборка ссылок из фильтра — всегда фиксированный порядок `season/brand/width/profile/diameter`. Страница `force-static` (при API убрать).
+  - Авто: `/catalog/tires/auto/[[...auto]]` — каскад марка→модель→год→модификация → результат с парами шин.
+  - Модель/товар: `/tires/[modelSlug]`, `/tires/[modelSlug]/[sizeSlug]` (185-60-r15-84h); диски — `/catalog/wheels` (заглушка, шаблона нет).
   - Сервисные: `/cart`, `/checkout`, `/order/[id]`, `/order-status` (гостевая проверка), `/auth/login`, `/auth/register`, `/articles`, `/articles/[id]`.
-  - ЛК: `/account` → `/account/profile`, `/account/orders`, `/account/orders/[id]`, `/account/garage`, `/account/favorites`, `/account/addresses` (макеты из удалённой копии НЕ восстанавливать — там другая вёрстка; верстать по образцу шаблона).
+  - ЛК: `/account` → `/account/profile`, `/account/orders`, `/account/orders/[id]`, `/account/garage`, `/account/favorites`, `/account/addresses` (макетов нет — верстать по образцу шаблона).
 
-**Фаза 2 — Каталог** — ✅ ВЫПОЛНЕНО 31.07.2026
-- Решения: слайдер цены — интерактивный на pointer events без библиотек; подбор по авто — каскад марка→модель→год→модификация; «Купить» на карточке — add-to-cart + AddToCartPopup.
-- Сделано: `catalog.ts` (модель Viatti 4 типоразмера, опции фильтра, авто-словарь BMW, пары AUTO_RESULT, SEO); `ProductCard` (linkTitle/pair, EU, add-to-cart), `CatalogFilter` (вкладки, 6 селектов, слайдер цены, доставка, страна, каскад авто, URL-применение), `PriceSlider`, `AutoSelectForm`, `Pagination`, `SeoBlock`; страницы `/catalog/tires/[[...params]]` (парсинг сегментов season/brand/width/profile/r-diameter + query), `/catalog/tires/auto/[[...auto]]` (каскад → список моделей → результат с car-block и парами), `/tires/[modelSlug]` (описание + типоразмеры по диаметрам с якорями).
-- Не сделано: оживление селектов главной (MainFilter → переход в каталог) — отложено; `/catalog/wheels` остаётся заглушкой (шаблона дисков нет).
-- `ProductCard` (все варианты), `CatalogFilter` (open/activeTab/applied), `AutoSelect` (3 шага), `ModelPage`, `Pagination`, `SeoBlock`, `MainFilter` (главная).
-- Роуты: `/catalog/tires`, `/catalog/wheels`, страница модели `/tires/[id]`, подбор по авто.
-- Данные: карточки товара, типоразмеры, пары — типы TS + мок-данные из разметки.
+**Фаза 2 — Каталог**
+- Компоненты: `ProductCard`, `CatalogFilter`, `PriceSlider`, `AutoSelectForm`, `SeoBlock` — в `src/features/catalog/components/`; `MainFilter`, `SectionProduct`, `ProductList`, `DiscountBlock`, `ThreeBlocks`, `AboutCompany` — в `src/features/home/components/`; `Pagination` — в `src/shared/ui/`.
+- Типы: `TireProduct`, `TireModel`, `FilterState` — в `src/features/catalog/types/`.
+- Данные: `src/data/catalog.ts` — типоразмеры, опции фильтра, авто-словарь BMW, пары AUTO_RESULT, SEO.
+- Роуты: `/catalog/tires/[[...params]]` (парсинг сегментов + query), `/catalog/tires/auto/[[...auto]]` (каскад → список моделей → результат с car-block и парами), `/tires/[modelSlug]` (описание + типоразмеры по диаметрам с якорями).
+- `/catalog/wheels` — заглушка (шаблона дисков нет).
+- Слайдер цены — интерактивный на pointer events без библиотек.
+- Подбор по авто — каскад марка→модель→год→модификация.
+- «Купить» на карточке — add-to-cart + открытие `AddToCartPopup`.
 
-**Фаза 3 — Товар** — ⏳
-- `ProductPage`: галерея (зум/активный thumb — состояние), параметры, количество, вкладки (Описание/Наличие/Доставка/Гарантия/Отзывы — client state).
-- Стор корзины (add-to-cart, счётчик в шапке).
+**Фаза 3 — Товар**
+- `ProductPage` (галерея: зум/активный thumb — состояние, параметры, количество, вкладки Описание/Наличие/Доставка/Гарантия/Отзывы — client state) — в `src/features/catalog/components/`.
+- Роут: `/tires/[modelSlug]/[sizeSlug]`.
 
-**Фаза 4 — Оформление и сервисные** — ⏳
-- `CartPage`, `OrderPage` (шаги 1–3 с `.active` переключателями → контролируемые), `AuthForm` (login/register), `ArticlesList`/`ArticlePage`.
-- Попап корзины после добавления (состояние).
+**Фаза 4 — Оформление и сервисные**
+- `CartPage`, `CartItem` — в `src/features/cart/components/`; `OrderPage` (шаги 1–3 с `.active` переключателями → контролируемые) — в `src/features/checkout/components/`; `AuthForm` (login/register) — в `src/features/auth/components/`; `ArticlesList`/`ArticlePage`, `NewsCard` — в `src/features/articles/components/`.
+- Роуты: `/cart`, `/checkout`, `/order/[id]`, `/order-status`, `/auth/login`, `/auth/register`, `/articles`, `/articles/[id]`.
 
-**Фаза 5 — Верификация** — ⏳
-- Визуальная проверка на 5 разрешениях (390/768/1024/1366/1920): отсутствие переполнений, битых картинок, расхождений с мокапом. Playwright-скрипты шаблона (`verify.mjs`) остаются эталоном для мокапа.
+**Фаза 5 — Верификация**
+- Ручная визуальная проверка на 5 разрешениях (390/768/1024/1366/1920): отсутствие переполнений, битых картинок, расхождений с мокапом.
+- Скрипты `.claude/verify/` остаются эталоном только для мокапа (Playwright не ставится — модель без vision, скриншоты не анализируются).
+
+---
 
 ## 4. Ожидаемый результат
 
-- Набор из ~25 React-компонентов (layout 7, UI 10, карточки 4, секции 14+), 1-в-1 воспроизводящих мокап по вёрстке и стилям.
-- Все 12 доменов шаблона реализованы как роуты frontend.
-- Верификация Playwright: 60 комбинаций без переполнений и битых картинок.
+- Набор из ~25 React-компонентов (layout 7, UI 10, карточки 4, секции 14), 1-в-1 воспроизводящих мокап по вёрстке и стилям.
+- Все 7 доменов шаблона (главная, каталог, товар, корзина, заказ, статьи, вход) реализованы как роуты frontend.
+- Верификация на 5 разрешениях без переполнений и битых картинок.
+
+---
 
 ## 5. Открытые вопросы
 
 - Страницы вне шаблона (compare, ЛК account/*, restore): верстать по образцу существующих страниц или отложить до появления макетов.
-- Роутинг frontend: восстанавливать ли структуру роутов из удалённой документации (ARCHITECTURE.md) или строить по доменам шаблона (главная, каталог, товар, корзина, заказ, статьи, вход).
 - Слайдеры главной (scroll-snap) и статичный слайдер цены — остаются CSS, JS-библиотеки из мокапа (slick/fancybox) в React не нужны.
-
-## 6. Промт для запуска каждой фазы (шаблон)
-
-> Внедряю в `/home/perminoviv/my/imsd-ai/frontend` фазу N: [перечислить компоненты].
-> Источник вёрстки — `/home/perminoviv/my/imsd-ai/template/[страница].html`, стили — `assets/css/style.css` (секция «[название секции]», строки N–M), токены в `:root`.
-> Требования: переносить классы и DOM 1-в-1, семантизация только теги (button/form/input) без смены классов; адаптив 5 разрешений; не менять style.css.
-> После завершения — отчёт: список файлов, что сделано, что не переносилось и почему.

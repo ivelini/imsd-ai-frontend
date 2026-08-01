@@ -1,52 +1,45 @@
-# CLAUDE.md
+@AGENTS.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+# CLAUDE.md
 
 ## Что это
 
-Каталог объединяет два слоя проекта IMS-DI (интернет-магазин шин и дисков, aalyans.ru):
+Интернет-магазин шин и дисков (aalyans.ru), два слоя:
 
-1. **`src/` — Next.js 16 приложение** (App Router, TypeScript, Tailwind v4, Turbopack, `@/*`-алиас). Развёрнуто 31.07.2026 в этом же каталоге; UI переносится из мокапа.
-2. **`.template/` — статичный HTML-мокап дизайна** (эталон вёрстки, перенесён из корня). 14 страниц, единый `assets/css/style.css` (4611 строк), дизайн-токены `:root` (строки 36–54), BEM-подобные классы, без JavaScript (состояния — статичные HTML).
+1. **`src/` — Next.js 16 приложение** (App Router, TypeScript, Turbopack, `@/*`-алиас, Zustand 5). UI переносится из мокапа. Код: `src/app/` (роутинг), `src/features/` (домены), `src/shared/` (ядро), `src/data/` (моки), `src/stores/` (Zustand).
+2. **`.template/` — статичный HTML-мокап дизайна** (эталон вёрстки). 16 страниц, стили в `assets/css/style.css` (4611 строк), BEM-подобные классы, без JavaScript. Страницы не ссылаются друг на друга.
 
-Соседние проекты: `admin/` (React SPA), `backend/` (Laravel) — у каждой свой CLAUDE.md.
+Соседние проекты: `admin/` (React SPA), `backend/` (Laravel, владеет бизнес-логикой; API позже).
+
+## Правила
+
+- Перенос вёрстки: **`.claude/rules/ui-porting.md`**
+- Архитектура frontend: **`.claude/rules/frontend-architecture.md`**
+- План переноса: **`.claude/plans/module-split.md`** (~25 модулей, фазы 0–5)
 
 ## Команды
 
-- `npm run dev` / `npm run build` / `npm run lint` — Next.js.
-- Мокап: открыть любой `.html` в `.template/` или `python3 -m http.server 8765` (для Playwright).
-- Верификация мокапа: `node .claude/verify/verify.mjs` (скриншоты 5 разрешений × 16 страниц) и `node .claude/verify/check-all.mjs` (переполнения/битые картинки без скриншотов) — пути страниц указывают на `.template/`.
+- `npm run dev` / `npm run build` / `npm run lint` — Next.js
+- Мокап: открыть `.html` в `.template/` или `python3 -m http.server 8765`
+- Верификация мокапа: `node .claude/verify/verify.mjs` (скриншоты 5 разрешений × 16 страниц) и `node .claude/verify/check-all.mjs` (переполнения/битые картинки)
 
-## Перенос UI: правила и план
+## Схема роутов
 
-- План декомпозиции мокапа на React-модули: **`.claude/plans/module-split.md`** (~25 модулей, фазы 0–5). Там же карта CSS-секций с номерами строк.
-- Решения: глобальный `style.css` переносится как есть; разметка 1-в-1 с семантизацией только тегов; стор — Zustand; данные — моки (API позже); ассеты в `public/assets/`; верификация визуальная.
-- `src/app/style.css` — копия `style.css` мокапа с путями `../img` → `/assets/img` (ассеты в `public/assets/`). Изменения в `.template/` переносить в `src/app/style.css` при необходимости.
-- Шрифты: Noto Sans/Nunito (woff2) через `@font-face` в style.css; Geist-шрифты из scaffold'а удалены.
+- Каталог шин: `/catalog/tires/[[...params]]` — сегменты `season/brand/width/profile/rN` + query (`price_min`, `price_max`, `delivery[]`, `page`). `force-static` (убрать при подключении API).
+- Подбор по авто: `/catalog/tires/auto/[[...auto]]` — каскад марка→модель→год→модификация → результат с парами.
+- Модель/товар: `/tires/[modelSlug]`, `/tires/[modelSlug]/[sizeSlug]` (типоразмер: `185-60-r15-84h`).
+- Диски: `/catalog/wheels` (заглушка, шаблона нет).
+- Сервисные: `/cart`, `/checkout`, `/order/[id]`, `/order-status`, `/auth/login|register`, `/articles`, `/articles/[id]`.
+- ЛК: `/account/*` (profile, orders, garage, favorites, addresses — макетов нет).
+- `lang="ru"` в layout (в мокапе `lang="en"` — артефакт, не воспроизводить).
 
-## Разрешения вёрстки (мокап)
+## Данные и состояние
 
-Макет верстался под **5 контрольных разрешений**, сгруппированных по брейкпоинтам в `style.css`:
+- `src/data/` — моки: `geo.ts` (88 городов), `nav.ts` (меню/подвал), `products.ts` (главная), `catalog.ts` (типоразмеры, опции фильтра, авто-словарь BMW, пары, SEO).
+- `src/stores/` — Zustand: `useUIStore` (город/попапы/меню), `useCartStore` (items, count, totals).
 
-| Разрешение | Брейкпоинт (CSS) | Диапазон | Устройства |
-|---|---|---|---|
-| 390px | `max-width: 639px` (+ узкий каталог `≤648px`) | 0–639 | Смартфоны |
-| 768px | `640–1023px` | 640–1023 | Планшеты / телефоны-горизонталь |
-| 1024px | `1024–1365px` | 1024–1365 | Ноутбуки малые |
-| 1366px | `≥1366px` | 1366+ | Десктоп (базовый) |
-| 1920px | (тот же `≥1366`) | — | Широкие мониторы |
+## Формат slug
 
-Канонические точки: **640 / 1024 / 1366** (токены `--bp-*`), мобильный брейкпоинт каталога — 648.
-
-## Архитектура мокапа (`.template/`)
-
-- **16 страниц**: `index.html` (главная), `catalog/` (index, model, auto, auto-selected + 4 состояния фильтра), `product/`, `cart/`, `order/`, `popups/` (гео, каталог-меню, корзина), `article/` (список, статья), `user/` (вход, регистрация).
-- **Страницы не ссылаются друг на друга** — ссылки-плейсхолдеры `href="#"`; «навигация» — открыть файл.
-- **Интерактив → страницы-состояния**: попапы инлайнятся в страницы, классы-модификаторы (`catalog-page-hide/open`, `catalog-filter-show`, `.inactive`) в React заменяются state.
-- Изображения: SVG инлайн + `assets/img/` (51 шт., используется 29); fancybox в assets отсутствует; JS-библиотеки мокапа (slick/fancybox/noUiSlider/Fotorama) в React не нужны.
-
-## Заметки
-
-- `lang="en"` на страницах мокапа при русском контенте — артефакт, в React-страницах не воспроизводить (`lang="ru"` в layout).
-- Старые планы `.claude/plans/` (`auth-pages.md`, `refactor-mockup-clean-html.md`) удалены; актуальный — `module-split.md`.
-- Находки при чтении мокапа, полезные для переноса (дубли страниц, крошки без CSS, состояния): см. память `template-quirks`.
+- Бренды — транслит строчными через дефис: `bmw`, `michelin`, `nokian-tyres`
+- Модели — как в данных: `viatti-strada-2`
+- Типоразмеры — `185-60-r15-84h`
