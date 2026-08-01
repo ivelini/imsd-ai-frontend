@@ -39,3 +39,9 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# project
+.template/node_modules/
+.claude/verify/screenshots/
+.claude/settings.local.json
+.idea/
