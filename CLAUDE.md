@@ -20,7 +20,7 @@
 ## Команды
 
 - `npm run dev` / `npm run build` / `npm run lint` — Next.js
-- **Dev-сервер — только через Docker** (`make up`, порт 30034; контейнер создаёт `.next` от root, локальный `npm run dev`/`build` конфликтует с ним — повреждает кэш turbopack). Локальный `npm run build` допустим, если контейнер остановлен.
+- **Dev-сервер — через Docker** (`make up`, порт 30034). Образ кастомный (`docker/frontend/Dockerfile`, `USER node` uid 1000 = хост-пользователь), поэтому `.next`/`node_modules` принадлежат uid 1000 и локальный `npm run build` работает. Не запускать build/`npm run dev` одновременно с dev-контейнером — общий `.next` (кэш turbopack повреждается).
 - Мокап: открыть `.html` в `.template/` или `python3 -m http.server 8765`
 - Верификация мокапа: `node .claude/verify/verify.mjs` (скриншоты 5 разрешений × 16 страниц) и `node .claude/verify/check-all.mjs` (переполнения/битые картинки)
 

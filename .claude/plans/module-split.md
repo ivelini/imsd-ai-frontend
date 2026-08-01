@@ -111,7 +111,7 @@
 - Обновить `.gitignore`: добавить `.template/node_modules/`, `.claude/verify/screenshots/`, `.claude/settings.local.json`, `.idea/`.
 - Убедиться что `npm run build` проходит.
 
-**Фаза 1 — Каркас (layout на всех страницах)**
+**Фаза 1 — Каркас (layout на всех страницах)** — ✅ ВЫПОЛНЕНО 01.08.2026
 - Компоненты: `Header`, `Footer`, `CatalogMenu`, `GeoPopup`, `Benefits`, `Breadcrumbs`, `AddToCartPopup` — в `src/shared/layout/`.
 - UI-примитивы (список B): `Button`, `Price`, `Rating`, `Pagination`, `EuLabel`, `PBadge`, `QuantitySelect`, `Checkbox`, `Select`, `Input` — в `src/shared/ui/`.
 - Zustand: стор UI (город, попапы, меню открыто) + стор корзины (items, count, totals; счётчик в шапке) — в `src/stores/`.
