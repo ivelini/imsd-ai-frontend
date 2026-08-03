@@ -1,4 +1,5 @@
-// Панель фильтров каталога: клиентский компонент (фаза 2)
+// Панель фильтров каталога: .catalog-panel + .catalog-filter (фаза 2)
+// Строго 1-в-1 с DOM-структурой шаблона
 "use client";
 
 import { useRouter } from "next/navigation";
@@ -19,31 +20,30 @@ export function CatalogFilter({ options, current }: CatalogFilterProps) {
   }
 
   return (
-    <div className="catalog-panel">
-      {/* Табы: По параметрам / По автомобилю */}
-      <div className="catalog-panel-filters">
-        <div className="filter-menu">
-          <div className="filter-item-catalog active" id="paramFilter">
-            По параметрам
-          </div>
-          <a href="/catalog/tires/auto" className="filter-item-catalog inactive" id="carFilter">
-            По автомобилю
-          </a>
-        </div>
-        <div className="catalog-panel-defaults">
-          <a href="/catalog/tires" className="remove-filters help">
-            Сбросить все фильтры
-          </a>
-        </div>
+    <>
+      {/* Верхняя панель: «Фильтры» / «По умолчанию» */}
+      <div className="catalog-panel">
+        <a className="catalog-panel-filters" href="#">
+          Фильтры
+        </a>
+        <a href="/catalog/tires" className="catalog-panel-defaults">По умолчанию</a>
       </div>
 
-      {/* Фильтры — раскрыты всегда в React (в мокапе скрыты по умолчанию) */}
-      <div className="catalog-filter catalog-filter-show" id="catalogFilterPanel">
+      {/* Содержимое фильтра */}
+      <div className="catalog-filter catalog-filter-show" id="filter-in-catalog">
+        {/* Табы */}
+        <div className="catalog-filter-category">
+          <div className="filter-item-catalog" id="paramFilter">По параметрам</div>
+          <a href="/catalog/tires/auto" className="filter-item-catalog inactive" id="carFilter">По автомобилю</a>
+        </div>
+
         <div className="catalog-filter-cont">
           {/* Город */}
-          <a href="#" className="city-change-catalog">Челябинск</a>
+          <a className="city-change city-change-catalog" href="#">
+            Челябинск
+          </a>
 
-          {/* Селекты */}
+          {/* Селекты — колонка 1 */}
           <div className="calatog-select-col">
             <select
               id="catalog-widthSelect"
@@ -94,6 +94,7 @@ export function CatalogFilter({ options, current }: CatalogFilterProps) {
             </select>
           </div>
 
+          {/* Селекты — колонка 2 */}
           <div className="calatog-select-col">
             <select
               id="catalog-manufacturerSelect"
@@ -163,12 +164,10 @@ export function CatalogFilter({ options, current }: CatalogFilterProps) {
             ))}
           </div>
 
-          <button className="get-result" onClick={() => {}}>Подобрать</button>
-          <a href="/catalog/tires" className="remove-filters help">
-            Сбросить все фильтры
-          </a>
+          <button className="get-result">Подобрать</button>
+          <a href="/catalog/tires" className="remove-filters help">Сбросить все фильтры</a>
         </div>
       </div>
-    </div>
+    </>
   );
 }
