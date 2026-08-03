@@ -1,34 +1,27 @@
-// Шапка: город/телефон, меню, бургер, логотип, поиск, user-panel (фаза 1)
-"use client";
+// Шапка: серверная структура + клиентские острова (03.08.2026)
+import type { NavData } from "@/shared/api/data";
+import { CityBadge } from "./client-islands/CityBadge";
+import { MenuToggle } from "./client-islands/MenuToggle";
+import { CartBadge } from "./client-islands/CartBadge";
+import { SearchIcon } from "./icons";
 
-import { NAV_LINKS, PHONE } from "@/data/nav";
-import { useUIStore } from "@/stores/useUIStore";
-import { selectCartCount, useCartStore } from "@/stores/useCartStore";
-import { ArrowDownRedIcon, BurgerIcon, CatalogIcon, PinHeaderIcon, SearchIcon } from "./icons";
+interface HeaderProps {
+  nav: NavData;
+}
 
-export function Header() {
-  const city = useUIStore((s) => s.city);
-  const setGeoOpen = useUIStore((s) => s.setGeoOpen);
-  const setMenuOpen = useUIStore((s) => s.setMenuOpen);
-  const count = useCartStore(selectCartCount);
-
+export function Header({ nav }: HeaderProps) {
   return (
     <header className="container">
       <div className="header-container">
         <div className="header-location-block">
           <p className="header-location-block-main">
-            <span className="choice-city-h">Ваш город:</span>
-            <a href="#" onClick={(e) => { e.preventDefault(); setGeoOpen(true); }}>
-              <PinHeaderIcon />
-              <span className="city-in-header">{city}</span>
-              <ArrowDownRedIcon />
-            </a>
+            <CityBadge />
           </p>
-          <p className="header-number">{PHONE.header}</p>
+          <p className="header-number">{nav.phone.header}</p>
         </div>
         <div className="navigation-block">
           <ul>
-            {NAV_LINKS.map((link) => (
+            {nav.navLinks.map((link) => (
               <li key={link.label}>
                 <a href={link.href}>{link.label}</a>
               </li>
@@ -40,16 +33,11 @@ export function Header() {
       {/* Дополнительное меню */}
       <div className="additional-menu">
         <div className="gr1">
-          <div id="hide-show-catalog" onClick={() => setMenuOpen(true)}>
-            <BurgerIcon />
-          </div>
+          <MenuToggle variant="burger" />
           <div className="logo">
             <img src="/assets/img/logo.svg" alt="" />
           </div>
-          <div className="catalog-button">
-            <CatalogIcon />
-            <a href="#" id="get-catalog">Каталог</a>
-          </div>
+          <MenuToggle variant="catalog" />
         </div>
         <div className="gr2">
           <div className="search-input">
@@ -69,7 +57,7 @@ export function Header() {
             <div className="cart header-icon-and-btn" id="busket">
               <img src="/assets/img/busket.svg" alt="" />
               <p className="header-icon-and-btn-text">Корзина</p>
-              <span id="count-in-busket">{count}</span>
+              <CartBadge />
             </div>
           </div>
         </div>

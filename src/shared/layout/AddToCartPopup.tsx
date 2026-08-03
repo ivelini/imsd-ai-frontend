@@ -1,20 +1,21 @@
-// Попап «Товар добавлен в корзину»: .cart_popup (фаза 1).
-// Мокап показывает через body-класс .popup-cart — в React условный рендер по state
+// Попап «Товар добавлен в корзину»: .cart_popup (03.08.2026)
 "use client";
 
+import { useCart } from "@/features/cart/api/useCart";
+import { useUpdateCartItem } from "@/features/cart/api/useUpdateCartItem";
 import { useUIStore } from "@/stores/useUIStore";
-import { useCartStore } from "@/stores/useCartStore";
 
 const formatPrice = (n: number) => n.toLocaleString("ru-RU").replace(/ /g, " ") + " ₽";
 
 export function AddToCartPopup() {
   const open = useUIStore((s) => s.cartPopupOpen);
   const setOpen = useUIStore((s) => s.setCartPopupOpen);
-  const items = useCartStore((s) => s.items);
+  const { data: items } = useCart();
+  const { mutate: changeQuantity } = useUpdateCartItem();
 
   if (!open) return null;
 
-  const item = items[0];
+  const item = items?.[0];
 
   return (
     <div className="cart_popup" id="cart_popup" style={{ display: "block" }}>
@@ -32,13 +33,13 @@ export function AddToCartPopup() {
           </div>
           <div className="cart_popup_item_quantity">
             <div className="cart_popup_item_quantity_in">
-              <div className="cart_popup_item_quantity_btn" onClick={() => useCartStore.getState().changeQuantity(item.id, -1)}>
+              <div className="cart_popup_item_quantity_btn" onClick={() => changeQuantity({ id: item.id, delta: -1 })}>
                 <img src="/assets/img/popup_minus.svg" alt="" />
               </div>
               <div className="cart_popup_item_quantity_number">
                 <span>{item.quantity}</span>
               </div>
-              <div className="cart_popup_item_quantity_btn" onClick={() => useCartStore.getState().changeQuantity(item.id, 1)}>
+              <div className="cart_popup_item_quantity_btn" onClick={() => changeQuantity({ id: item.id, delta: 1 })}>
                 <img src="/assets/img/popup_plus.svg" alt="" />
               </div>
             </div>

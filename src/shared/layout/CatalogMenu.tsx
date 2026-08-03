@@ -1,12 +1,16 @@
-// Выпадающее меню «Каталог»: .catalog-hidden-menu (фаза 1)
+// Выпадающее меню «Каталог»: .catalog-hidden-menu (03.08.2026)
 "use client";
 
-import { CATALOG_MENU_GROUPS, MENU_SOCIALS, PHONE } from "@/data/nav";
+import type { NavData } from "@/shared/api/data";
 import { useUIStore } from "@/stores/useUIStore";
 import { Button } from "@/shared/ui/Button";
 import { ChevronRightIcon, CloseIcon, SearchIcon } from "./icons";
 
-export function CatalogMenu() {
+interface CatalogMenuProps {
+  nav: NavData;
+}
+
+export function CatalogMenu({ nav }: CatalogMenuProps) {
   const open = useUIStore((s) => s.menuOpen);
   const setOpen = useUIStore((s) => s.setMenuOpen);
 
@@ -25,7 +29,7 @@ export function CatalogMenu() {
         <input type="text" placeholder="Поиск по товарам" />
         <SearchIcon />
       </div>
-      {CATALOG_MENU_GROUPS.map((group) => (
+      {nav.catalogMenuGroups.map((group) => (
         <div className="catalog-page-link-group" key={group.title}>
           <h3 className="link-group-title">{group.title}</h3>
           {group.items.map((item) => (
@@ -37,10 +41,10 @@ export function CatalogMenu() {
         </div>
       ))}
       <div className="catalog-page-footer">
-        <p className="catalog-page-num">{PHONE.menu}</p>
+        <p className="catalog-page-num">{nav.phone.menu}</p>
         <Button className="catalog-page-btn">Заказать звонок</Button>
         <div className="social-links-blk">
-          {MENU_SOCIALS.map((s) => (
+          {nav.menuSocials.map((s) => (
             <a href="#" className="social-links-item" key={s}>
               <img src={`/assets/img/${s}.svg`} alt="" />
             </a>

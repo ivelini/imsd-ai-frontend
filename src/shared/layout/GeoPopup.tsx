@@ -1,8 +1,7 @@
-// Гео-окно: выбор города (фаза 1). Мокап показывает через body-класс .popup-geo —
-// в React условный рендер по state (geoOpen)
+// Гео-окно: выбор города (03.08.2026)
 "use client";
 
-import { GEO_CITIES, GEO_REGIONS } from "@/data/geo";
+import { useGeo } from "@/shared/layout/api/useGeo";
 import { useUIStore } from "@/stores/useUIStore";
 
 export function GeoPopup() {
@@ -10,6 +9,7 @@ export function GeoPopup() {
   const setGeoOpen = useUIStore((s) => s.setGeoOpen);
   const city = useUIStore((s) => s.city);
   const setCity = useUIStore((s) => s.setCity);
+  const { data: geo } = useGeo();
 
   if (!geoOpen) return null;
 
@@ -29,40 +29,44 @@ export function GeoPopup() {
         </div>
         <div className="geo-location-window-search">
           <div className="geo-location-window-search-text">Выберите город</div>
-          <input type="text" className="geo-location-window-search-input" value="" />
+          <input type="text" className="geo-location-window-search-input" defaultValue="" />
         </div>
-        <div className="geo-location-window-list">
-          {GEO_REGIONS.map((region) => (
-            <div className="geo-location-window-list-item" key={region.id}>
-              <a href="#" className="geo-location-window-list-item-link" data-id={region.id} data-parse-value={region.name}>
-                <span>{region.name}</span>
-              </a>
-            </div>
-          ))}
-        </div>
-        <div className="geo-location-window__location-list">
-          {GEO_REGIONS.map((region, i) => (
-            <div
-              className={`geo-location-window__city-list geo-location-window__city-list-${i + 1}`}
-              key={region.id}
-              data-cityid={region.id}
-              data-regionid={String(Number(region.id) - 1)}
-            >
-              {GEO_CITIES.filter((c) => c.regionId === region.id).map((c) => (
-                <div className="geo-location-window__city" key={c.id}>
-                  <span
-                    className={`geo-location-window__link${city === c.name ? " geo-location-window__link_active" : ""}`}
-                    title={c.name}
-                    data-id={c.id}
-                    onClick={() => selectCity(c.name)}
-                  >
-                    {c.name}
-                  </span>
+        {geo && (
+          <>
+            <div className="geo-location-window-list">
+              {geo.regions.map((region) => (
+                <div className="geo-location-window-list-item" key={region.id}>
+                  <a href="#" className="geo-location-window-list-item-link" data-id={region.id} data-parse-value={region.name}>
+                    <span>{region.name}</span>
+                  </a>
                 </div>
               ))}
             </div>
-          ))}
-        </div>
+            <div className="geo-location-window__location-list">
+              {geo.regions.map((region, i) => (
+                <div
+                  className={`geo-location-window__city-list geo-location-window__city-list-${i + 1}`}
+                  key={region.id}
+                  data-cityid={region.id}
+                  data-regionid={String(Number(region.id) - 1)}
+                >
+                  {geo.cities.filter((c) => c.regionId === region.id).map((c) => (
+                    <div className="geo-location-window__city" key={c.id}>
+                      <span
+                        className={`geo-location-window__link${city === c.name ? " geo-location-window__link_active" : ""}`}
+                        title={c.name}
+                        data-id={c.id}
+                        onClick={() => selectCity(c.name)}
+                      >
+                        {c.name}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              ))}
+            </div>
+          </>
+        )}
       </div>
     </div>
   );

@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import "./style.css";
+import { getNav } from "@/shared/api/data";
+import { ClientLayout } from "@/shared/layout/ClientLayout";
 import { AddToCartPopup } from "@/shared/layout/AddToCartPopup";
 import { Benefits } from "@/shared/layout/Benefits";
 import { CatalogMenu } from "@/shared/layout/CatalogMenu";
@@ -12,25 +14,29 @@ export const metadata: Metadata = {
   description: "Интернет-магазин шин и дисков",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const nav = await getNav();
+
   return (
     <html lang="ru">
       <body>
-        <div className="app">
-          <div className="wrapper">
-            <CatalogMenu />
-            <GeoPopup />
-            <Header />
-            <Benefits />
-            {children}
-            <Footer />
-            <AddToCartPopup />
+        <ClientLayout>
+          <div className="app">
+            <div className="wrapper">
+              <CatalogMenu nav={nav} />
+              <GeoPopup />
+              <Header nav={nav} />
+              <Benefits benefits={nav.benefits} />
+              {children}
+              <Footer nav={nav} />
+              <AddToCartPopup />
+            </div>
           </div>
-        </div>
+        </ClientLayout>
       </body>
     </html>
   );

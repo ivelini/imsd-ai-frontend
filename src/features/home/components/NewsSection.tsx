@@ -1,13 +1,17 @@
-// Новости на главной (фаза 1)
-import { NEWS_ITEMS } from "@/data/products";
+// Новости на главной: серверный, данные через props (03.08.2026)
+import type { NewsItem } from "@/features/home/types";
 import { NewsCard } from "@/shared/ui/NewsCard";
 
-export function NewsSection() {
+interface NewsSectionProps {
+  news: NewsItem[];
+}
+
+export function NewsSection({ news }: NewsSectionProps) {
   return (
     <section className="news-section container">
       <h2>Новости</h2>
       <div className="news-list">
-        {NEWS_ITEMS.map((n) => (
+        {news.map((n) => (
           <NewsCard item={n} key={n.id} />
         ))}
       </div>

@@ -1,14 +1,8 @@
 // Мок-данные главной из .template/index.html
 // Фаза 1: заменить на API (Laravel)
+import type { SectionProduct, NewsItem } from "@/features/home/types";
 
-export interface SectionProduct {
-  id: string;
-  image: string;
-  title: string;
-  rating: string;
-  price: string;
-  oldPrice: string;
-}
+export type { SectionProduct, NewsItem };
 
 export const WHEELS_PRODUCTS: SectionProduct[] = [
   {
@@ -95,12 +89,6 @@ export const DISK_PRODUCTS: SectionProduct[] = [
     oldPrice: "32 200 ₽",
   },
 ];
-
-export interface NewsItem {
-  id: string;
-  title: string;
-  text: string;
-}
 
 export const NEWS_ITEMS: NewsItem[] = [
   {

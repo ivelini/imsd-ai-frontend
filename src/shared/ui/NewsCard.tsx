@@ -1,5 +1,5 @@
 // Карточка новости: .news — общая для главной (features/home) и статей (features/articles)
-import type { NewsItem } from "@/data/products";
+import type { NewsItem } from "@/features/home/types";
 
 export function NewsCard({ item }: { item: NewsItem }) {
   return (

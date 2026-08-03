@@ -1,5 +1,5 @@
 // Карточка товара главной: .section-product (фаза 1)
-import type { SectionProduct as SectionProductData } from "@/data/products";
+import type { SectionProduct as SectionProductData } from "@/features/home/types";
 
 export function SectionProduct({ product }: { product: SectionProductData }) {
   return (
