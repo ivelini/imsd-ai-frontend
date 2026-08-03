@@ -100,18 +100,93 @@ export async function getAboutText(): Promise<string> {
 }
 
 // ---------------------------------------------------------------------------
-// Catalog (фаза 2 — заглушки)
+// Catalog
 // ---------------------------------------------------------------------------
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-export async function getCatalogProducts(
-  _filter: Record<string, unknown>,
-): Promise<PaginatedResult<unknown>> {
-  throw new Error("getCatalogProducts — фаза 2");
+import {
+  ALL_PRODUCTS,
+  getFilterOptions,
+  getTireModel,
+  AUTO_BRANDS,
+  AUTO_YEARS,
+  generateModifications,
+  getAutoResult,
+  SEO_CONTENT,
+} from "@/data/catalog";
+import type {
+  AutoBrandData,
+  AutoModData,
+  AutoResultProduct,
+} from "@/data/catalog";
+import type { FilterOptions, FilterState, TireProduct } from "@/features/catalog/types";
+
+export { getTireModel, getAutoResult, SEO_CONTENT };
+export type { AutoBrandData, AutoModData, AutoResultProduct, FilterOptions, TireProduct };
+
+const PER_PAGE = 12;
+
+export async function getCatalogFilters(): Promise<FilterOptions> {
+  return delay(50, getFilterOptions());
 }
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-export async function getModel(_slug: string): Promise<unknown> {
-  throw new Error("getModel — фаза 2");
+export async function getCatalogProducts(
+  filter: FilterState,
+): Promise<PaginatedResult<TireProduct>> {
+  let items = [...ALL_PRODUCTS];
+
+  if (filter.season) items = items.filter((p) => p.season === filter.season);
+  if (filter.brand) items = items.filter((p) => p.brandId === filter.brand);
+  if (filter.width) items = items.filter((p) => p.width === filter.width);
+  if (filter.profile) items = items.filter((p) => p.profile === filter.profile);
+  if (filter.diameter) items = items.filter((p) => p.diameter === filter.diameter);
+  if (filter.priceMin != null) items = items.filter((p) => p.price >= filter.priceMin!);
+  if (filter.priceMax != null) items = items.filter((p) => p.price <= filter.priceMax!);
+  if (filter.country) items = items.filter((p) => p.country === filter.country);
+  if (filter.tireType) items = items.filter((p) => p.tireType === filter.tireType);
+  if (filter.delivery && filter.delivery.length > 0) {
+    // В моках все товары доступны — фильтр delivery не сужает
+  }
+
+  const total = items.length;
+  const page = filter.page ?? 1;
+  const start = (page - 1) * PER_PAGE;
+  const paged = items.slice(start, start + PER_PAGE);
+
+  return delay(50, { items: paged, total, page, perPage: PER_PAGE });
+}
+
+export async function getAutoBrands(): Promise<AutoBrandData[]> {
+  return delay(30, AUTO_BRANDS);
+}
+
+export async function getAutoModels(
+  brand: string,
+): Promise<{ slug: string; name: string }[]> {
+  const brandData = AUTO_BRANDS.find((b) => b.id === brand);
+  return delay(30, brandData?.models ?? []);
+}
+
+export async function getAutoYears(
+  _brand: string,
+  _model: string,
+): Promise<number[]> {
+  return delay(30, AUTO_YEARS);
+}
+
+export async function getAutoModifications(
+  brand: string,
+  model: string,
+  year: number,
+): Promise<AutoModData[]> {
+  return delay(30, generateModifications(brand, model, year));
+}
+
+export async function fetchAutoResult(
+  brand: string,
+  model: string,
+  year: number,
+  mod: string,
+): Promise<AutoResultProduct[] | null> {
+  return delay(50, getAutoResult(brand, model, year, mod));
 }
 
 // ---------------------------------------------------------------------------

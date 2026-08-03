@@ -93,17 +93,17 @@ export const DISK_PRODUCTS: SectionProduct[] = [
 export const NEWS_ITEMS: NewsItem[] = [
   {
     id: "news-1",
-    title: "Новость очень важная заголовок",
+    title: "Новость очень важная заголовок2",
     text: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure",
   },
   {
     id: "news-2",
-    title: "Новость очень важная заголовок",
+    title: "Новость очень важная заголовок3",
     text: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure",
   },
   {
     id: "news-3",
-    title: "Новость очень важная заголовок",
+    title: "Новость очень важная заголовок4",
     text: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure",
   },
 ];
