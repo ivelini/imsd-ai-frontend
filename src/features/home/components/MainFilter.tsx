@@ -10,18 +10,19 @@ import { ArrowDownGrayIcon, ArrowRightBlackIcon } from "@/shared/layout/icons";
 import { HelpIcon, PinFilterIcon } from "./main-filter-icons";
 import { DiskIcon, WheelIcon } from "./wheel-disk-icons";
 
+// value — латинские slug, совпадают с URL каталога (контракт api-contract.md)
 const SEASON_OPTIONS = [
   ["", "Сезонность"],
-  ["летняя", "Летняя"],
-  ["зимняя", "Зимняя"],
-  ["всесезонная", "Всесезонная"],
+  ["summer", "Летняя"],
+  ["winter", "Зимняя"],
+  ["all-season", "Всесезонная"],
 ];
 
 const TYPE_OPTIONS = [
   ["", "Тип шин"],
-  ["легковая", "Легковая"],
-  ["внедорожная", "Внедорожная"],
-  ["коммерческая", "Коммерческая"],
+  ["passenger", "Легковая"],
+  ["suv", "Внедорожная"],
+  ["commercial", "Коммерческая"],
 ];
 
 const WIDTHS = Array.from({ length: 21 }, (_, i) => String(145 + i * 10));

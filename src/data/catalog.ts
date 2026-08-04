@@ -1,14 +1,48 @@
 // Мок-данные каталога (фаза 2, 03.08.2026)
 // ~500 товаров, 4 бренда авто, справочники фильтра, SEO
-import type { TireProduct, FilterOptions } from "@/features/catalog/types";
+// Мок имитирует ответ бэкенда: value — латинские slug (совпадают с URL),
+// label/готовые строки формируются здесь (как это сделает API).
+import type { TireProduct, FilterOptions, FilterOption } from "@/features/catalog/types";
 
 // ============================================================================
-// Справочники фильтра
+// Словари «бэка»: value → готовый label для отображения
 // ============================================================================
 
-export const SEASONS = ["летняя", "зимняя", "всесезонная"] as const;
+export const SEASON_LABELS: Record<string, string> = {
+  summer: "Летняя",
+  winter: "Зимняя",
+  "all-season": "Всесезонная",
+};
 
-export const TIRE_TYPES = ["легковая", "внедорожная", "коммерческая"] as const;
+export const TIRE_TYPE_LABELS: Record<string, string> = {
+  passenger: "Легковая",
+  suv: "Внедорожная",
+  commercial: "Коммерческая",
+};
+
+export const COUNTRY_LABELS: Record<string, string> = {
+  russia: "Россия",
+  france: "Франция",
+  finland: "Финляндия",
+  japan: "Япония",
+  italy: "Италия",
+};
+
+// ============================================================================
+// Справочники фильтра (в value-формате)
+// ============================================================================
+
+export const SEASONS: FilterOption[] = [
+  { label: SEASON_LABELS.summer, value: "summer" },
+  { label: SEASON_LABELS.winter, value: "winter" },
+  { label: SEASON_LABELS["all-season"], value: "all-season" },
+];
+
+export const TIRE_TYPES: FilterOption[] = [
+  { label: TIRE_TYPE_LABELS.passenger, value: "passenger" },
+  { label: TIRE_TYPE_LABELS.suv, value: "suv" },
+  { label: TIRE_TYPE_LABELS.commercial, value: "commercial" },
+];
 
 export const ALL_WIDTHS = Array.from({ length: 21 }, (_, i) => 145 + i * 10); // 145..355
 
@@ -24,22 +58,25 @@ interface BrandDef {
   id: string;
   name: string;
   slug: string;
-  country: string;
+  country: string; // value-формат ("russia")
   priceBase: number; // базовая цена для самого маленького размера
   priceFactor: number; // множитель на размер
 }
 
 const BRANDS: BrandDef[] = [
-  { id: "viatti", name: "Viatti", slug: "viatti", country: "Россия", priceBase: 8000, priceFactor: 1.0 },
-  { id: "michelin", name: "Michelin", slug: "michelin", country: "Франция", priceBase: 12000, priceFactor: 1.6 },
-  { id: "nokian-tyres", name: "Nokian Tyres", slug: "nokian-tyres", country: "Финляндия", priceBase: 10000, priceFactor: 1.3 },
-  { id: "bridgestone", name: "Bridgestone", slug: "bridgestone", country: "Япония", priceBase: 11000, priceFactor: 1.4 },
-  { id: "pirelli", name: "Pirelli", slug: "pirelli", country: "Италия", priceBase: 13000, priceFactor: 1.7 },
+  { id: "viatti", name: "Viatti", slug: "viatti", country: "russia", priceBase: 8000, priceFactor: 1.0 },
+  { id: "michelin", name: "Michelin", slug: "michelin", country: "france", priceBase: 12000, priceFactor: 1.6 },
+  { id: "nokian-tyres", name: "Nokian Tyres", slug: "nokian-tyres", country: "finland", priceBase: 10000, priceFactor: 1.3 },
+  { id: "bridgestone", name: "Bridgestone", slug: "bridgestone", country: "japan", priceBase: 11000, priceFactor: 1.4 },
+  { id: "pirelli", name: "Pirelli", slug: "pirelli", country: "italy", priceBase: 13000, priceFactor: 1.7 },
 ];
 
 export const BRAND_LIST = BRANDS.map(({ id, name, slug, country }) => ({ id, name, slug, country }));
 
-export const COUNTRIES = [...new Set(BRANDS.map((b) => b.country))];
+export const COUNTRIES: FilterOption[] = [...new Set(BRANDS.map((b) => b.country))].map((c) => ({
+  label: COUNTRY_LABELS[c] ?? c,
+  value: c,
+}));
 
 // ============================================================================
 // Модели шин по брендам
@@ -62,8 +99,8 @@ const MODELS: Record<string, ModelDef[]> = {
     {
       slug: "viatti-strada-2",
       name: "V-130 Strada Asimmetrico",
-      season: "летняя",
-      tireType: "легковая",
+      season: "summer",
+      tireType: "passenger",
       widths: [175, 185, 195, 205, 215, 225, 235, 245, 255, 265, 275, 285, 295, 305, 315],
       profiles: [30, 35, 40, 45, 50, 55, 60, 65, 70],
       diameters: [14, 15, 16, 17, 18, 19, 20, 21, 22],
@@ -73,8 +110,8 @@ const MODELS: Record<string, ModelDef[]> = {
     {
       slug: "viatti-bosco",
       name: "V-125 Bosco",
-      season: "зимняя",
-      tireType: "легковая",
+      season: "winter",
+      tireType: "passenger",
       widths: [165, 175, 185, 195, 205, 215, 225, 235, 245],
       profiles: [40, 45, 50, 55, 60, 65, 70],
       diameters: [14, 15, 16, 17, 18, 19],
@@ -84,8 +121,8 @@ const MODELS: Record<string, ModelDef[]> = {
     {
       slug: "viatti-nordico",
       name: "V-134 Nordico",
-      season: "всесезонная",
-      tireType: "внедорожная",
+      season: "all-season",
+      tireType: "suv",
       widths: [215, 225, 235, 245, 255, 265, 275, 285],
       profiles: [40, 45, 50, 55, 60, 65],
       diameters: [16, 17, 18, 19, 20, 21],
@@ -97,8 +134,8 @@ const MODELS: Record<string, ModelDef[]> = {
     {
       slug: "michelin-primacy-4",
       name: "Primacy 4+",
-      season: "летняя",
-      tireType: "легковая",
+      season: "summer",
+      tireType: "passenger",
       widths: [185, 195, 205, 215, 225, 235, 245, 255],
       profiles: [35, 40, 45, 50, 55, 60, 65],
       diameters: [15, 16, 17, 18, 19, 20],
@@ -108,8 +145,8 @@ const MODELS: Record<string, ModelDef[]> = {
     {
       slug: "michelin-pilot-sport-5",
       name: "Pilot Sport 5",
-      season: "летняя",
-      tireType: "легковая",
+      season: "summer",
+      tireType: "passenger",
       widths: [205, 215, 225, 235, 245, 255, 265, 275, 285, 295, 305],
       profiles: [30, 35, 40, 45],
       diameters: [17, 18, 19, 20, 21, 22],
@@ -119,8 +156,8 @@ const MODELS: Record<string, ModelDef[]> = {
     {
       slug: "michelin-alpin-7",
       name: "Alpin 7",
-      season: "зимняя",
-      tireType: "легковая",
+      season: "winter",
+      tireType: "passenger",
       widths: [175, 185, 195, 205, 215, 225, 235, 245],
       profiles: [40, 45, 50, 55, 60, 65],
       diameters: [14, 15, 16, 17, 18, 19],
@@ -130,8 +167,8 @@ const MODELS: Record<string, ModelDef[]> = {
     {
       slug: "michelin-crossclimate-2",
       name: "CrossClimate 2",
-      season: "всесезонная",
-      tireType: "внедорожная",
+      season: "all-season",
+      tireType: "suv",
       widths: [205, 215, 225, 235, 245, 255, 265],
       profiles: [40, 45, 50, 55, 60],
       diameters: [16, 17, 18, 19, 20],
@@ -143,8 +180,8 @@ const MODELS: Record<string, ModelDef[]> = {
     {
       slug: "nokian-hakka-10",
       name: "Hakkapeliitta 10",
-      season: "зимняя",
-      tireType: "легковая",
+      season: "winter",
+      tireType: "passenger",
       widths: [175, 185, 195, 205, 215, 225, 235, 245],
       profiles: [40, 45, 50, 55, 60, 65, 70],
       diameters: [14, 15, 16, 17, 18, 19],
@@ -154,8 +191,8 @@ const MODELS: Record<string, ModelDef[]> = {
     {
       slug: "nokian-hakka-blue-3",
       name: "Hakka Blue 3",
-      season: "летняя",
-      tireType: "легковая",
+      season: "summer",
+      tireType: "passenger",
       widths: [185, 195, 205, 215, 225, 235, 245, 255],
       profiles: [35, 40, 45, 50, 55, 60],
       diameters: [15, 16, 17, 18, 19, 20],
@@ -167,8 +204,8 @@ const MODELS: Record<string, ModelDef[]> = {
     {
       slug: "bridgestone-turanza-t005",
       name: "Turanza T005",
-      season: "летняя",
-      tireType: "легковая",
+      season: "summer",
+      tireType: "passenger",
       widths: [185, 195, 205, 215, 225, 235, 245, 255],
       profiles: [35, 40, 45, 50, 55, 60, 65],
       diameters: [15, 16, 17, 18, 19, 20],
@@ -178,8 +215,8 @@ const MODELS: Record<string, ModelDef[]> = {
     {
       slug: "bridgestone-blizzak-lm005",
       name: "Blizzak LM005",
-      season: "зимняя",
-      tireType: "легковая",
+      season: "winter",
+      tireType: "passenger",
       widths: [175, 185, 195, 205, 215, 225, 235],
       profiles: [40, 45, 50, 55, 60, 65, 70],
       diameters: [14, 15, 16, 17, 18, 19],
@@ -189,8 +226,8 @@ const MODELS: Record<string, ModelDef[]> = {
     {
       slug: "bridgestone-weather-control",
       name: "Weather Control A005",
-      season: "всесезонная",
-      tireType: "внедорожная",
+      season: "all-season",
+      tireType: "suv",
       widths: [205, 215, 225, 235, 245, 255, 265],
       profiles: [40, 45, 50, 55, 60],
       diameters: [16, 17, 18, 19, 20],
@@ -202,8 +239,8 @@ const MODELS: Record<string, ModelDef[]> = {
     {
       slug: "pirelli-p-zero",
       name: "P Zero",
-      season: "летняя",
-      tireType: "легковая",
+      season: "summer",
+      tireType: "passenger",
       widths: [205, 215, 225, 235, 245, 255, 265, 275, 285, 295, 305, 315],
       profiles: [25, 30, 35, 40, 45],
       diameters: [17, 18, 19, 20, 21, 22],
@@ -213,8 +250,8 @@ const MODELS: Record<string, ModelDef[]> = {
     {
       slug: "pirelli-scorpion-verde",
       name: "Scorpion Verde",
-      season: "всесезонная",
-      tireType: "внедорожная",
+      season: "all-season",
+      tireType: "suv",
       widths: [215, 225, 235, 245, 255, 265, 275, 285],
       profiles: [40, 45, 50, 55, 60, 65],
       diameters: [16, 17, 18, 19, 20, 21, 22],
@@ -224,8 +261,8 @@ const MODELS: Record<string, ModelDef[]> = {
     {
       slug: "pirelli-ice-zero-2",
       name: "Ice Zero 2",
-      season: "зимняя",
-      tireType: "легковая",
+      season: "winter",
+      tireType: "passenger",
       widths: [175, 185, 195, 205, 215, 225, 235, 245],
       profiles: [40, 45, 50, 55, 60, 65, 70],
       diameters: [14, 15, 16, 17, 18, 19],
@@ -270,6 +307,8 @@ function generateProducts(): TireProduct[] {
             const oldPrice = Math.round(price * 1.12);
 
             const sizeSlug = `${width}-${profile}-r${diameter}-${model.loadIndex}${model.speedRating.toLowerCase()}`;
+            const countryLabel = COUNTRY_LABELS[brand.country] ?? brand.country;
+            const seasonLabel = SEASON_LABELS[model.season] ?? model.season;
 
             products.push({
               id,
@@ -288,14 +327,19 @@ function generateProducts(): TireProduct[] {
               oldPrice,
               code,
               country: brand.country,
+              countryLabel,
               year: "2025-2026",
-              quantity: Math.floor(Math.random() * 20) + 1,
+              // Готовый заголовок карточки — формирует «бэк», фронт не собирает
+              title: `Шина ${brand.name} ${model.name} ${width}/${profile} R${diameter} ${model.loadIndex}${model.speedRating} ${seasonLabel.toLowerCase()}`,
+              // Детерминированно (без Math.random — иначе hydration mismatch
+              // между сервером и клиентом, JS падает)
+              quantity: ((idCounter * 7) % 20) + 1,
               image: "/assets/img/wheel-product.png",
               tireType: model.tireType,
               euLabel: {
-                rollingResistance: ["A", "B", "C", "D"][Math.floor(Math.random() * 4)],
-                wetGrip: ["A", "B", "C"][Math.floor(Math.random() * 3)],
-                noiseEmission: 68 + Math.floor(Math.random() * 5),
+                rollingResistance: ["A", "B", "C", "D"][idCounter % 4],
+                wetGrip: ["A", "B", "C"][idCounter % 3],
+                noiseEmission: 68 + (idCounter % 5),
               },
             });
           }
@@ -321,16 +365,32 @@ export function getPriceRange() {
 // ============================================================================
 
 export function getFilterOptions(): FilterOptions {
-  const seasons = [...new Set(ALL_PRODUCTS.map((p) => p.season))];
-  const brands = BRAND_LIST.map((b) => ({
-    ...b,
-    count: ALL_PRODUCTS.filter((p) => p.brandId === b.id).length,
+  // Все опции — единый формат FilterOption { label, value }: label формирует «бэк»
+  const seasons: FilterOption[] = [...new Set(ALL_PRODUCTS.map((p) => p.season))].map((s) => ({
+    label: SEASON_LABELS[s] ?? s,
+    value: s,
   }));
-  const widths = [...new Set(ALL_PRODUCTS.map((p) => p.width))].sort((a, b) => a - b);
-  const profiles = [...new Set(ALL_PRODUCTS.map((p) => p.profile))].sort((a, b) => a - b);
-  const diameters = [...new Set(ALL_PRODUCTS.map((p) => p.diameter))].sort((a, b) => a - b);
-  const tireTypes = [...new Set(ALL_PRODUCTS.map((p) => p.tireType))];
-  const countries = [...new Set(ALL_PRODUCTS.map((p) => p.country))];
+  const brands: FilterOption[] = BRAND_LIST.map((b) => ({
+    label: `${b.name} (${ALL_PRODUCTS.filter((p) => p.brandId === b.id).length})`,
+    value: b.slug,
+  }));
+  const widths: FilterOption[] = [...new Set(ALL_PRODUCTS.map((p) => p.width))]
+    .sort((a, b) => a - b)
+    .map((w) => ({ label: String(w), value: String(w) }));
+  const profiles: FilterOption[] = [...new Set(ALL_PRODUCTS.map((p) => p.profile))]
+    .sort((a, b) => a - b)
+    .map((p) => ({ label: String(p), value: String(p) }));
+  const diameters: FilterOption[] = [...new Set(ALL_PRODUCTS.map((p) => p.diameter))]
+    .sort((a, b) => a - b)
+    .map((d) => ({ label: `R${d}`, value: String(d) }));
+  const tireTypes: FilterOption[] = [...new Set(ALL_PRODUCTS.map((p) => p.tireType))].map((t) => ({
+    label: TIRE_TYPE_LABELS[t] ?? t,
+    value: t,
+  }));
+  const countries: FilterOption[] = [...new Set(ALL_PRODUCTS.map((p) => p.country))].map((c) => ({
+    label: COUNTRY_LABELS[c] ?? c,
+    value: c,
+  }));
   const priceRange = getPriceRange();
 
   return { seasons, brands, widths, profiles, diameters, tireTypes, countries, priceMin: priceRange.min, priceMax: priceRange.max };
@@ -581,13 +641,13 @@ export function getTireModel(slug: string): TireModelData | null {
       "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ante metus dictum at tempor commodo. Neque viverra justo nec ultrices dui. Risus ultricies tristique nulla aliquet enim.",
     image: "/assets/img/large.png",
     params: [
-      { name: "Сезонность", value: modelDef.season },
-      { name: "Назначение", value: modelDef.tireType },
-      { name: "Тип протектора", value: modelDef.season === "зимняя" ? "направленный" : "асимметричный" },
-      { name: "Страна бренда", value: brandDef.country },
-      { name: "Страна производства", value: brandDef.country },
+      { name: "Сезонность", value: SEASON_LABELS[modelDef.season] ?? modelDef.season },
+      { name: "Назначение", value: TIRE_TYPE_LABELS[modelDef.tireType] ?? modelDef.tireType },
+      { name: "Тип протектора", value: modelDef.season === "winter" ? "направленный" : "асимметричный" },
+      { name: "Страна бренда", value: COUNTRY_LABELS[brandDef.country] ?? brandDef.country },
+      { name: "Страна производства", value: COUNTRY_LABELS[brandDef.country] ?? brandDef.country },
       { name: "Год выпуска", value: "2025-2026" },
-      { name: "Шипы", value: modelDef.season === "зимняя" && brandDef.id === "nokian-tyres" ? "Да" : "Нет" },
+      { name: "Шипы", value: modelDef.season === "winter" && brandDef.id === "nokian-tyres" ? "Да" : "Нет" },
       { name: "Run flat", value: brandDef.id === "michelin" || brandDef.id === "pirelli" ? "Да" : "Нет" },
     ],
     sizesByDiameter,
@@ -613,42 +673,122 @@ export function getAutoResult(brand: string, model: string, year: number, mod: s
   const modData = mods.find((m) => m.id === mod);
   if (!modData) return null;
 
-  // Ищем товары, подходящие под размеры модификации
+  // Структура секций как в шаблоне auto-selected.html:
+  // 1. Одиночный первый размер (без header)
+  // 2. «Рекомендация производителя» — пара sizes[1]+sizes[2]
+  // 3. «Лучшая альтернатива» — остальные размеры парами
   const result: AutoResultProduct[] = [];
-  const carBrand = AUTO_BRANDS.find((b) => b.id === brand);
-  const carModel = carBrand?.models.find((m) => m.slug === model);
-  const carMod = modData;
+  const sizes = modData.sizes;
 
-  // "Рекомендовано" — размеры оригинальные
-  if (modData.sizes.length >= 2) {
-    const s1 = modData.sizes[0];
-    const s2 = modData.sizes[1];
-    const sizeLabel = `${s1.width}/${s1.profile} R${s1.diameter} - ${s2.width}/${s2.profile} R${s2.diameter}`;
+  const sizeOf = (s: { width: number; profile: number; diameter: number }) =>
+    `${s.width}/${s.profile} R${s.diameter}`;
 
-    const front = findMatchingProduct(s1.width, s1.profile, s1.diameter);
-    const rear = findMatchingProduct(s2.width, s2.profile, s2.diameter);
+  // Одиночный первый размер
+  if (sizes[0]) {
+    const p = findMatchingProduct(sizes[0].width, sizes[0].profile, sizes[0].diameter);
+    if (p) result.push({ categorySection: "", sizeLabel: sizeOf(sizes[0]), products: [p] });
+  }
 
+  // Рекомендованная пара
+  if (sizes[1] && sizes[2]) {
+    const front = findMatchingProduct(sizes[1].width, sizes[1].profile, sizes[1].diameter);
+    const rear = findMatchingProduct(sizes[2].width, sizes[2].profile, sizes[2].diameter);
     if (front && rear) {
-      result.push({ categorySection: "Рекомендация производителя", sizeLabel, products: [front, rear] });
-      result.push({ categorySection: "Рекомендация производителя", sizeLabel, products: [front, { ...rear, id: rear.id + "-alt", slug: rear.slug + "-alt", price: Math.round(rear.price * 1.05) }], isPair: true });
+      result.push({
+        categorySection: "Рекомендация производителя",
+        sizeLabel: `${sizeOf(sizes[1])} - ${sizeOf(sizes[2])}`,
+        products: [front, rear],
+      });
     }
   }
 
-  // "Лучшая альтернатива" — из оставшихся размеров
-  const altSizes = modData.sizes.filter((_, i) => i >= 2 && i < modData.sizes.length - 1);
-  for (let i = 0; i < altSizes.length - 1; i += 2) {
-    const s1 = altSizes[i];
-    const s2 = altSizes[i + 1];
-    const sizeLabel = `${s1.width}/${s1.profile} R${s1.diameter} - ${s2.width}/${s2.profile} R${s2.diameter}`;
-    const front = findMatchingProduct(s1.width, s1.profile, s1.diameter);
-    const rear = findMatchingProduct(s2.width, s2.profile, s2.diameter);
+  // Лучшая альтернатива — остальные пары
+  const alt = sizes.slice(3);
+  for (let i = 0; i + 1 < alt.length; i += 2) {
+    const front = findMatchingProduct(alt[i].width, alt[i].profile, alt[i].diameter);
+    const rear = findMatchingProduct(alt[i + 1].width, alt[i + 1].profile, alt[i + 1].diameter);
     if (front && rear) {
-      result.push({ categorySection: "Лучшая альтернатива", sizeLabel, products: [front, rear] });
-      result.push({ categorySection: "Лучшая альтернатива", sizeLabel, products: [front, { ...rear, id: rear.id + "-alt", slug: rear.slug + "-alt", price: Math.round(rear.price * 0.95) }], isPair: true });
+      result.push({
+        categorySection: "Лучшая альтернатива",
+        sizeLabel: `${sizeOf(alt[i])} - ${sizeOf(alt[i + 1])}`,
+        products: [front, rear],
+      });
     }
   }
 
   return result.length > 0 ? result : null;
+}
+
+// ============================================================================
+// CarBlock — блок выбранного авто с чекбоксами размеров (auto-selected)
+// ============================================================================
+
+export interface CarOption {
+  label: string;
+  width: number;
+  height: number;
+  diameter: number;
+}
+
+export interface CarSectionData {
+  name: string;
+  options: CarOption[];
+}
+
+export interface CarBlockData {
+  name: string;
+  sections: CarSectionData[];
+}
+
+export function getCarBlock(brand: string, model: string, year: number, mod: string): CarBlockData | null {
+  const key = `${brand}:${model}:${year}`;
+  const mods = AUTO_MODIFICATIONS_BY_KEY[key];
+  if (!mods) return null;
+
+  const modData = mods.find((m) => m.id === mod);
+  if (!modData) return null;
+
+  const carBrand = AUTO_BRANDS.find((b) => b.id === brand);
+  const carModel = carBrand?.models.find((m) => m.slug === model);
+  const sizes = modData.sizes;
+
+  const sizeOf = (s: { width: number; profile: number; diameter: number }) =>
+    `${s.width}/${s.profile} R${s.diameter}`;
+
+  const sections: CarSectionData[] = [];
+
+  // Рекомендовано: одиночный первый размер + пара
+  const recommended: CarOption[] = [];
+  if (sizes[0]) {
+    recommended.push({ label: sizeOf(sizes[0]), width: sizes[0].width, height: sizes[0].profile, diameter: sizes[0].diameter });
+  }
+  if (sizes[1] && sizes[2]) {
+    recommended.push({
+      label: `${sizeOf(sizes[1])} - ${sizeOf(sizes[2])}`,
+      width: sizes[2].width,
+      height: sizes[2].profile,
+      diameter: sizes[2].diameter,
+    });
+  }
+  if (recommended.length) sections.push({ name: "Рекомендовано", options: recommended });
+
+  // Лучшая альтернатива: остальные размеры парами
+  const alt: CarOption[] = [];
+  const rest = sizes.slice(3);
+  for (let i = 0; i + 1 < rest.length; i += 2) {
+    alt.push({
+      label: `${sizeOf(rest[i])} - ${sizeOf(rest[i + 1])}`,
+      width: rest[i + 1].width,
+      height: rest[i + 1].profile,
+      diameter: rest[i + 1].diameter,
+    });
+  }
+  if (alt.length) sections.push({ name: "Лучшая альтернатива", options: alt });
+
+  return {
+    name: `${carBrand?.name ?? brand} ${carModel?.name ?? model} ${modData.name}, ${year} г.`,
+    sections,
+  };
 }
 
 function findMatchingProduct(width: number, profile: number, diameter: number): TireProduct | null {

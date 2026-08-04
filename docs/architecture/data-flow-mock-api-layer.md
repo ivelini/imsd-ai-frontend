@@ -20,8 +20,21 @@ URL → Server Component (читает params)
             └─ getXxx() / addXxx()
                  └─ shared/api/data.ts
                       ├─ сейчас: setTimeout → data/*
-                      └─ потом:  fetch → Laravel /api/*
+                      └─ потом:  fetch → API_BASE + rewrites() (см. ниже)
 ```
+
+## Подключение бэкенда (Laravel, другой домен)
+
+```
+Браузер → https://aalyans.ru/api/*   (same-origin, CORS не нужен)
+  → next.config.ts: rewrites() → https://api.aalyans.ru/*
+  → shared/api/data.ts: fetch(`${API_BASE}/...`)  (API_BASE = NEXT_PUBLIC_API_URL ?? "/api")
+```
+
+- `rewrites()` в `next.config.ts` — все `/api/*` проксируются на бэк-домен
+- `API_BASE` уже заложен в `shared/api/data.ts`
+- При смене домена бэка меняется только rewrite в конфиге
+- `allowedDevOrigins` — только для dev-ресурсов Next, к API не относится
 
 ## Мутация (корзина)
 

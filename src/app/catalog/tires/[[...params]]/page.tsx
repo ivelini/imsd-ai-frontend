@@ -24,7 +24,7 @@ export default async function CatalogPage({ params, searchParams }: PageProps) {
     <section className="catalog-section container">
       <h2>Шины на авто в Челябинске</h2>
       <div className="main-content-catalog">
-        <CatalogFilter options={filters} current={filter} />
+        <CatalogFilter options={filters} current={filter} trackUrl />
         <div className="catalog-with-products">
           {result.items.length === 0 ? (
             <p className="catalog-empty">Товаров не найдено</p>
@@ -32,14 +32,14 @@ export default async function CatalogPage({ params, searchParams }: PageProps) {
             result.items.map((p) => <ProductCard product={p} showLink key={p.id} />)
           )}
         </div>
-        {result.total > result.perPage && (
-          <Pagination
-            current={result.page}
-            total={Math.ceil(result.total / result.perPage)}
-            buildHref={(page) => buildCatalogUrl({ ...filter, page })}
-          />
-        )}
       </div>
+        {result.total > result.perPage && (
+            <Pagination
+                current={result.page}
+                total={Math.ceil(result.total / result.perPage)}
+                buildHref={(page) => buildCatalogUrl({ ...filter, page })}
+            />
+        )}
       <SeoBlock brand={filter.brand} season={filter.season} />
     </section>
   );

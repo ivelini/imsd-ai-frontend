@@ -1,19 +1,8 @@
 // Парсер URL-сегментов каталога в FilterState (фаза 2)
 // [[...params]] → { season?, brand?, width?, profile?, diameter? }
-// Порядок сегментов не важен при парсинге, фиксированный при сборке.
+// value сегментов = value опций фильтра 1:1 (summer, viatti, 185, 60, r15) —
+// никаких маппингов (контракт: .claude/rules/api-contract.md)
 import type { FilterState } from "@/features/catalog/types";
-
-const SEASON_MAP: Record<string, string> = {
-  winter: "зимняя",
-  summer: "летняя",
-  "all-season": "всесезонная",
-};
-
-const REVERSE_SEASON_MAP: Record<string, string> = {
-  "зимняя": "winter",
-  "летняя": "summer",
-  "всесезонная": "all-season",
-};
 
 const R_DIAMETER = /^r(\d+)$/i; // r15, R16
 
@@ -28,12 +17,6 @@ export function parseCatalogParams(
   const unknowns: string[] = [];
   for (const seg of segments) {
     const lower = seg.toLowerCase();
-
-    // Сезон
-    if (SEASON_MAP[lower]) {
-      filter.season = SEASON_MAP[lower];
-      continue;
-    }
 
     // Диаметр rN
     const rMatch = lower.match(R_DIAMETER);
@@ -53,26 +36,55 @@ export function parseCatalogParams(
       continue;
     }
 
-    // Всё остальное — потенциальный бренд
+    // Всё остальное — сезон или бренд (value совпадает с URL напрямую)
     unknowns.push(lower);
   }
 
-  // Первый неизвестный → бренд
+  // Известные сезоны → season, остальное → бренд
+  const seasons = new Set(["summer", "winter", "all-season"]);
   if (unknowns.length > 0) {
-    filter.brand = unknowns[0];
+    const first = unknowns[0];
+    filter.season = seasons.has(first) ? first : undefined;
+    // Бренд — первое не-сезонное значение
+    const brand = unknowns.find((u) => !seasons.has(u));
+    if (brand) filter.brand = brand;
   }
 
-  // Query-параметры
+  // Query-параметры (сегменты имеют приоритет: если сегмент не задал — берём из query,
+  // так каскад авто хранит параметры шин в query при переключении вкладок)
+  if (filter.season == null && searchParams.season) {
+    filter.season = String(searchParams.season);
+  }
+  if (filter.brand == null && searchParams.brand) {
+    filter.brand = String(searchParams.brand);
+  }
+  if (filter.width == null && searchParams.width) {
+    filter.width = parseInt(String(searchParams.width), 10);
+  }
+  if (filter.profile == null && searchParams.profile) {
+    filter.profile = parseInt(String(searchParams.profile), 10);
+  }
+  if (filter.diameter == null && searchParams.diameter) {
+    filter.diameter = parseInt(String(searchParams.diameter), 10);
+  }
   if (searchParams.price_min) {
     filter.priceMin = parseInt(String(searchParams.price_min), 10);
   }
   if (searchParams.price_max) {
     filter.priceMax = parseInt(String(searchParams.price_max), 10);
   }
-  if (searchParams.delivery) {
-    filter.delivery = Array.isArray(searchParams.delivery)
-      ? searchParams.delivery
-      : [searchParams.delivery];
+  if (searchParams.country) {
+    filter.country = String(searchParams.country);
+  }
+  if (searchParams.tire_type) {
+    filter.tireType = String(searchParams.tire_type);
+  }
+  // delivery[] приходит из URL как { "delivery[]": [...] } — читаем оба ключа
+  const deliveryParam = searchParams.delivery ?? searchParams["delivery[]"];
+  if (deliveryParam) {
+    filter.delivery = Array.isArray(deliveryParam)
+      ? deliveryParam
+      : [deliveryParam];
   }
   if (searchParams.page) {
     filter.page = parseInt(String(searchParams.page), 10);
@@ -81,12 +93,39 @@ export function parseCatalogParams(
   return filter;
 }
 
-/** Сборка URL из FilterState → фиксированный порядок season/brand/width/profile/diameter */
+/**
+ * Query-строка фильтров.
+ * includeParams=true — включает и параметры шин (season/brand/width/profile/diameter):
+ * используется на вкладке «По автомобилю», чтобы состояние фильтра параметров
+ * сохранялось в URL и восстанавливалось при возврате на «По параметрам».
+ */
+export function buildQueryString(filter: FilterState, includeParams = false): string {
+  const query = new URLSearchParams();
+  if (includeParams) {
+    if (filter.season) query.set("season", filter.season);
+    if (filter.brand) query.set("brand", filter.brand);
+    if (filter.width) query.set("width", String(filter.width));
+    if (filter.profile) query.set("profile", String(filter.profile));
+    if (filter.diameter) query.set("diameter", String(filter.diameter));
+  }
+  if (filter.priceMin) query.set("price_min", String(filter.priceMin));
+  if (filter.priceMax) query.set("price_max", String(filter.priceMax));
+  if (filter.country) query.set("country", filter.country);
+  if (filter.tireType) query.set("tire_type", filter.tireType);
+  if (filter.delivery?.length) {
+    filter.delivery.forEach((d) => query.append("delivery", d));
+  }
+  if (filter.page && filter.page > 1) query.set("page", String(filter.page));
+  const qs = query.toString();
+  return qs ? `?${qs}` : "";
+}
+
+/** Сборка URL каталога → фиксированный порядок season/brand/width/profile/diameter + query */
 export function buildCatalogUrl(filter: FilterState): string {
   const parts: string[] = [];
 
   if (filter.season) {
-    parts.push(REVERSE_SEASON_MAP[filter.season] ?? filter.season);
+    parts.push(filter.season); // value уже латиницей
   }
   if (filter.brand) {
     parts.push(filter.brand);
@@ -101,17 +140,6 @@ export function buildCatalogUrl(filter: FilterState): string {
     parts.push(`r${filter.diameter}`);
   }
 
-  const query = new URLSearchParams();
-  if (filter.priceMin) query.set("price_min", String(filter.priceMin));
-  if (filter.priceMax) query.set("price_max", String(filter.priceMax));
-  if (filter.delivery?.length) {
-    filter.delivery.forEach((d) => query.append("delivery[]", d));
-  }
-  if (filter.page && filter.page > 1) query.set("page", String(filter.page));
-
   const path = `/catalog/tires/${parts.join("/")}`;
-  const qs = query.toString();
-  return qs ? `${path}?${qs}` : path;
+  return `${path}${buildQueryString(filter)}`;
 }
-
-export { SEASON_MAP, REVERSE_SEASON_MAP };

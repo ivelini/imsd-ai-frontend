@@ -6,6 +6,14 @@ import type { SectionProduct, NewsItem } from "@/features/home/types";
 import type { CartItem } from "@/features/cart/types";
 
 // ---------------------------------------------------------------------------
+// База API (зарезервировано для бэкенда)
+// При подключении Laravel: NEXT_PUBLIC_API_URL в .env.local, запросы через
+// rewrites() в next.config.ts (фронт ходит на свой домен /api/*, Next проксирует
+// на бэк — CORS не нужен). Мок-слой константу не использует.
+// ---------------------------------------------------------------------------
+export const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? "/api";
+
+// ---------------------------------------------------------------------------
 // Утилита — эмуляция сетевой задержки
 // ---------------------------------------------------------------------------
 function delay<T>(ms: number, value: T): Promise<T> {
@@ -110,17 +118,19 @@ import {
   AUTO_YEARS,
   generateModifications,
   getAutoResult,
+  getCarBlock,
   SEO_CONTENT,
 } from "@/data/catalog";
 import type {
   AutoBrandData,
   AutoModData,
   AutoResultProduct,
+  CarBlockData,
 } from "@/data/catalog";
 import type { FilterOptions, FilterState, TireProduct } from "@/features/catalog/types";
 
-export { getTireModel, getAutoResult, SEO_CONTENT };
-export type { AutoBrandData, AutoModData, AutoResultProduct, FilterOptions, TireProduct };
+export { getTireModel, getAutoResult, getCarBlock, SEO_CONTENT };
+export type { AutoBrandData, AutoModData, AutoResultProduct, CarBlockData, FilterOptions, TireProduct };
 
 const PER_PAGE = 12;
 

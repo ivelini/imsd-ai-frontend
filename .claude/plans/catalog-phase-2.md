@@ -216,3 +216,57 @@ getAutoResult(brand: string, model: string, year: number, mod: string): Promise<
 - Модель: описание + типоразмеры по диаметрам
 - Пагинация живая
 - `npm run build` зелёный
+
+---
+
+## 10. Факт выполнения (03.08.2026)
+
+### ✅ Сделано (коммит 60f2a49):
+
+1. **`data/catalog.ts`** — ~500 товаров (5 брендов: Viatti, Michelin, Nokian, Bridgestone, Pirelli; 15 моделей), авто-словарь (4 марки: BMW, Audi, Mercedes, Toyota), SEO-контент, getFilterOptions/getTireModel/getAutoResult
+2. **`features/catalog/types/`** — TireProduct, FilterState, FilterOptions, BrandOption
+3. **`shared/api/data.ts`** — 7 async-функций: getCatalogFilters, getCatalogProducts, getAutoBrands/Models/Years/Modifications, fetchAutoResult
+4. **`ProductCard`** (с EuLabel внутри) — 1-в-1 со шаблоном, проп showLink
+5. **`CatalogFilter`** — клиентский, 1-в-1 со шаблоном (6 селектов колонка 1, скрытая колонка авто, price-range-static слайдер, delivery чекбоксы, country-selet-2)
+6. **`Pagination`** — живая (1...41, текущая активна)
+7. **Роут** `/catalog/tires/[[...params]]` — серверный, парсер URL → `shared/lib/parseParams.ts` (parseCatalogParams, buildCatalogUrl)
+8. **Роут** `/catalog/tires/auto/[[...auto]]` — каскад: марки → модели → годы → модификации → результат
+9. **Роут** `/tires/[modelSlug]` — ModelDescription + ModelSizes (типоразмеры по диаметрам с якорями)
+10. **SeoBlock** — статичный из SEO_CONTENT
+11. **MainFilter** — оживлён (selects → buildCatalogUrl → router.push)
+12. **Пагинация** — работает с фильтром через buildCatalogUrl
+
+### ✅ Сделано дополнительно (03–04.08.2026, без коммита):
+
+13. **CarBlock** — `.car-block` с чекбоксами размеров (getCarBlock в data/catalog.ts); `getAutoResult` переписан под структуру шаблона (одиночный размер → Рекомендация → Лучшая альтернатива)
+14. **CategorySection** — `.category-section` + `.pair-group`; ProductCard: проп `pair` → класс `product-pair`
+15. **PriceSlider** — интерактивный на pointer events (thumbs + fill, синхронизация с инпутами)
+16. **CatalogFilter** — вкладки «По параметрам»/«По автомобилю» (клик → переключение), кнопка «Подобрать» удалена, «Сбросить все фильтры» учитывает вкладку
+17. **Сайдбар на всех уровнях каскада** — `CatalogLayout` обёртка; селекты каскада отражают выбор (autoData: brand/model/year/mod + опции models/years/modifications)
+18. **Вкладка = URL** — переключение через router.push; **query-фильтры (цена/доставка/страна) раздельные для вкладок** (filterParams/filterAuto)
+19. **Zustand-память фильтра** — `stores/useFilterStore.ts` (persist localStorage): filterParams, filterAuto, autoFilter; каскад — чистый URL, восстановление при переключении вкладок и F5
+20. **Унификация формата опций** — `FilterOption {label, value}`, value = латинский slug = URL (summer/viatti/russia/passenger), товары: title/countryLabel готовые от «бэка», SEASON_MAP удалён. Контракт: `.claude/rules/api-contract.md` + `docs/architecture/api-contract.md`
+21. **API_BASE** — заложен в shared/api/data.ts (NEXT_PUBLIC_API_URL ?? "/api"), при API: rewrites() в next.config.ts
+22. **allowedDevOrigins** — next.config.ts (Firefox блокировал cross-origin JS в dev через Docker)
+
+### ⚠️ Требует доработки (не сделано):
+
+- **`/catalog/wheels`** — заглушка (диски) — не трогалась, осталась Placeholder
+- **`/tires/[modelSlug]/[sizeSlug]`** — страница товара (фаза 3)
+- **Верификация** — визуально на 5 разрешениях не проведена
+- fetchAutoResult не фильтрует результат по цене/доставке/стране вкладки авто (query сохраняется в URL, товары не фильтруются)
+
+### Фиксы вёрстки (коммит 3caa708 + правки):
+
+- CatalogFilter переписан 1-в-1: catalog-panel (с SVG) + #filter-in-catalog как siblings в .main-content-catalog
+- Селекты обёрнуты в .custom-select-wrapper.custom-select-wrapper-cat + .select-arrow
+- Колонка 1: 6 селектов (ширина, профиль, диаметр, сезонность, тип шин, производитель)
+- Цена: .filter-price → label + .input-filters → .price-inputs + .price-range-static
+- Чекбоксы: .delivery-checkbox-group → .options-group → .option (input + label)
+- Страна: .country-selet-2
+
+### Инциденты сессии:
+
+- **Math.random() в generateProducts** → hydration mismatch (сервер/клиент разные данные) → JS не работал нигде. Фикс: детерминированная генерация по idCounter
+- **Firefox блокирует cross-origin dev-ресурсы** → JS не работал. Фикс: allowedDevOrigins в next.config.ts
+- **parseParams: delivery[] ≠ delivery, country не парсился** → селект страны/чекбоксы не сохраняли выбор. Фикс: единый ключ delivery + country/tire_type в query

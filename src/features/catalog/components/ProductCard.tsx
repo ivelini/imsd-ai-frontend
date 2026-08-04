@@ -10,15 +10,17 @@ function formatPrice(n: number): string {
 interface ProductCardProps {
   product: TireProduct;
   showLink?: boolean; // true в каталоге, false в автоподборе/модели
+  pair?: boolean; // вторая шина комплекта → класс product-pair
 }
 
-export function ProductCard({ product, showLink = true }: ProductCardProps) {
+export function ProductCard({ product, showLink = true, pair = false }: ProductCardProps) {
   const sizeTitle = `${product.width}/${product.profile} R${product.diameter} ${product.loadIndex}${product.speedRating}`;
   const sizeSlug = `${product.width}-${product.profile}-r${product.diameter}-${product.loadIndex}${product.speedRating.toLowerCase()}`;
   const href = `/tires/${product.modelSlug}/${sizeSlug}`;
+  // Заголовок приходит готовым от «бэка» (product.title), собирать на фронте нельзя
 
   return (
-    <div className="catalog-product">
+    <div className={`catalog-product${pair ? " product-pair" : ""}`}>
       {/* Изображение */}
       <div className="catalog-product-image">
         <div className="catalog-product-image-panel">
@@ -38,9 +40,9 @@ export function ProductCard({ product, showLink = true }: ProductCardProps) {
         <div className="catalog-product-info">
           <h2 className="catalog-product-title">
             {showLink ? (
-              <Link href={href}>{product.brandName} {product.modelName} {sizeTitle} {product.season}</Link>
+              <Link href={href}>{product.title}</Link>
             ) : (
-              <span>{product.brandName} {product.modelName} {sizeTitle} {product.season}</span>
+              <span>{product.title}</span>
             )}
           </h2>
           <div className="catalog-product-prices">
@@ -54,7 +56,7 @@ export function ProductCard({ product, showLink = true }: ProductCardProps) {
           <div className="catalog-product-flex-item catalog-product-general-info">
             <p className="product-code"><b>Код товара:</b> {product.code}</p>
             <p className="country">Производитель: <span className="p-badge">{product.brandName} &gt;</span></p>
-            <p className="country">Страна производства: <span className="p-badge">{product.country} &gt;</span></p>
+            <p className="country">Страна производства: <span className="p-badge">{product.countryLabel} &gt;</span></p>
             <p className="country">Год выпуска: <span className="p-badge">{product.year} &gt;</span></p>
           </div>
           <div className="merge-block">
