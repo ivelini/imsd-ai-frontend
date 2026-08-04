@@ -1,4 +1,4 @@
-# План: модуль выбора города (city query-параметр)
+# План: модуль выбора города (city query-параметр) — ✅ ВЫПОЛНЕНО 04.08.2026
 
 ## Контекст
 
@@ -130,3 +130,23 @@
 1. **Suspense-граница**: `useSearchParams()` в статическом рендеринге требует Suspense. `CityHydrator` — единственный потребитель, обёрнут в `<Suspense fallback={null}>`. В корневом layout уже есть динамический `await getNav()`, так что весь layout динамический — Suspense может не понадобиться, но обёртка для безопасности.
 2. **Back/forward браузера**: `useSearchParams()` реактивен на popstate → CityHydrator обновит Zustand автоматически.
 3. **88 значений value в моке**: данные предоставляет «бэк» (мок), фронт их не генерирует. При переходе на API бэкенд вернёт `{ label, value }` — замена прозрачна.
+
+---
+
+## Факт выполнения (04.08.2026)
+
+### ✅ Сделано
+- `GeoCity.label + value` (label = рус., value = лат. slug), `DEFAULT_CITY_VALUE = "chelyabinsk"`
+- Созданы: `cityUrl.ts` (resolveCityValue, appendCityParam, mergeSearchParams, resolveCityLabel), `useCity.ts`, `CityHydrator.tsx`
+- Zustand `useUIStore`: `city` → `cityValue: string | null` + `setCityValue`
+- `GeoPopup`: selectCity через `router.push`, вкладки регионов с `selectedRegion`, поиск по label, fix CSS `display: none`
+- `CardCityBadge` — клиентский остров для `choice-city` в `ProductCard` (карточка осталась серверной)
+- `CityBadge`, `MainFilter`, `CatalogFilter` — перевод на `useCity()`
+- `parseParams`: `cityValue` в `buildQueryString`/`buildCatalogUrl`
+- `ProductCard` — серверный, `cityLabel`/`cityValue` через props, `appendCityParam` для href
+- Страницы каталога/авто/модели: проброс `city` из `searchParams`
+- `GeoData.defaultCityValue`
+
+### Инциденты
+- GeoPopup не показывал города: CSS `display: none` на `.geo-location-window__city-list` — фикс через `selectedRegion` + `style={{ display: "block" }}`
+- ProductCard стал клиентским из-за `useCity()` — переделан на серверный + `CardCityBadge` остров

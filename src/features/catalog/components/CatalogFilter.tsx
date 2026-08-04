@@ -5,7 +5,7 @@
 import { useEffect, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import type { FilterOptions, FilterState } from "@/features/catalog/types";
-import { buildCatalogUrl, buildQueryString } from "@/shared/lib/parseParams";
+import { buildCatalogUrl, buildWheelsUrl, buildQueryString } from "@/shared/lib/parseParams";
 import { useAutoBrands } from "@/features/catalog/api/useAutoBrands";
 import { useFilterStore } from "@/stores/useFilterStore";
 import { useCity } from "@/shared/layout/api/useCity";
@@ -27,6 +27,8 @@ export interface AutoFilterData {
 interface CatalogFilterProps {
   options: FilterOptions;
   current: FilterState;
+  /** Категория: шины (по умолчанию) или диски */
+  category?: "tires" | "wheels";
   /** Активная вкладка по умолчанию (страницы автоподбора → "car") */
   initialTab?: "params" | "car";
   /** Текущий выбор каскада авто (заполняет селекты вкладки «По автомобилю») */
@@ -64,7 +66,7 @@ function CatSelect({ id, value, onChange, placeholder, children }: {
   );
 }
 
-export function CatalogFilter({ options, current, initialTab = "params", autoData, trackUrl = false }: CatalogFilterProps) {
+export function CatalogFilter({ options, current, initialTab = "params", autoData, trackUrl = false, category = "tires" }: CatalogFilterProps) {
   const router = useRouter();
   const pathname = usePathname();
   const { cityLabel, cityValue, setGeoOpen } = useCity();
@@ -73,18 +75,22 @@ export function CatalogFilter({ options, current, initialTab = "params", autoDat
   // Вкладка: «По параметрам» / «По автомобилю»
   const [tab, setTab] = useState<"params" | "car">(initialTab);
   // Марки авто для вкладки «По автомобилю»
-  const { data: autoBrands } = useAutoBrands();
-  // Память фильтров: отдельные значения для каждой вкладки
-  const filterParams = useFilterStore((s) => s.filterParams);
-  const setFilterParams = useFilterStore((s) => s.setFilterParams);
-  const filterAuto = useFilterStore((s) => s.filterAuto);
-  const setFilterAuto = useFilterStore((s) => s.setFilterAuto);
+  const { data: autoBrands } = useAutoBrands(category);
+  const isWheels = category === "wheels";
+  const autoBase = isWheels ? "/catalog/wheels/auto" : "/catalog/tires/auto";
+  const catalogBase = isWheels ? "/catalog/wheels" : "/catalog/tires";
+  const buildUrl = isWheels ? buildWheelsUrl : buildCatalogUrl;
+  // Память фильтров: раздельная для шин и дисков
+  const filterParams = useFilterStore((s) => isWheels ? s.wheelsFilterParams : s.filterParams);
+  const setFilterParams = useFilterStore((s) => isWheels ? s.setWheelsFilterParams : s.setFilterParams);
+  const filterAuto = useFilterStore((s) => isWheels ? s.wheelsFilterAuto : s.filterAuto);
+  const setFilterAuto = useFilterStore((s) => isWheels ? s.setWheelsFilterAuto : s.setFilterAuto);
   // Память выбора авто-каскада (марка/модель/год/модификация)
-  const storedAuto = useFilterStore((s) => s.autoFilter);
-  const setStoredAuto = useFilterStore((s) => s.setAutoFilter);
-  const resetFilterParams = useFilterStore((s) => s.resetFilterParams);
-  const resetFilterAuto = useFilterStore((s) => s.resetFilterAuto);
-  const resetAuto = useFilterStore((s) => s.resetAutoFilter);
+  const storedAuto = useFilterStore((s) => isWheels ? s.wheelsAutoFilter : s.autoFilter);
+  const setStoredAuto = useFilterStore((s) => isWheels ? s.setWheelsAutoFilter : s.setAutoFilter);
+  const resetFilterParams = useFilterStore((s) => isWheels ? s.resetWheelsFilterParams : s.resetFilterParams);
+  const resetFilterAuto = useFilterStore((s) => isWheels ? s.resetWheelsFilterAuto : s.resetFilterAuto);
+  const resetAuto = useFilterStore((s) => isWheels ? s.resetWheelsAutoFilter : s.resetAutoFilter);
 
   // URL — источник истины для соответствующей вкладки:
   // каталог (trackUrl) → filterParams; каскад → filterAuto
@@ -116,17 +122,17 @@ export function CatalogFilter({ options, current, initialTab = "params", autoDat
   /** Переключение вкладки: URL каждой вкладки собирается из своей памяти */
   const switchTab = (next: "params" | "car") => {
     if (next === "params") {
-      router.push(buildCatalogUrl(filterParams, cityValue));
+      router.push(buildUrl(filterParams, cityValue));
     } else {
       const { brand, model, year, mod } = storedAuto;
       const qs = buildQueryString(filterAuto, false, cityValue);
       if (brand) {
-        const path = ["catalog", "tires", "auto", brand, model ?? "", year ?? "", mod ?? ""]
+        const path = [autoBase, brand, model ?? "", year ?? "", mod ?? ""]
           .filter(Boolean)
           .join("/");
-        router.push(`/${path}${qs}`);
+        router.push(`${path}${qs}`);
       } else {
-        router.push(`/catalog/tires/auto${qs}`);
+        router.push(`${autoBase}${qs}`);
       }
     }
     setTab(next);
@@ -137,11 +143,10 @@ export function CatalogFilter({ options, current, initialTab = "params", autoDat
     const next = { ...effective, ...overrides };
     if (tab === "params") {
       setFilterParams(next);
-      router.push(buildCatalogUrl(next, cityValue));
+      router.push(buildUrl(next, cityValue));
     } else {
       setFilterAuto(next);
-      // На каскаде — текущий путь + query; на каталоге (вкладка авто) — переход на каскад
-      const autoPath = pathname.startsWith("/catalog/tires/auto") ? pathname : "/catalog/tires/auto";
+      const autoPath = pathname.startsWith(autoBase) ? pathname : autoBase;
       router.push(`${autoPath}${buildQueryString(next, false, cityValue)}`);
     }
   }
@@ -151,7 +156,13 @@ export function CatalogFilter({ options, current, initialTab = "params", autoDat
     resetFilterParams();
     resetFilterAuto();
     resetAuto();
-    router.push(tab === "car" ? `/catalog/tires/auto${buildQueryString({}, false, cityValue)}` : buildCatalogUrl({}, cityValue));
+    if (tab === "car") {
+      router.push(`${autoBase}${buildQueryString({}, false, cityValue)}`);
+    } else if (isWheels) {
+      router.push(buildWheelsUrl({}, cityValue));
+    } else {
+      router.push(buildCatalogUrl({}, cityValue));
+    }
   };
 
   const num = (v: string) => (v && v !== "0" ? parseInt(v, 10) : undefined);
@@ -208,27 +219,55 @@ export function CatalogFilter({ options, current, initialTab = "params", autoDat
             </svg>
           </a>
 
-          {/* Вкладка «По параметрам»: колонка с параметрами шин */}
+          {/* Вкладка «По параметрам» */}
           {tab === "params" && (
             <div className="calatog-select-col">
-              <CatSelect id="catalog-widthSelect" value={effective.width ? String(effective.width) : "0"} onChange={(v) => apply({ width: num(v) })} placeholder="Ширина">
-                {options.widths.map((w) => <option key={w.value} value={w.value}>{w.label}</option>)}
-              </CatSelect>
-              <CatSelect id="catalog-profileSelect" value={effective.profile ? String(effective.profile) : "0"} onChange={(v) => apply({ profile: num(v) })} placeholder="Профиль">
-                {options.profiles.map((p) => <option key={p.value} value={p.value}>{p.label}</option>)}
-              </CatSelect>
-              <CatSelect id="catalog-diameterSelect" value={effective.diameter ? String(effective.diameter) : "0"} onChange={(v) => apply({ diameter: num(v) })} placeholder="Диаметр">
-                {options.diameters.map((d) => <option key={d.value} value={d.value}>{d.label}</option>)}
-              </CatSelect>
-              <CatSelect id="catalog-seasonalitySelect" value={effective.season ?? "0"} onChange={(v) => apply({ season: str(v) })} placeholder="Сезонность">
-                {options.seasons.map((s) => <option key={s.value} value={s.value}>{s.label}</option>)}
-              </CatSelect>
-              <CatSelect id="catalog-tireTypeSelect" value={effective.tireType ?? "0"} onChange={(v) => apply({ tireType: str(v) })} placeholder="Тип шин">
-                {options.tireTypes.map((t) => <option key={t.value} value={t.value}>{t.label}</option>)}
-              </CatSelect>
-              <CatSelect id="catalog-manufacturerSelect" value={effective.brand ?? "0"} onChange={(v) => apply({ brand: str(v) })} placeholder="Производитель">
-                {options.brands.map((b) => <option key={b.value} value={b.value}>{b.label}</option>)}
-              </CatSelect>
+              {isWheels ? (
+                <>
+                  <CatSelect id="catalog-diameterSelect" value={effective.diameter ? String(effective.diameter) : "0"} onChange={(v) => apply({ diameter: num(v) })} placeholder="Диаметр">
+                    {options.diameters.map((d) => <option key={d.value} value={d.value}>{d.label}</option>)}
+                  </CatSelect>
+                  <CatSelect id="catalog-widthSelect" value={effective.width ? String(effective.width) : "0"} onChange={(v) => apply({ width: num(v) })} placeholder="Ширина">
+                    {options.widths.map((w) => <option key={w.value} value={w.value}>{w.label}</option>)}
+                  </CatSelect>
+                  <CatSelect id="catalog-pcdSelect" value={effective.pcd ?? "0"} onChange={(v) => apply({ pcd: str(v) })} placeholder="PCD (крепеж)">
+                    {options.pcds.map((p) => <option key={p.value} value={p.value}>{p.label}</option>)}
+                  </CatSelect>
+                  <CatSelect id="catalog-etSelect" value={effective.et ? String(effective.et) : "0"} onChange={(v) => apply({ et: num(v) })} placeholder="ET (вылет)">
+                    {options.ets.map((e) => <option key={e.value} value={e.value}>{e.label}</option>)}
+                  </CatSelect>
+                  <CatSelect id="catalog-hubBoreSelect" value={effective.hubBore ? String(effective.hubBore) : "0"} onChange={(v) => apply({ hubBore: parseFloat(v) || undefined })} placeholder="D (Ступица)">
+                    {options.hubBores.map((h) => <option key={h.value} value={h.value}>{h.label}</option>)}
+                  </CatSelect>
+                  <CatSelect id="catalog-wheelTypeSelect" value={effective.wheelType ?? "0"} onChange={(v) => apply({ wheelType: str(v) })} placeholder="Тип дисков">
+                    {options.wheelTypes.map((t) => <option key={t.value} value={t.value}>{t.label}</option>)}
+                  </CatSelect>
+                  <CatSelect id="catalog-manufacturerSelect" value={effective.brand ?? "0"} onChange={(v) => apply({ brand: str(v) })} placeholder="Производитель">
+                    {options.brands.map((b) => <option key={b.value} value={b.value}>{b.label}</option>)}
+                  </CatSelect>
+                </>
+              ) : (
+                <>
+                  <CatSelect id="catalog-widthSelect" value={effective.width ? String(effective.width) : "0"} onChange={(v) => apply({ width: num(v) })} placeholder="Ширина">
+                    {options.widths.map((w) => <option key={w.value} value={w.value}>{w.label}</option>)}
+                  </CatSelect>
+                  <CatSelect id="catalog-profileSelect" value={effective.profile ? String(effective.profile) : "0"} onChange={(v) => apply({ profile: num(v) })} placeholder="Профиль">
+                    {options.profiles.map((p) => <option key={p.value} value={p.value}>{p.label}</option>)}
+                  </CatSelect>
+                  <CatSelect id="catalog-diameterSelect" value={effective.diameter ? String(effective.diameter) : "0"} onChange={(v) => apply({ diameter: num(v) })} placeholder="Диаметр">
+                    {options.diameters.map((d) => <option key={d.value} value={d.value}>{d.label}</option>)}
+                  </CatSelect>
+                  <CatSelect id="catalog-seasonalitySelect" value={effective.season ?? "0"} onChange={(v) => apply({ season: str(v) })} placeholder="Сезонность">
+                    {options.seasons.map((s) => <option key={s.value} value={s.value}>{s.label}</option>)}
+                  </CatSelect>
+                  <CatSelect id="catalog-tireTypeSelect" value={effective.tireType ?? "0"} onChange={(v) => apply({ tireType: str(v) })} placeholder="Тип шин">
+                    {options.tireTypes.map((t) => <option key={t.value} value={t.value}>{t.label}</option>)}
+                  </CatSelect>
+                  <CatSelect id="catalog-manufacturerSelect" value={effective.brand ?? "0"} onChange={(v) => apply({ brand: str(v) })} placeholder="Производитель">
+                    {options.brands.map((b) => <option key={b.value} value={b.value}>{b.label}</option>)}
+                  </CatSelect>
+                </>
+              )}
             </div>
           )}
 
@@ -239,7 +278,7 @@ export function CatalogFilter({ options, current, initialTab = "params", autoDat
               <CatSelect
                 id="manufacturerSelect"
                 value={autoData?.brand ?? "0"}
-                onChange={(v) => goAuto(`/catalog/tires/auto/${v}`, v)}
+                onChange={(v) => goAuto(`${autoBase}/${v}`, v)}
                 placeholder="Производитель"
               >
                 {autoBrands?.map((b) => (
@@ -251,7 +290,7 @@ export function CatalogFilter({ options, current, initialTab = "params", autoDat
               <CatSelect
                 id="modelSelect"
                 value={autoData?.model ?? "0"}
-                onChange={(v) => goAuto(`/catalog/tires/auto/${autoData?.brand}/${v}`, v)}
+                onChange={(v) => goAuto(`${autoBase}/${autoData?.brand}/${v}`, v)}
                 placeholder="Модель"
               >
                 {autoData?.models?.map((m) => (
@@ -263,7 +302,7 @@ export function CatalogFilter({ options, current, initialTab = "params", autoDat
               <CatSelect
                 id="yearSelect"
                 value={autoData?.year ?? "0"}
-                onChange={(v) => goAuto(`/catalog/tires/auto/${autoData?.brand}/${autoData?.model}/${v}`, v)}
+                onChange={(v) => goAuto(`${autoBase}/${autoData?.brand}/${autoData?.model}/${v}`, v)}
                 placeholder="Год выпуска"
               >
                 {autoData?.years?.map((y) => (
@@ -275,7 +314,7 @@ export function CatalogFilter({ options, current, initialTab = "params", autoDat
               <CatSelect
                 id="modificationSelect"
                 value={autoData?.mod ?? "0"}
-                onChange={(v) => goAuto(`/catalog/tires/auto/${autoData?.brand}/${autoData?.model}/${autoData?.year}/${v}`, v)}
+                onChange={(v) => goAuto(`${autoBase}/${autoData?.brand}/${autoData?.model}/${autoData?.year}/${v}`, v)}
                 placeholder="Модификация"
               >
                 {autoData?.modifications?.map((m) => (

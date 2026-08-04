@@ -1,6 +1,6 @@
 // Карточка товара каталога .catalog-product (фаза 2)
 import Link from "next/link";
-import type { TireProduct } from "@/features/catalog/types";
+import type { ProductBase } from "@/features/catalog/types";
 import { appendCityParam } from "@/shared/lib/cityUrl";
 import { EuLabel } from "./EuLabel";
 import { CardCityBadge } from "./CardCityBadge";
@@ -10,7 +10,7 @@ function formatPrice(n: number): string {
 }
 
 interface ProductCardProps {
-  product: TireProduct;
+  product: ProductBase;
   showLink?: boolean; // true в каталоге, false в автоподборе/модели
   pair?: boolean; // вторая шина комплекта → класс product-pair
   cityLabel?: string;
@@ -18,10 +18,8 @@ interface ProductCardProps {
 }
 
 export function ProductCard({ product, showLink = true, pair = false, cityLabel, cityValue }: ProductCardProps) {
-  const sizeTitle = `${product.width}/${product.profile} R${product.diameter} ${product.loadIndex}${product.speedRating}`;
-  const sizeSlug = `${product.width}-${product.profile}-r${product.diameter}-${product.loadIndex}${product.speedRating.toLowerCase()}`;
-  const href = appendCityParam(`/tires/${product.modelSlug}/${sizeSlug}`, cityValue ?? "");
-  // Заголовок приходит готовым от «бэка» (product.title), собирать на фронте нельзя
+  const categoryPath = (product as any).category === "wheels" ? "wheels" : "tires";
+  const href = appendCityParam(`/${categoryPath}/${product.modelSlug}/${product.sizeSlug}`, cityValue ?? "");
 
   return (
     <div className={`catalog-product${pair ? " product-pair" : ""}`}>

@@ -151,3 +151,84 @@ export function buildCatalogUrl(filter: FilterState, cityValue?: string): string
   const path = `/catalog/tires/${parts.join("/")}`;
   return `${path}${buildQueryString(filter, false, cityValue)}`;
 }
+
+// ---------------------------------------------------------------------------
+// Диски
+// ---------------------------------------------------------------------------
+
+/** Парсинг URL-сегментов + query для каталога дисков */
+export function parseWheelsParams(
+  params: { params?: string[] },
+  searchParams: Record<string, string | string[] | undefined>,
+): FilterState {
+  const segments = params.params ?? [];
+  const filter: FilterState = {};
+
+  for (const seg of segments) {
+    const lower = seg.toLowerCase();
+
+    // Диаметр rN
+    const rMatch = lower.match(R_DIAMETER);
+    if (rMatch) {
+      filter.diameter = parseInt(rMatch[1], 10);
+      continue;
+    }
+
+    // Число → ширина (J-width, например 6.5)
+    const num = parseFloat(lower);
+    if (!isNaN(num) && filter.width == null) {
+      filter.width = num;
+      continue;
+    }
+
+    // Остальное — бренд
+    if (filter.brand == null) {
+      filter.brand = lower;
+    }
+  }
+
+  // Wheels-specific query params
+  if (searchParams.pcd) filter.pcd = String(searchParams.pcd);
+  if (searchParams.et) filter.et = parseInt(String(searchParams.et), 10);
+  if (searchParams.hub_bore) filter.hubBore = parseFloat(String(searchParams.hub_bore));
+  if (searchParams.wheel_type) filter.wheelType = String(searchParams.wheel_type);
+
+  // Общие query-параметры
+  if (searchParams.brand && filter.brand == null) filter.brand = String(searchParams.brand);
+  if (searchParams.price_min) filter.priceMin = parseInt(String(searchParams.price_min), 10);
+  if (searchParams.price_max) filter.priceMax = parseInt(String(searchParams.price_max), 10);
+  if (searchParams.country) filter.country = String(searchParams.country);
+  const deliveryParam = searchParams.delivery ?? searchParams["delivery[]"];
+  if (deliveryParam) {
+    filter.delivery = Array.isArray(deliveryParam) ? deliveryParam : [deliveryParam];
+  }
+  if (searchParams.page) filter.page = parseInt(String(searchParams.page), 10);
+
+  return filter;
+}
+
+/** Сборка URL для каталога дисков */
+export function buildWheelsUrl(filter: FilterState, cityValue?: string): string {
+  const parts: string[] = [];
+
+  if (filter.diameter) parts.push(`r${filter.diameter}`);
+  if (filter.width) parts.push(String(filter.width));
+  if (filter.brand) parts.push(filter.brand);
+
+  const path = `/catalog/wheels/${parts.join("/")}`;
+  const query = new URLSearchParams();
+
+  if (filter.pcd) query.set("pcd", filter.pcd);
+  if (filter.et) query.set("et", String(filter.et));
+  if (filter.hubBore) query.set("hub_bore", String(filter.hubBore));
+  if (filter.wheelType) query.set("wheel_type", filter.wheelType);
+  if (filter.priceMin) query.set("price_min", String(filter.priceMin));
+  if (filter.priceMax) query.set("price_max", String(filter.priceMax));
+  if (filter.country) query.set("country", filter.country);
+  if (filter.delivery?.length) filter.delivery.forEach((d) => query.append("delivery", d));
+  if (filter.page && filter.page > 1) query.set("page", String(filter.page));
+  if (cityValue && cityValue !== DEFAULT_CITY_VALUE) query.set("city", cityValue);
+
+  const qs = query.toString();
+  return `${path}${qs ? `?${qs}` : ""}`;
+}

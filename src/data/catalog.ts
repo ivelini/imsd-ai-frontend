@@ -310,9 +310,12 @@ function generateProducts(): TireProduct[] {
             const countryLabel = COUNTRY_LABELS[brand.country] ?? brand.country;
             const seasonLabel = SEASON_LABELS[model.season] ?? model.season;
 
+            const sizeTitle = `${width}/${profile} R${diameter} ${model.loadIndex}${model.speedRating}`;
+
             products.push({
               id,
               slug: sizeSlug,
+              category: "tires" as const,
               brandId: brand.id,
               brandName: brand.name,
               modelSlug: model.slug,
@@ -329,10 +332,9 @@ function generateProducts(): TireProduct[] {
               country: brand.country,
               countryLabel,
               year: "2025-2026",
-              // Готовый заголовок карточки — формирует «бэк», фронт не собирает
-              title: `Шина ${brand.name} ${model.name} ${width}/${profile} R${diameter} ${model.loadIndex}${model.speedRating} ${seasonLabel.toLowerCase()}`,
-              // Детерминированно (без Math.random — иначе hydration mismatch
-              // между сервером и клиентом, JS падает)
+              title: `Шина ${brand.name} ${model.name} ${sizeTitle} ${seasonLabel.toLowerCase()}`,
+              sizeSlug,
+              sizeTitle,
               quantity: ((idCounter * 7) % 20) + 1,
               image: "/assets/img/wheel-product.png",
               tireType: model.tireType,
@@ -365,7 +367,7 @@ export function getPriceRange() {
 // ============================================================================
 
 // Способы получения: label формирует «бэк», value — латинский slug = query
-const DELIVERY_OPTIONS: FilterOption[] = [
+export const DELIVERY_OPTIONS: FilterOption[] = [
   { label: "Сегодня", value: "today" },
   { label: "Поставка 1-2 дня", value: "delivery-1-2" },
   { label: "Поставка 2-5 дней", value: "delivery-2-5" },
@@ -382,7 +384,7 @@ export function getFilterOptions(): FilterOptions {
     label: `${b.name} (${ALL_PRODUCTS.filter((p) => p.brandId === b.id).length})`,
     value: b.slug,
   }));
-  const widths: FilterOption[] = [...new Set(ALL_PRODUCTS.map((p) => p.width))]
+  const widths: FilterOption[] = [...new Set(ALL_PRODUCTS.map((p) => Number(p.width)))]
     .sort((a, b) => a - b)
     .map((w) => ({ label: String(w), value: String(w) }));
   const profiles: FilterOption[] = [...new Set(ALL_PRODUCTS.map((p) => p.profile))]
@@ -401,7 +403,7 @@ export function getFilterOptions(): FilterOptions {
   }));
   const priceRange = getPriceRange();
 
-  return { seasons, brands, widths, profiles, diameters, tireTypes, countries, delivery: DELIVERY_OPTIONS, priceMin: priceRange.min, priceMax: priceRange.max };
+  return { seasons, brands, widths, profiles, diameters, tireTypes, pcds: [], ets: [], hubBores: [], wheelTypes: [], countries, delivery: DELIVERY_OPTIONS, priceMin: priceRange.min, priceMax: priceRange.max };
 }
 
 // ============================================================================

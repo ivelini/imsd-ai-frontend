@@ -2,12 +2,13 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
-import { getAutoBrands } from "@/shared/api/data";
+import { getAutoBrands, getWheelsAutoBrands } from "@/shared/api/data";
 
-export function useAutoBrands() {
+export function useAutoBrands(category?: "tires" | "wheels") {
+  const isWheels = category === "wheels";
   return useQuery({
-    queryKey: ["auto", "brands"],
-    queryFn: getAutoBrands,
+    queryKey: ["auto", "brands", category ?? "tires"],
+    queryFn: isWheels ? getWheelsAutoBrands : getAutoBrands,
     staleTime: 5 * 60 * 1000,
   });
 }
