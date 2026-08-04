@@ -156,6 +156,7 @@ export async function getProduct(
   const loadSpeedLabel = `${product.loadIndex}${product.speedRating}`;
   const spikesLabel = product.season === "winter" ? "Да" : "Нет";
   const runFlatLabel = ["michelin", "pirelli"].includes(product.brandId) ? "Да" : "Нет";
+  const productionCountryLabel = product.countryLabel;
 
   const quantityOptions = [1, 2, 3, 4].map((q) => ({
     value: q,
@@ -178,7 +179,7 @@ export async function getProduct(
     loadSpeedLabel,
     spikesLabel,
     runFlatLabel,
-    productionCountryLabel: product.countryLabel,
+    productionCountryLabel,
     quantityOptions,
     pickupDate: "8 авг (сб)",
     deliveryLabel: "бесплатно",
@@ -198,6 +199,44 @@ export async function getProduct(
     warrantyText:
       "Гарантия на все шины интернет-магазина «Автоальянс» составляет 12 месяцев с даты покупки. Гарантийный срок службы шин — 5 лет с даты изготовления. Гарантия распространяется на производственные дефекты. Гарантия не распространяется на механические повреждения, возникшие в результате неправильной эксплуатации.",
     reviewCount: 25,
+    parameters: [
+      { name: "Код товара:", value: product.code },
+      {
+        name: "Производитель:",
+        value: product.brandName,
+        badge: true,
+        description: {
+          title: product.brandName,
+          text: `${product.brandName} — один из ведущих производителей автомобильных шин. Компания основана в середине XX века и за прошедшие десятилетия зарекомендовала себя как надёжный поставщик качественной резины для легковых, внедорожных и коммерческих автомобилей. Продукция ${product.brandName} проходит строгий контроль качества на всех этапах производства и соответствует международным стандартам безопасности. Шины ${product.brandName} выбирают миллионы водителей по всему миру.`,
+        },
+      },
+      { name: "Ширина профиля:", value: String(product.width) },
+      { name: "Высота профиля:", value: String(product.profile) },
+      { name: "Посадочный диаметр:", value: String(product.diameter) },
+      { name: "Сезонность:", value: seasonLabel },
+      { name: "Страна бренда:", value: product.countryLabel },
+      { name: "Индекс скорости и нагрузки:", value: loadSpeedLabel },
+      {
+        name: "Страна производства:",
+        value: productionCountryLabel,
+        badge: true,
+        description: {
+          title: `Страна производства — ${product.countryLabel}`,
+          text: `Производство шин осуществляется на современных заводах в ${product.countryLabel === "Россия" ? "России" : product.countryLabel + "и"}. Производственные мощности оснащены оборудованием последнего поколения, а технологический процесс соответствует мировым стандартам шинной промышленности. Локализация производства позволяет оптимизировать логистические издержки и предложить покупателям конкурентоспособные цены при сохранении высокого качества продукции.`,
+        },
+      },
+      {
+        name: "Год выпуска:",
+        value: product.year,
+        badge: true,
+        description: {
+          title: `Год выпуска — ${product.year}`,
+          text: `Шины выпущены в ${product.year.includes("-") ? "период " + product.year : product.year + " году"}. Срок службы автомобильных шин составляет 5 лет с даты изготовления при соблюдении правил хранения и эксплуатации. Рекомендуется обращать внимание на дату выпуска при покупке — свежие шины обеспечивают максимальный уровень безопасности и комфорта. Хранение шин на складе осуществляется в соответствии с требованиями ГОСТ — в сухом проветриваемом помещении, без воздействия прямых солнечных лучей.`,
+        },
+      },
+      { name: "Шипы:", value: spikesLabel },
+      { name: "Run flat:", value: runFlatLabel },
+    ],
   });
 }
 

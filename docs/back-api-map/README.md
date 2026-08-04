@@ -7,7 +7,7 @@
 | Файл | Домен |
 |------|-------|
 | [geo.md](geo.md) | Города, регионы |
-| [catalog/tires.md](catalog/tires.md) | Каталог шин: поиск, фасеты, авто-подбор, модель |
+| [catalog/tires.md](catalog/tires.md) | Каталог шин: поиск, фасеты, авто-подбор, модель, товар |
 | [catalog/wheels.md](catalog/wheels.md) | Каталог дисков: поиск, фасеты, авто-подбор |
 | [common.md](common.md) | Навигация, главная, новости, SEO |
 

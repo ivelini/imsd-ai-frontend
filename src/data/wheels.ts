@@ -109,6 +109,24 @@ for (const brand of BRANDS) {
           title: modelName,
           sizeSlug,
           sizeTitle,
+          parameters: [
+            { name: "Код товара:", value: `W${String(_nextId).padStart(5, "0")}` },
+            {
+              name: "Производитель:",
+              value: brand.name,
+              badge: true,
+              description: {
+                title: brand.name,
+                text: `${brand.name} — один из ведущих производителей автомобильных дисков. Продукция проходит строгий контроль качества.`,
+              },
+            },
+            {
+              name: "Страна производства:",
+              value: COUNTRY_LABELS[brand.country] ?? brand.country,
+              badge: true,
+            },
+            { name: "Год выпуска:", value: "2026" },
+          ],
         });
         _nextId++;
       }

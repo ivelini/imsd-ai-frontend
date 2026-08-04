@@ -2,6 +2,7 @@
 import Link from "next/link";
 import type { ProductBase } from "@/features/catalog/types";
 import { appendCityParam } from "@/shared/lib/cityUrl";
+import { ParamBadge } from "@/shared/ui/ParamBadge";
 import { EuLabel } from "./EuLabel";
 import { CardCityBadge } from "./CardCityBadge";
 
@@ -56,10 +57,20 @@ export function ProductCard({ product, showLink = true, pair = false, cityLabel,
         </div>
         <div className="catalog-product-flex-container">
           <div className="catalog-product-flex-item catalog-product-general-info">
-            <p className="product-code"><b>Код товара:</b> {product.code}</p>
-            <p className="country">Производитель: <span className="p-badge">{product.brandName} &gt;</span></p>
-            <p className="country">Страна производства: <span className="p-badge">{product.countryLabel} &gt;</span></p>
-            <p className="country">Год выпуска: <span className="p-badge">{product.year} &gt;</span></p>
+            {product.parameters.map((p, i) => (
+              <p className="country" key={i}>
+                {p.name}{" "}
+                {p.badge ? (
+                  p.description ? (
+                    <ParamBadge label={p.value} description={p.description} />
+                  ) : (
+                    <span className="p-badge">{p.value} {">"}</span>
+                  )
+                ) : (
+                  <span><b>{p.value}</b></span>
+                )}
+              </p>
+            ))}
           </div>
           <div className="merge-block">
             <div className="catalog-product-flex-item catalog-product-location-info">

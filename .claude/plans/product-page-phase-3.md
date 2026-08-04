@@ -1,4 +1,4 @@
-# План: Фаза 3 — Страница товара
+# План: Фаза 3 — Страница товара — ✅ ВЫПОЛНЕНО 04.08.2026
 
 **Дата:** 04.08.2026
 
@@ -73,3 +73,36 @@ page.tsx (Server)
 ## Будущее: /wheels/[modelSlug]/[sizeSlug]
 
 Та же архитектура, адаптировать `ProductDetails` под параметры дисков (PCD, ET, hub bore, wheelType). Вне скоупа фазы 3.
+
+---
+
+## Факт выполнения
+
+**✅ Сделано (основное):**
+- `ProductDetailData extends TireProduct` — display-ready поля, `getProduct()` в data.ts
+- `ProductGallery`: иконки сезонности (солнце/снежинка/all-season), первые 4 миниатюры + счётчик `+N`, клик → лайтбокс
+- `ImageLightbox` (shared/ui): переиспользуемый — затемнение, стрелки, миниатюры, счётчик, ESC/X/оверлей
+- `ProductDetails`: 12-row parameters-list, цена, `AddToCartBlock`
+- `AddToCartBlock`: quantity select + useAddToCart + попап корзины внутри компонента (правильный товар, X/оверлей/ESC)
+- `ProductTabs`: 6 табов, scroll, `DescriptionExpand` («Показать всё»/«Скрыть»)
+- `Breadcrumbs` — первое применение, `generateMetadata` — динамический title
+- `AddToCartPopup.tsx` удалён (попап перенесён в AddToCartBlock)
+- Механика города: `cityValue: null` = не выбран → нет `?city=` в URL
+
+**✅ Сделано (стили):**
+- `.lightbox-*` — оверлей, стрелки, миниатюры, счётчик
+- `.thumbnails-more` — тёмный блок `+N` на 5-й позиции
+- `.cart_popup_overlay`, `.cart_popup_close`
+- Убран scroll-snap слайдер из `.thumbnails` (возвращён 1:1 шаблону + колонка на мобиле)
+- `.cart_popup` — `background: var(--color-white)` + `border-radius`
+
+**⚠️ Требует доработки:**
+- `/wheels/[modelSlug]/[sizeSlug]` — страница товара дисков (вне скоупа)
+- Реальные изображения товаров — сейчас мок (4 шаблонных картинки × 2)
+- EU-лейбл позиционирование в лайтбоксе (сейчас только на основном изображении)
+
+**Инциденты сессии:**
+- Слайдер thumbnails: 4×70px=280px помещалось в 540px контейнер без переполнения → стрелки не появлялись → заменён на лайтбокс
+- `setCityValue` не принимал `null` → обновлён тип в сторе
+- `appendCityParam` с `""` добавлял пустой `?city=` → изменён на пропуск при `!cityValue`
+- CSS-файл с табами — `sed` использован для вставки (Edit не находил совпадение из-за tab/space)

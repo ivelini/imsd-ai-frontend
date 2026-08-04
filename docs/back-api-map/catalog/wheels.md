@@ -55,7 +55,25 @@
             "image": "/assets/img/wheel-product.png",
             "title": "Replica 7.0J R16 5x112 ET35",
             "sizeSlug": "7.0-r16-5-112-et35",
-            "sizeTitle": "7.0J R16 5x112 ET35"
+            "sizeTitle": "7.0J R16 5x112 ET35",
+            "parameters": [
+                { "name": "Код товара:", "value": "W00001" },
+                {
+                    "name": "Производитель:",
+                    "value": "Replica",
+                    "badge": true,
+                    "description": {
+                        "title": "Replica",
+                        "text": "Replica — один из ведущих производителей автомобильных дисков..."
+                    }
+                },
+                {
+                    "name": "Страна производства:",
+                    "value": "Россия",
+                    "badge": true
+                },
+                { "name": "Год выпуска:", "value": "2026" }
+            ]
         }
     ],
     "facets": {

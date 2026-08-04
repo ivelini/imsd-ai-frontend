@@ -3,12 +3,18 @@
 // (контракт api-contract.md: все label формирует «бэк»)
 
 import type { TireProduct } from "@/features/catalog/types";
+import type { ProductParam } from "@/shared/types/product";
+
+export type { ProductParam, ParamDescription } from "@/shared/types/product";
 
 export interface ProductDetailData extends TireProduct {
   /** Галерея: массив изображений [0] = основное */
   images: string[];
 
-  /** Готовые label для parameters-list (12 строк) */
+  /** Параметры для отображения в parameters-list (формирует «бэк») */
+  parameters: ProductParam[];
+
+  /** Готовые label для параметров (formatted strings) */
   seasonLabel: string;
   loadSpeedLabel: string;
   spikesLabel: string;

@@ -1,4 +1,5 @@
 // Типы каталога (фаза 2, 03.08.2026)
+import type { ProductParam } from "@/shared/types/product";
 
 /** Единый формат опций фильтра/селекта: label — от бэка, value — латинский slug = URL */
 export interface FilterOption {
@@ -34,6 +35,9 @@ export interface ProductBase {
     wetGrip: string;
     noiseEmission: number;
   };
+  /** Параметры для отображения в карточке (формирует «бэк»).
+   *  badge + description → ParamBadge с попапом, иначе parameter-value. */
+  parameters: ProductParam[];
 }
 
 // ============================================================================

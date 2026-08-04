@@ -142,7 +142,7 @@ export function AddToCartBlock({ product }: { product: ProductDetailData }) {
                     </div>
                   </div>
                   <div className="cart_popup_item_info_av">
-                    Наличие <span>&gt;12 шт.</span>
+                    Наличие <span>{">"}12 шт.</span>
                   </div>
                 </div>
                 <div className="cart_popup_item_total">{formatPrice(cartItem.price * cartItem.quantity)}</div>

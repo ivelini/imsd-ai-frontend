@@ -62,7 +62,37 @@
                 "rollingResistance": "B",
                 "wetGrip": "C",
                 "noiseEmission": 71
-            }
+            },
+            "parameters": [
+                { "name": "Код товара:", "value": "АА-000001" },
+                {
+                    "name": "Производитель:",
+                    "value": "Viatti",
+                    "badge": true,
+                    "description": {
+                        "title": "Viatti",
+                        "text": "Viatti — один из ведущих производителей автомобильных шин..."
+                    }
+                },
+                {
+                    "name": "Страна производства:",
+                    "value": "Россия",
+                    "badge": true,
+                    "description": {
+                        "title": "Страна производства — Россия",
+                        "text": "Производство осуществляется на современных заводах..."
+                    }
+                },
+                {
+                    "name": "Год выпуска:",
+                    "value": "2025-2026",
+                    "badge": true,
+                    "description": {
+                        "title": "Год выпуска — 2025-2026",
+                        "text": "Срок службы шин — 5 лет с даты изготовления..."
+                    }
+                }
+            ]
         }
     ],
     "facets": {
@@ -347,3 +377,140 @@
     }
 }
 ```
+
+---
+
+### GET /api/tires/{modelSlug}/{sizeSlug}
+
+Страница товара (типоразмер).  
+Параметры query-string: `city` (опционально).
+
+```json
+{
+    "data": {
+        "id": "tire-1",
+        "slug": "175-60-r14-84h",
+        "category": "tires",
+        "brandId": "viatti",
+        "brandName": "Viatti",
+        "modelSlug": "viatti-strada-2",
+        "modelName": "V-130 Strada Asimmetrico",
+        "width": 175,
+        "profile": 60,
+        "diameter": 14,
+        "season": "summer",
+        "loadIndex": "84",
+        "speedRating": "H",
+        "tireType": "passenger",
+        "price": 6215,
+        "oldPrice": 6961,
+        "code": "АА-075632",
+        "country": "russia",
+        "countryLabel": "Россия",
+        "year": "2025-2026",
+        "quantity": 15,
+        "image": "/assets/img/wheel-product.png",
+        "title": "Шина Viatti V-130 Strada Asimmetrico 175/60 R14 84H летняя",
+        "sizeSlug": "175-60-r14-84h",
+        "sizeTitle": "175/60 R14 84H",
+        "euLabel": {
+            "rollingResistance": "C",
+            "wetGrip": "C",
+            "noiseEmission": 70
+        },
+
+        "images": [
+            "/assets/img/large.png",
+            "/assets/img/disk-1.png",
+            "/assets/img/wheel-product.png",
+            "/assets/img/disk-2.png",
+            "/assets/img/large.png",
+            "/assets/img/disk-1.png",
+            "/assets/img/wheel-product.png",
+            "/assets/img/disk-2.png"
+        ],
+
+        "parameters": [
+            { "name": "Код товара:", "value": "АА-075632" },
+            {
+                "name": "Производитель:",
+                "value": "Viatti",
+                "badge": true,
+                "description": {
+                    "title": "Viatti",
+                    "text": "Viatti — один из ведущих производителей автомобильных шин..."
+                }
+            },
+            { "name": "Ширина профиля:", "value": "175" },
+            { "name": "Высота профиля:", "value": "60" },
+            { "name": "Посадочный диаметр:", "value": "14" },
+            { "name": "Сезонность:", "value": "Летняя" },
+            { "name": "Страна бренда:", "value": "Россия" },
+            { "name": "Индекс скорости и нагрузки:", "value": "84H" },
+            {
+                "name": "Страна производства:",
+                "value": "Россия",
+                "badge": true,
+                "description": {
+                    "title": "Страна производства — Россия",
+                    "text": "Производство шин осуществляется на современных заводах в России..."
+                }
+            },
+            {
+                "name": "Год выпуска:",
+                "value": "2025-2026",
+                "badge": true,
+                "description": {
+                    "title": "Год выпуска — 2025-2026",
+                    "text": "Шины выпущены в период 2025-2026. Срок службы..."
+                }
+            },
+            { "name": "Шипы:", "value": "Нет" },
+            { "name": "Run flat:", "value": "Нет" }
+        ],
+
+        "seasonLabel": "Летняя",
+        "loadSpeedLabel": "84H",
+        "spikesLabel": "Нет",
+        "runFlatLabel": "Нет",
+        "productionCountryLabel": "Россия",
+
+        "quantityOptions": [
+            { "value": 1, "label": "6 215 ₽ - 1 шт." },
+            { "value": 2, "label": "12 430 ₽ - 2 шт." },
+            { "value": 3, "label": "18 645 ₽ - 3 шт." },
+            { "value": 4, "label": "24 860 ₽ - 4 шт." }
+        ],
+
+        "pickupDate": "8 авг (сб)",
+        "deliveryLabel": "бесплатно",
+        "storeAddress": "Челябинск - Свердловский тракт 3Н (Автоальянс)",
+        "storeHours": "Рабочие дни: 09:00-19:00 / Выходные: 09:00-17:00",
+
+        "descriptionHtml": "<p>V-130 Strada Asimmetrico — летняя шина...</p>",
+        "availabilityText": "Информация о наличии продукта обновляется в реальном времени...",
+        "deliveryText": "Доставка осуществляется по всей России...",
+        "warrantyText": "Гарантия на все шины интернет-магазина «Автоальянс» составляет 12 месяцев...",
+        "reviewCount": 25,
+
+        "seo": {
+            "title": "Шина Viatti V-130 Strada Asimmetrico 175/60 R14 84H летняя",
+            "description": "Купить Шина Viatti V-130 Strada Asimmetrico 175/60 R14 84H летняя в Челябинске. Цена 6 215 ₽.",
+            "breadcrumbs": [
+                { "title": "Главная", "url": "/" },
+                { "title": "Каталог шин", "url": "/catalog/tires" },
+                { "title": "Viatti", "url": "/tires/viatti-strada-2" },
+                { "title": "175/60 R14 84H" }
+            ]
+        }
+    }
+}
+```
+
+**Поля параметров:**
+| Поле | Тип | Описание |
+|---|---|---|
+| `parameters[].name` | string | Название параметра (с двоеточием) |
+| `parameters[].value` | string | Значение для отображения |
+| `parameters[].badge` | bool? | `true` → рендерить как `p-badge` (кликабельная ссылка) |
+| `parameters[].description` | object? | Если badge=true — попап с `title` и `text` при клике |
