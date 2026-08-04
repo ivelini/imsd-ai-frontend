@@ -88,6 +88,11 @@ page.tsx (Server)
 - `Breadcrumbs` — первое применение, `generateMetadata` — динамический title
 - `AddToCartPopup.tsx` удалён (попап перенесён в AddToCartBlock)
 - Механика города: `cityValue: null` = не выбран → нет `?city=` в URL
+- `ProductParam`, `ParamDescription` в `shared/types/product.ts` — общие для каталога и товара
+- `ProductBase.parameters: ProductParam[]` — единый формат от бэка
+- `ParamBadge` (shared/ui): createPortal в body — нет `<div>` внутри `<p>`
+- Каталог: 4 параметра (код, производитель, страна, год) с badge+description
+- `docs/back-api-map/`: `parameters` в tires.md и wheels.md
 
 **✅ Сделано (стили):**
 - `.lightbox-*` — оверлей, стрелки, миниатюры, счётчик
@@ -102,7 +107,10 @@ page.tsx (Server)
 - EU-лейбл позиционирование в лайтбоксе (сейчас только на основном изображении)
 
 **Инциденты сессии:**
-- Слайдер thumbnails: 4×70px=280px помещалось в 540px контейнер без переполнения → стрелки не появлялись → заменён на лайтбокс
+- Слайдер thumbnails: 4×70px=280px помещалось в 540px контейнер без переполнения → заменён на лайтбокс
 - `setCityValue` не принимал `null` → обновлён тип в сторе
 - `appendCityParam` с `""` добавлял пустой `?city=` → изменён на пропуск при `!cityValue`
 - CSS-файл с табами — `sed` использован для вставки (Edit не находил совпадение из-за tab/space)
+- `&gt;` в JSX-тексте → `&amp;gt;` в HTML, hydration mismatch → заменён на `{">"}`
+- `<div>` внутри `<p>` (ParamBadge в ProductCard) → браузер авто-закрывает `<p>` → hydration error → `createPortal` в `document.body`
+- `productionCountryLabel` не определён как переменная (был только в return-объекте) → добавлен `const`

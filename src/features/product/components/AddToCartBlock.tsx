@@ -1,37 +1,28 @@
 "use client";
-// Количество + кнопка «Добавить в корзину» + попап (фаза 3, 04.08.2026)
-import { useState, useEffect, useCallback } from "react";
+// Количество + кнопка «Добавить в корзину»/«Убрать» + попапы (фаза 3, 04.08.2026)
+import { useState, useEffect } from "react";
 import { useAddToCart } from "@/features/cart/api/useAddToCart";
+import { useRemoveFromCart } from "@/features/cart/api/useRemoveFromCart";
 import { useCart } from "@/features/cart/api/useCart";
-import { useUpdateCartItem } from "@/features/cart/api/useUpdateCartItem";
+import { CartPopup } from "@/shared/ui/CartPopup";
+import { ConfirmRemovePopup } from "@/shared/ui/ConfirmRemovePopup";
 import type { ProductDetailData } from "../types";
-
-const formatPrice = (n: number) => n.toLocaleString("ru-RU") + " ₽";
 
 export function AddToCartBlock({ product }: { product: ProductDetailData }) {
   const [quantity, setQuantity] = useState(1);
   const [popupOpen, setPopupOpen] = useState(false);
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const [ready, setReady] = useState(false);
   const { mutate, isPending } = useAddToCart();
+  const { mutate: remove } = useRemoveFromCart();
   const { data: items } = useCart();
-  const { mutate: changeQuantity } = useUpdateCartItem();
+
+  // После mount — рендер по данным корзины (post-hydration update)
+  useEffect(() => setReady(true), []);
 
   // Найти добавленный товар в корзине (по id продукта)
   const cartItem = items?.find((i) => i.id === product.id);
-
-  // ESC → закрыть попап
-  const handleKeyDown = useCallback(
-    (e: KeyboardEvent) => {
-      if (e.key === "Escape") setPopupOpen(false);
-    },
-    [],
-  );
-
-  useEffect(() => {
-    if (popupOpen) {
-      document.addEventListener("keydown", handleKeyDown);
-      return () => document.removeEventListener("keydown", handleKeyDown);
-    }
-  }, [popupOpen, handleKeyDown]);
+  const isInCart = !!cartItem;
 
   const handleAdd = () => {
     mutate(
@@ -89,75 +80,29 @@ export function AddToCartBlock({ product }: { product: ProductDetailData }) {
       </div>
 
       <button
-        className="add-to-cart-button primary-button"
-        onClick={handleAdd}
-        disabled={isPending}
+        className={`add-to-cart-button primary-button${!ready ? " add-to-cart-button--skeleton" : isInCart ? " add-to-cart-button--remove" : ""}`}
+        onClick={!ready ? undefined : isInCart ? () => setConfirmOpen(true) : handleAdd}
       >
-        {isPending ? "Добавление..." : "Добавить в корзину"}
+        {!ready ? "" : isInCart ? "Убрать из корзины" : isPending ? "Добавление..." : "Добавить в корзину"}
       </button>
 
-      {/* Попап «Товар добавлен в корзину» */}
-      {popupOpen && (
-        <div
-          className="cart_popup_overlay"
-          onClick={() => setPopupOpen(false)}
-        >
-          <div
-            className="cart_popup"
-            id="cart_popup"
-            style={{ display: "block" }}
-            onClick={(e) => e.stopPropagation()}
-          >
-            <button
-              className="cart_popup_close"
-              onClick={() => setPopupOpen(false)}
-              aria-label="Закрыть"
-            >
-              <svg width="18" height="18" viewBox="0 0 18 18">
-                <path d="M1 1L17 17M17 1L1 17" stroke="#666" strokeWidth="2" strokeLinecap="round"/>
-              </svg>
-            </button>
-            <div className="cart_popup_title">Товар успешно добавлен в корзину</div>
-            {cartItem && (
-              <div className="cart_popup_item">
-                <div className="cart_popup_item_img">
-                  <img src={cartItem.image} alt="" />
-                </div>
-                <div className="cart_popup_item_info">
-                  <div className="cart_popup_item_info_title">{cartItem.name}</div>
-                  <div className="cart_popup_item_info_single">
-                    {quantity} шт. - <span>{formatPrice(cartItem.price)}</span>
-                  </div>
-                </div>
-                <div className="cart_popup_item_quantity">
-                  <div className="cart_popup_item_quantity_in">
-                    <div className="cart_popup_item_quantity_btn" onClick={() => changeQuantity({ id: cartItem.id, delta: -1 })}>
-                      <img src="/assets/img/popup_minus.svg" alt="" />
-                    </div>
-                    <div className="cart_popup_item_quantity_number">
-                      <span>{cartItem.quantity}</span>
-                    </div>
-                    <div className="cart_popup_item_quantity_btn" onClick={() => changeQuantity({ id: cartItem.id, delta: 1 })}>
-                      <img src="/assets/img/popup_plus.svg" alt="" />
-                    </div>
-                  </div>
-                  <div className="cart_popup_item_info_av">
-                    Наличие <span>{">"}12 шт.</span>
-                  </div>
-                </div>
-                <div className="cart_popup_item_total">{formatPrice(cartItem.price * cartItem.quantity)}</div>
-              </div>
-            )}
-            <div className="cart_popup_btns">
-              <a href="#" className="cart_popup_btn cart_popup_btn_close" onClick={(e) => { e.preventDefault(); setPopupOpen(false); }}>
-                Продолжить покупки
-              </a>
-              <a href="/cart" className="cart_popup_btn cart_popup_btn_cart">
-                Перейти в корзину
-              </a>
-            </div>
-          </div>
-        </div>
+      {popupOpen && cartItem && (
+        <CartPopup
+          item={cartItem}
+          addedQuantity={quantity}
+          onClose={() => setPopupOpen(false)}
+        />
+      )}
+
+      {confirmOpen && (
+        <ConfirmRemovePopup
+          name={product.title}
+          onConfirm={() => {
+            remove(product.id);
+            setConfirmOpen(false);
+          }}
+          onClose={() => setConfirmOpen(false)}
+        />
       )}
     </>
   );
