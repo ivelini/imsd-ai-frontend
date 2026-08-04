@@ -14,8 +14,14 @@ function CityHydratorInner() {
   const valueFromUrl = resolveCityValue(searchParams);
 
   useEffect(() => {
-    if (cityValue !== valueFromUrl) {
+    // null = город не выбран (нет ?city= в URL) → не трогаем стор
+    // строка = город выбран → синхронизируем в стор
+    if (valueFromUrl && cityValue !== valueFromUrl) {
       setCityValue(valueFromUrl);
+    } else if (!valueFromUrl && cityValue) {
+      // URL без ?city=, но стор содержит значение (после выбора другого города
+      // или ручного удаления параметра) → сбрасываем в null
+      setCityValue(null);
     }
   }, [valueFromUrl, cityValue, setCityValue]);
 

@@ -1,5 +1,5 @@
 // Утилиты для города в URL (city query-параметр)
-import { DEFAULT_CITY, DEFAULT_CITY_VALUE, GEO_CITIES } from "@/data/geo";
+import { DEFAULT_CITY, GEO_CITIES } from "@/data/geo";
 
 /** Резолв label города по value (для серверных компонентов) */
 export function resolveCityLabel(value?: string): string {
@@ -9,16 +9,20 @@ export function resolveCityLabel(value?: string): string {
 
 export const CITY_PARAM = "city";
 
-/** Извлечь value города из searchParams (или DEFAULT_CITY_VALUE) */
+/** Извлечь value города из searchParams (null = не выбран) */
 export function resolveCityValue(
   searchParams: URLSearchParams,
-): string {
-  return searchParams.get(CITY_PARAM) || DEFAULT_CITY_VALUE;
+): string | null {
+  return searchParams.get(CITY_PARAM) || null;
 }
 
-/** Добавить city параметр к URL-строке (пути с query). Если default — не добавляем. */
+/**
+ * Добавить city параметр к URL-строке.
+ * Если город не выбран (cityValue пуст) — не добавляем.
+ * Если выбран (даже Челябинск) — добавляем всегда.
+ */
 export function appendCityParam(url: string, cityValue: string): string {
-  if (cityValue === DEFAULT_CITY_VALUE) return url;
+  if (!cityValue) return url;
   const sep = url.includes("?") ? "&" : "?";
   return `${url}${sep}city=${encodeURIComponent(cityValue)}`;
 }

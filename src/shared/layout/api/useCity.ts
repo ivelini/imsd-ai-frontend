@@ -10,6 +10,7 @@ export function useCity() {
   const setGeoOpen = useUIStore((s) => s.setGeoOpen);
   const { data: geo } = useGeo();
 
+  // null = город не выбран (по умолчанию Челябинск для отображения)
   const slug = cityValue ?? DEFAULT_CITY_VALUE;
 
   const cityLabel = geo
@@ -17,9 +18,9 @@ export function useCity() {
     : DEFAULT_CITY;
 
   return {
-    cityValue: slug,
+    cityValue, // null если не выбран, иначе slug
     cityLabel,
     setGeoOpen: () => setGeoOpen(true),
-    isReady: cityValue !== null,
+    isReady: true,
   };
 }

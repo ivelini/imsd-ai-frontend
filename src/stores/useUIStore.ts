@@ -6,7 +6,7 @@ interface UIState {
   geoOpen: boolean;
   menuOpen: boolean;
   cartPopupOpen: boolean;
-  setCityValue: (value: string) => void;
+  setCityValue: (value: string | null) => void;
   setGeoOpen: (open: boolean) => void;
   setMenuOpen: (open: boolean) => void;
   setCartPopupOpen: (open: boolean) => void;

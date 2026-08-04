@@ -3,7 +3,6 @@
 // value сегментов = value опций фильтра 1:1 (summer, viatti, 185, 60, r15) —
 // никаких маппингов (контракт: .claude/rules/api-contract.md)
 import type { FilterState } from "@/features/catalog/types";
-import { DEFAULT_CITY_VALUE } from "@/data/geo";
 
 const R_DIAMETER = /^r(\d+)$/i; // r15, R16
 
@@ -103,7 +102,7 @@ export function parseCatalogParams(
 export function buildQueryString(
   filter: FilterState,
   includeParams = false,
-  cityValue?: string,
+  cityValue?: string | null,
 ): string {
   const query = new URLSearchParams();
   if (includeParams) {
@@ -121,7 +120,7 @@ export function buildQueryString(
     filter.delivery.forEach((d) => query.append("delivery", d));
   }
   if (filter.page && filter.page > 1) query.set("page", String(filter.page));
-  if (cityValue && cityValue !== DEFAULT_CITY_VALUE) {
+  if (cityValue) {
     query.set("city", cityValue);
   }
   const qs = query.toString();
@@ -129,7 +128,7 @@ export function buildQueryString(
 }
 
 /** Сборка URL каталога → фиксированный порядок season/brand/width/profile/diameter + query */
-export function buildCatalogUrl(filter: FilterState, cityValue?: string): string {
+export function buildCatalogUrl(filter: FilterState, cityValue?: string | null): string {
   const parts: string[] = [];
 
   if (filter.season) {
@@ -208,7 +207,7 @@ export function parseWheelsParams(
 }
 
 /** Сборка URL для каталога дисков */
-export function buildWheelsUrl(filter: FilterState, cityValue?: string): string {
+export function buildWheelsUrl(filter: FilterState, cityValue?: string | null): string {
   const parts: string[] = [];
 
   if (filter.diameter) parts.push(`r${filter.diameter}`);
@@ -227,7 +226,7 @@ export function buildWheelsUrl(filter: FilterState, cityValue?: string): string 
   if (filter.country) query.set("country", filter.country);
   if (filter.delivery?.length) filter.delivery.forEach((d) => query.append("delivery", d));
   if (filter.page && filter.page > 1) query.set("page", String(filter.page));
-  if (cityValue && cityValue !== DEFAULT_CITY_VALUE) query.set("city", cityValue);
+  if (cityValue) query.set("city", cityValue);
 
   const qs = query.toString();
   return `${path}${qs ? `?${qs}` : ""}`;
