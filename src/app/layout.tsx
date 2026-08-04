@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import "./style.css";
 import { getNav } from "@/shared/api/data";
 import { ClientLayout } from "@/shared/layout/ClientLayout";
-import { AddToCartPopup } from "@/shared/layout/AddToCartPopup";
+
 import { Benefits } from "@/shared/layout/Benefits";
 import { CatalogMenu } from "@/shared/layout/CatalogMenu";
 import { Footer } from "@/shared/layout/Footer";
@@ -35,7 +35,7 @@ export default async function RootLayout({
               <Benefits benefits={nav.benefits} />
               {children}
               <Footer nav={nav} />
-              <AddToCartPopup />
+
             </div>
           </div>
         </ClientLayout>

@@ -164,7 +164,16 @@ export async function getProduct(
 
   return delay(50, {
     ...product,
-    images: [product.image, product.image, product.image, product.image],
+    images: [
+      "/assets/img/large.png",
+      "/assets/img/disk-1.png",
+      "/assets/img/wheel-product.png",
+      "/assets/img/disk-2.png",
+      "/assets/img/large.png",
+      "/assets/img/disk-1.png",
+      "/assets/img/wheel-product.png",
+      "/assets/img/disk-2.png",
+    ],
     seasonLabel,
     loadSpeedLabel,
     spikesLabel,

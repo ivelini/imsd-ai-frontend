@@ -124,7 +124,7 @@
   - Сервисные: `/cart`, `/checkout`, `/order/[id]`, `/order-status` (гостевая проверка), `/auth/login`, `/auth/register`, `/articles`, `/articles/[id]`.
   - ЛК: `/account` → `/account/profile`, `/account/orders`, `/account/orders/[id]`, `/account/garage`, `/account/favorites`, `/account/addresses` (макетов нет — верстать по образцу шаблона).
 
-**Фаза 2 — Каталог**
+**Фаза 2 — Каталог** — ✅ ВЫПОЛНЕНО 04.08.2026
 - Компоненты: `ProductCard`, `CatalogFilter`, `PriceSlider`, `AutoSelectForm`, `SeoBlock` — в `src/features/catalog/components/`; `MainFilter`, `SectionProduct`, `ProductList`, `DiscountBlock`, `ThreeBlocks`, `AboutCompany` — в `src/features/home/components/`; `Pagination` — в `src/shared/ui/`.
 - Типы: `TireProduct`, `TireModel`, `FilterState` — в `src/features/catalog/types/`.
 - Данные: `src/data/catalog.ts` — типоразмеры, опции фильтра, авто-словарь BMW, пары AUTO_RESULT, SEO.
@@ -134,9 +134,18 @@
 - Подбор по авто — каскад марка→модель→год→модификация.
 - «Купить» на карточке — add-to-cart + открытие `AddToCartPopup`.
 
-**Фаза 3 — Товар**
-- `ProductPage` (галерея: зум/активный thumb — состояние, параметры, количество, вкладки Описание/Наличие/Доставка/Гарантия/Отзывы — client state) — в `src/features/catalog/components/`.
-- Роут: `/tires/[modelSlug]/[sizeSlug]`.
+**Фаза 3 — Товар** — ✅ ВЫПОЛНЕНО 04.08.2026
+- `ProductGallery` (client): thumbnails → main image + EuLabel, SVG-иконки
+- `ProductDetails` (server): 12-row parameters-list, цена, `AddToCartBlock`
+- `AddToCartBlock` (client): quantity select + useAddToCart + cart popup
+- `ProductTabs` (client): 6 табов (3 hide-on-mobile), scroll, content-секции
+- `DescriptionExpand` (client): «Показать всё»/«Скрыть»
+- `ProductDetailData extends TireProduct` — display-ready поля от «бэка»
+- `getProduct(modelSlug, sizeSlug)` в shared/api/data
+- `Breadcrumbs` — первое применение в проекте
+- `generateMetadata` — динамический title/description
+- Роут: `/tires/[modelSlug]/[sizeSlug]`
+- Домен: `src/features/product/` (типы + компоненты)
 
 **Фаза 4 — Оформление и сервисные**
 - `CartPage`, `CartItem` — в `src/features/cart/components/`; `OrderPage` (шаги 1–3 с `.active` переключателями → контролируемые) — в `src/features/checkout/components/`; `AuthForm` (login/register) — в `src/features/auth/components/`; `ArticlesList`/`ArticlePage`, `NewsCard` — в `src/features/articles/components/`.

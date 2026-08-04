@@ -43,7 +43,7 @@ export default async function ProductPage({ params, searchParams }: PageProps) {
     <>
       <Breadcrumbs crumbs={breadcrumbs} />
       <div className="container product-container">
-        <ProductGallery images={product.images} euLabel={product.euLabel} />
+        <ProductGallery images={product.images} season={product.season} euLabel={product.euLabel} />
         <ProductDetails product={product} />
       </div>
       <ProductTabs product={product} />

@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="44" height="44" viewBox="0 0 44 44" fill="none">
+  <!-- Центральная вертикаль -->
+  <rect x="20" y="4" width="4" height="36" rx="2" fill="#3059A8"/>
+  <!-- Центральная горизонталь -->
+  <rect x="4" y="20" width="36" height="4" rx="2" fill="#3059A8"/>
+  <!-- Диагональ \ -->
+  <rect x="18" y="6" width="4" height="20" rx="2" transform="rotate(45 20 16)" fill="#3059A8"/>
+  <!-- Диагональ / -->
+  <rect x="20" y="18" width="4" height="20" rx="2" transform="rotate(-45 22 28)" fill="#3059A8"/>
+  <!-- Ветви: верх -->
+  <rect x="20" y="0" width="4" height="8" rx="2" fill="#3059A8"/>
+  <rect x="14" y="6" width="4" height="4" rx="1" transform="rotate(30 16 8)" fill="#3059A8"/>
+  <rect x="26" y="6" width="4" height="4" rx="1" transform="rotate(-30 28 8)" fill="#3059A8"/>
+  <!-- Ветви: низ -->
+  <rect x="20" y="36" width="4" height="8" rx="2" fill="#3059A8"/>
+  <rect x="14" y="34" width="4" height="4" rx="1" transform="rotate(-30 16 36)" fill="#3059A8"/>
+  <rect x="26" y="34" width="4" height="4" rx="1" transform="rotate(30 28 36)" fill="#3059A8"/>
+  <!-- Ветви: лево -->
+  <rect x="0" y="20" width="8" height="4" rx="2" fill="#3059A8"/>
+  <rect x="6" y="14" width="4" height="4" rx="1" transform="rotate(60 8 16)" fill="#3059A8"/>
+  <rect x="6" y="26" width="4" height="4" rx="1" transform="rotate(-60 8 28)" fill="#3059A8"/>
+  <!-- Ветви: право -->
+  <rect x="36" y="20" width="8" height="4" rx="2" fill="#3059A8"/>
+  <rect x="34" y="14" width="4" height="4" rx="1" transform="rotate(120 36 16)" fill="#3059A8"/>
+  <rect x="34" y="26" width="4" height="4" rx="1" transform="rotate(-120 36 28)" fill="#3059A8"/>
+</svg>
