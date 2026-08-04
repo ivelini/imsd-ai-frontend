@@ -1,6 +1,7 @@
 // Каталог шин: серверная страница с клиентским фильтром (фаза 2)
 import { getCatalogFilters, getCatalogProducts } from "@/shared/api/data";
 import { parseCatalogParams, buildCatalogUrl } from "@/shared/lib/parseParams";
+import { resolveCityLabel } from "@/shared/lib/cityUrl";
 import { CatalogFilter } from "@/features/catalog/components/CatalogFilter";
 import { ProductCard } from "@/features/catalog/components/ProductCard";
 import { Pagination } from "@/features/catalog/components/Pagination";
@@ -14,11 +15,13 @@ interface PageProps {
 export default async function CatalogPage({ params, searchParams }: PageProps) {
   const [resolvedParams, resolvedSearchParams] = await Promise.all([params, searchParams]);
   const filter = parseCatalogParams(resolvedParams, resolvedSearchParams);
+  const cityValue = typeof resolvedSearchParams.city === "string" ? resolvedSearchParams.city : undefined;
 
   const [filters, result] = await Promise.all([
     getCatalogFilters(),
     getCatalogProducts(filter),
   ]);
+  const cityLabel = resolveCityLabel(cityValue);
 
   return (
     <section className="catalog-section container">
@@ -29,7 +32,7 @@ export default async function CatalogPage({ params, searchParams }: PageProps) {
           {result.items.length === 0 ? (
             <p className="catalog-empty">Товаров не найдено</p>
           ) : (
-            result.items.map((p) => <ProductCard product={p} showLink key={p.id} />)
+            result.items.map((p) => <ProductCard product={p} showLink key={p.id} cityLabel={cityLabel} cityValue={cityValue} />)
           )}
         </div>
       </div>
@@ -37,7 +40,7 @@ export default async function CatalogPage({ params, searchParams }: PageProps) {
             <Pagination
                 current={result.page}
                 total={Math.ceil(result.total / result.perPage)}
-                buildHref={(page) => buildCatalogUrl({ ...filter, page })}
+                buildHref={(page) => buildCatalogUrl({ ...filter, page }, cityValue)}
             />
         )}
       <SeoBlock brand={filter.brand} season={filter.season} />

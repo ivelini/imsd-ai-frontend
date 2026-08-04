@@ -58,6 +58,7 @@ export interface FilterOptions {
   diameters: FilterOption[];
   tireTypes: FilterOption[];
   countries: FilterOption[];
+  delivery: FilterOption[];
   priceMin: number;
   priceMax: number;
 }

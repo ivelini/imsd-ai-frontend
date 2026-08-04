@@ -66,6 +66,7 @@ import {
   GEO_REGIONS,
   GEO_CITIES,
   DEFAULT_CITY,
+  DEFAULT_CITY_VALUE,
 } from "@/data/geo";
 import type { GeoRegion, GeoCity } from "@/data/geo";
 
@@ -73,6 +74,7 @@ export interface GeoData {
   regions: GeoRegion[];
   cities: GeoCity[];
   defaultCity: string;
+  defaultCityValue: string;
 }
 
 export async function getGeo(): Promise<GeoData> {
@@ -80,6 +82,7 @@ export async function getGeo(): Promise<GeoData> {
     regions: GEO_REGIONS,
     cities: GEO_CITIES,
     defaultCity: DEFAULT_CITY,
+    defaultCityValue: DEFAULT_CITY_VALUE,
   });
 }
 

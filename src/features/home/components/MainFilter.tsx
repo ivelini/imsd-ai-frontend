@@ -3,7 +3,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { useUIStore } from "@/stores/useUIStore";
+import { useCity } from "@/shared/layout/api/useCity";
 import { buildCatalogUrl } from "@/shared/lib/parseParams";
 import type { FilterState } from "@/features/catalog/types";
 import { ArrowDownGrayIcon, ArrowRightBlackIcon } from "@/shared/layout/icons";
@@ -51,8 +51,7 @@ function Select({ value, onChange, options, label }: {
 
 export function MainFilter() {
   const router = useRouter();
-  const city = useUIStore((s) => s.city);
-  const setGeoOpen = useUIStore((s) => s.setGeoOpen);
+  const { cityLabel, cityValue, setGeoOpen } = useCity();
   const [category, setCategory] = useState<"wheels" | "disks">("wheels");
   const [width, setWidth] = useState("");
   const [profile, setProfile] = useState("");
@@ -71,7 +70,7 @@ export function MainFilter() {
     if (category === "disks") {
       router.push("/catalog/wheels");
     } else {
-      router.push(buildCatalogUrl(filter));
+      router.push(buildCatalogUrl(filter, cityValue));
     }
   };
 
@@ -98,9 +97,9 @@ export function MainFilter() {
             </div>
             <a href="/catalog/tires/auto" className="filter-switcher-option filter-switcher-option_disabled">По автомобилю</a>
           </div>
-          <a href="#" className="choice-city" onClick={(e) => { e.preventDefault(); setGeoOpen(true); }}>
+          <a href="#" className="choice-city" onClick={(e) => { e.preventDefault(); setGeoOpen(); }}>
             <PinFilterIcon />
-            {city}
+            {cityLabel}
             <ArrowRightBlackIcon />
           </a>
         </div>

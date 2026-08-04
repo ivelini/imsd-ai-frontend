@@ -7,6 +7,7 @@ import { Benefits } from "@/shared/layout/Benefits";
 import { CatalogMenu } from "@/shared/layout/CatalogMenu";
 import { Footer } from "@/shared/layout/Footer";
 import { GeoPopup } from "@/shared/layout/GeoPopup";
+import { CityHydrator } from "@/shared/layout/client-islands/CityHydrator";
 import { Header } from "@/shared/layout/Header";
 
 export const metadata: Metadata = {
@@ -25,6 +26,7 @@ export default async function RootLayout({
     <html lang="ru">
       <body>
         <ClientLayout>
+          <CityHydrator />
           <div className="app">
             <div className="wrapper">
               <CatalogMenu nav={nav} />

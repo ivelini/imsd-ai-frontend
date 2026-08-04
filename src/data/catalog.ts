@@ -364,6 +364,14 @@ export function getPriceRange() {
 // Опции фильтра (вычисляются из товаров)
 // ============================================================================
 
+// Способы получения: label формирует «бэк», value — латинский slug = query
+const DELIVERY_OPTIONS: FilterOption[] = [
+  { label: "Сегодня", value: "today" },
+  { label: "Поставка 1-2 дня", value: "delivery-1-2" },
+  { label: "Поставка 2-5 дней", value: "delivery-2-5" },
+  { label: "Поставка 5-7 дней", value: "delivery-5-7" },
+];
+
 export function getFilterOptions(): FilterOptions {
   // Все опции — единый формат FilterOption { label, value }: label формирует «бэк»
   const seasons: FilterOption[] = [...new Set(ALL_PRODUCTS.map((p) => p.season))].map((s) => ({
@@ -393,7 +401,7 @@ export function getFilterOptions(): FilterOptions {
   }));
   const priceRange = getPriceRange();
 
-  return { seasons, brands, widths, profiles, diameters, tireTypes, countries, priceMin: priceRange.min, priceMax: priceRange.max };
+  return { seasons, brands, widths, profiles, diameters, tireTypes, countries, delivery: DELIVERY_OPTIONS, priceMin: priceRange.min, priceMax: priceRange.max };
 }
 
 // ============================================================================

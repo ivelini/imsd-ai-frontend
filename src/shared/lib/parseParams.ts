@@ -3,6 +3,7 @@
 // value сегментов = value опций фильтра 1:1 (summer, viatti, 185, 60, r15) —
 // никаких маппингов (контракт: .claude/rules/api-contract.md)
 import type { FilterState } from "@/features/catalog/types";
+import { DEFAULT_CITY_VALUE } from "@/data/geo";
 
 const R_DIAMETER = /^r(\d+)$/i; // r15, R16
 
@@ -99,7 +100,11 @@ export function parseCatalogParams(
  * используется на вкладке «По автомобилю», чтобы состояние фильтра параметров
  * сохранялось в URL и восстанавливалось при возврате на «По параметрам».
  */
-export function buildQueryString(filter: FilterState, includeParams = false): string {
+export function buildQueryString(
+  filter: FilterState,
+  includeParams = false,
+  cityValue?: string,
+): string {
   const query = new URLSearchParams();
   if (includeParams) {
     if (filter.season) query.set("season", filter.season);
@@ -116,12 +121,15 @@ export function buildQueryString(filter: FilterState, includeParams = false): st
     filter.delivery.forEach((d) => query.append("delivery", d));
   }
   if (filter.page && filter.page > 1) query.set("page", String(filter.page));
+  if (cityValue && cityValue !== DEFAULT_CITY_VALUE) {
+    query.set("city", cityValue);
+  }
   const qs = query.toString();
   return qs ? `?${qs}` : "";
 }
 
 /** Сборка URL каталога → фиксированный порядок season/brand/width/profile/diameter + query */
-export function buildCatalogUrl(filter: FilterState): string {
+export function buildCatalogUrl(filter: FilterState, cityValue?: string): string {
   const parts: string[] = [];
 
   if (filter.season) {
@@ -141,5 +149,5 @@ export function buildCatalogUrl(filter: FilterState): string {
   }
 
   const path = `/catalog/tires/${parts.join("/")}`;
-  return `${path}${buildQueryString(filter)}`;
+  return `${path}${buildQueryString(filter, false, cityValue)}`;
 }

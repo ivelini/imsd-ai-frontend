@@ -4,9 +4,11 @@ import { ProductCard } from "./ProductCard";
 
 interface ModelSizesProps {
   sizesByDiameter: Record<string, TireProduct[]>;
+  cityLabel?: string;
+  cityValue?: string;
 }
 
-export function ModelSizes({ sizesByDiameter }: ModelSizesProps) {
+export function ModelSizes({ sizesByDiameter, cityLabel, cityValue }: ModelSizesProps) {
   const diameters = Object.keys(sizesByDiameter).sort(
     (a, b) => parseInt(a.replace("r", "")) - parseInt(b.replace("r", "")),
   );
@@ -29,7 +31,7 @@ export function ModelSizes({ sizesByDiameter }: ModelSizesProps) {
         <div className="model-diameter" id={`diameter-${d}`} key={d}>
           <h3 className="model-diameter-title">{d.toUpperCase()}</h3>
           {sizesByDiameter[d].map((p) => (
-            <ProductCard product={p} showLink={false} key={p.id} />
+            <ProductCard product={p} showLink={false} key={p.id} cityLabel={cityLabel} cityValue={cityValue} />
           ))}
         </div>
       ))}

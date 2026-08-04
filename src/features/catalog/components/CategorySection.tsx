@@ -7,16 +7,18 @@ interface CategorySectionProps {
   header?: string;
   sizeLabel: string;
   products: TireProduct[];
+  cityLabel?: string;
+  cityValue?: string;
 }
 
-export function CategorySection({ header, sizeLabel, products }: CategorySectionProps) {
+export function CategorySection({ header, sizeLabel, products, cityLabel, cityValue }: CategorySectionProps) {
   return (
     <div className="category-section">
       {header && <div className="category-section-header">{header}</div>}
       <div className="category-section-size">{sizeLabel}</div>
       <div className="pair-group">
         {products.map((p, i) => (
-          <ProductCard product={p} key={p.id} showLink={false} pair={i > 0} />
+          <ProductCard product={p} key={p.id} showLink={false} pair={i > 0} cityLabel={cityLabel} cityValue={cityValue} />
         ))}
       </div>
     </div>

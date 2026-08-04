@@ -1,12 +1,11 @@
 // Город в шапке: отображает текущий город, клик открывает GeoPopup
 "use client";
 
-import { useUIStore } from "@/stores/useUIStore";
+import { useCity } from "@/shared/layout/api/useCity";
 import { PinHeaderIcon, ArrowDownRedIcon } from "@/shared/layout/icons";
 
 export function CityBadge() {
-  const city = useUIStore((s) => s.city);
-  const setGeoOpen = useUIStore((s) => s.setGeoOpen);
+  const { cityLabel, setGeoOpen } = useCity();
 
   return (
     <>
@@ -15,11 +14,11 @@ export function CityBadge() {
         href="#"
         onClick={(e) => {
           e.preventDefault();
-          setGeoOpen(true);
+          setGeoOpen();
         }}
       >
         <PinHeaderIcon />
-        <span className="city-in-header">{city}</span>
+        <span className="city-in-header">{cityLabel}</span>
         <ArrowDownRedIcon />
       </a>
     </>

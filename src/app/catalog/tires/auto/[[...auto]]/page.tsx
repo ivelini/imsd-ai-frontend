@@ -15,6 +15,7 @@ import { CatalogFilter, type AutoFilterData } from "@/features/catalog/component
 import { CategorySection } from "@/features/catalog/components/CategorySection";
 import { SeoBlock } from "@/features/catalog/components/SeoBlock";
 import { parseCatalogParams, buildQueryString } from "@/shared/lib/parseParams";
+import { resolveCityLabel } from "@/shared/lib/cityUrl";
 import type { FilterState } from "@/features/catalog/types";
 
 interface PageProps {
@@ -47,7 +48,9 @@ export default async function AutoPage({ params, searchParams }: PageProps) {
   // Query-фильтры вкладки «По автомобилю» (цена/доставка/страна) — в URL каскада;
   // параметры шин в каскад не попадают (хранятся в сторе filterParams)
   const current = parseCatalogParams({ params: [] }, resolvedSearch);
-  const qs = buildQueryString(current);
+  const cityValue = typeof resolvedSearch.city === "string" ? resolvedSearch.city : undefined;
+  const cityLabel = resolveCityLabel(cityValue);
+  const qs = buildQueryString(current, false, cityValue);
   // segments: [brand?, model?, year?, mod?]
 
   // Уровень 0: список марок
@@ -229,6 +232,8 @@ export default async function AutoPage({ params, searchParams }: PageProps) {
               header={section.categorySection || undefined}
               sizeLabel={section.sizeLabel}
               products={section.products}
+              cityLabel={cityLabel}
+              cityValue={cityValue}
             />
           ))}
         </div>
