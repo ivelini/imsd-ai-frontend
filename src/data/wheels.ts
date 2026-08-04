@@ -2,7 +2,7 @@
 // ~200 товаров, 4 бренда, справочники фильтра, авто-словарь
 // Мок имитирует ответ бэкенда: value — латинские slug (совпадают с URL),
 // label/готовые строки формируются здесь (как это сделает API).
-import type { WheelProduct, FilterOptions, FilterOption } from "@/features/catalog/types";
+import type { WheelProduct, FilterOptions, FilterOption, FilterState } from "@/features/catalog/types";
 
 // ============================================================================
 // Словари «бэка»: value → готовый label для отображения
@@ -326,13 +326,15 @@ function findWheel(width: number, diameter: number, pcd: string, et: number, hub
 
 export interface WheelAutoResultItem {
   categorySection: string;
-  sizeLabel: string;
-  products: WheelProduct[];
-  isPair?: boolean;
+  items: {
+    sizeLabel: string;
+    sizeKeys: string[];
+    sizes: { front: WheelProduct; rear?: WheelProduct }[];
+  }[];
 }
 
 export function getWheelsAutoResult(
-  brand: string, model: string, year: number, mod: string,
+  brand: string, model: string, year: number, mod: string, filter?: FilterState,
 ): WheelAutoResultItem[] | null {
   const key = `${brand}:${model}`;
   const mods = generateWheelMods(brand, model, year);
@@ -342,40 +344,61 @@ export function getWheelsAutoResult(
   const result: WheelAutoResultItem[] = [];
   const sizes = modData.sizes;
 
+  const szKey = (s: { width: number; diameter: number; pcd: string; et: number }) =>
+    `${s.width}-r${s.diameter}-${s.pcd.replace("x", "-")}-et${s.et}`;
   const sizeLabel = (s: { width: number; diameter: number; pcd: string; et: number }) =>
     `${s.width}J R${s.diameter} ${s.pcd} ET${s.et}`;
 
+  const matchWheel = (w: number, d: number, pcd: string, et: number, hb: number) => {
+    const product = findWheel(w, d, pcd, et, hb);
+    if (!product) return null;
+    if (filter) {
+      if (filter.priceMin != null && product.price < filter.priceMin) return null;
+      if (filter.priceMax != null && product.price > filter.priceMax) return null;
+      if (filter.country && product.country !== filter.country) return null;
+    }
+    return product;
+  };
+
+  const recommendedItems: WheelAutoResultItem["items"] = [];
+  const altItems: WheelAutoResultItem["items"] = [];
+
   if (sizes[0]) {
-    const p = findWheel(sizes[0].width, sizes[0].diameter, sizes[0].pcd, sizes[0].et, sizes[0].hubBore);
-    if (p) result.push({ categorySection: "", sizeLabel: sizeLabel(sizes[0]), products: [p] });
+    const p = matchWheel(sizes[0].width, sizes[0].diameter, sizes[0].pcd, sizes[0].et, sizes[0].hubBore);
+    if (p) recommendedItems.push({ sizeLabel: sizeLabel(sizes[0]), sizeKeys: [szKey(sizes[0])], sizes: [{ front: p }] });
   }
 
   if (sizes[1] && sizes[2]) {
-    const front = findWheel(sizes[1].width, sizes[1].diameter, sizes[1].pcd, sizes[1].et, sizes[1].hubBore);
-    const rear = findWheel(sizes[2].width, sizes[2].diameter, sizes[2].pcd, sizes[2].et, sizes[2].hubBore);
+    const front = matchWheel(sizes[1].width, sizes[1].diameter, sizes[1].pcd, sizes[1].et, sizes[1].hubBore);
+    const rear = matchWheel(sizes[2].width, sizes[2].diameter, sizes[2].pcd, sizes[2].et, sizes[2].hubBore);
     if (front && rear) {
-      result.push({
-        categorySection: "Рекомендация производителя",
+      recommendedItems.push({
         sizeLabel: `${sizeLabel(sizes[1])} / ${sizeLabel(sizes[2])}`,
-        products: [front, rear],
-        isPair: true,
+        sizeKeys: [szKey(sizes[1]), szKey(sizes[2])],
+        sizes: [{ front, rear }],
       });
     }
   }
 
-  // Альтернативы: другие размеры
+  if (recommendedItems.length > 0) {
+    result.push({ categorySection: "Рекомендация производителя", items: recommendedItems });
+  }
+
   const remaining = sizes.slice(3);
-  for (let i = 0; i < remaining.length; i += 2) {
-    const front = findWheel(remaining[i].width, remaining[i].diameter, remaining[i].pcd, remaining[i].et, remaining[i].hubBore);
-    const rear = remaining[i + 1] ? findWheel(remaining[i + 1].width, remaining[i + 1].diameter, remaining[i + 1].pcd, remaining[i + 1].et, remaining[i + 1].hubBore) : undefined;
-    if (front) {
-      result.push({
-        categorySection: "Лучшая альтернатива",
-        sizeLabel: rear ? `${sizeLabel(remaining[i])} / ${sizeLabel(remaining[i + 1])}` : sizeLabel(remaining[i]),
-        products: rear ? [front, rear] : [front],
-        isPair: !!rear,
+  for (let i = 0; i + 1 < remaining.length; i += 2) {
+    const front = matchWheel(remaining[i].width, remaining[i].diameter, remaining[i].pcd, remaining[i].et, remaining[i].hubBore);
+    const rear = matchWheel(remaining[i + 1].width, remaining[i + 1].diameter, remaining[i + 1].pcd, remaining[i + 1].et, remaining[i + 1].hubBore);
+    if (front && rear) {
+      altItems.push({
+        sizeLabel: `${sizeLabel(remaining[i])} / ${sizeLabel(remaining[i + 1])}`,
+        sizeKeys: [szKey(remaining[i]), szKey(remaining[i + 1])],
+        sizes: [{ front, rear }],
       });
     }
+  }
+
+  if (altItems.length > 0) {
+    result.push({ categorySection: "Лучшая альтернатива", items: altItems });
   }
 
   return result.length > 0 ? result : null;
@@ -384,7 +407,7 @@ export function getWheelsAutoResult(
 // CarBlock для колёс
 export interface WheelCarBlockData {
   name: string;
-  sections: { name: string; options: { label: string; width: number; diameter: number; pcd: string; et: number; checked?: boolean }[] }[];
+  sections: { name: string; options: { label: string; width: number; diameter: number; pcd: string; et: number; checked?: boolean; key: string }[] }[];
 }
 
 export function getWheelsCarBlock(brand: string, model: string, year: number, mod: string): WheelCarBlockData | null {
@@ -401,13 +424,14 @@ export function getWheelsCarBlock(brand: string, model: string, year: number, mo
     sections: [
       {
         name: "Размеры",
-        options: modData.sizes.map((s) => ({
+        options: modData.sizes.map((s, i) => ({
           label: `${s.width}J R${s.diameter} ${s.pcd} ET${s.et} D${s.hubBore}`,
           width: s.width,
           diameter: s.diameter,
           pcd: s.pcd,
           et: s.et,
-          checked: modData.sizes.indexOf(s) === 0,
+          checked: i === 0,
+          key: `${s.width}-r${s.diameter}-${s.pcd.replace("x", "-")}-et${s.et}`,
         })),
       },
     ],

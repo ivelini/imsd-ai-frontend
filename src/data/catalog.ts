@@ -2,7 +2,7 @@
 // ~500 товаров, 4 бренда авто, справочники фильтра, SEO
 // Мок имитирует ответ бэкенда: value — латинские slug (совпадают с URL),
 // label/готовые строки формируются здесь (как это сделает API).
-import type { TireProduct, FilterOptions, FilterOption } from "@/features/catalog/types";
+import type { TireProduct, FilterOptions, FilterOption, FilterState } from "@/features/catalog/types";
 
 // ============================================================================
 // Словари «бэка»: value → готовый label для отображения
@@ -669,13 +669,15 @@ export function getTireModel(slug: string): TireModelData | null {
 // ============================================================================
 
 export interface AutoResultProduct {
-  categorySection: string; // "Рекомендация производителя" | "Лучшая альтернатива" | ...
-  sizeLabel: string; // "275/45 R20 - 305/40 R20"
-  products: TireProduct[];
-  isPair?: boolean;
+  categorySection: string; // "Рекомендация производителя" | "Лучшая альтернатива"
+  items: {
+    sizeLabel: string; // "275/45 R20 - 305/40 R20" или "265/50 R19"
+    sizeKeys: string[]; // ключи размеров для связи с CarOption.key
+    sizes: { front: TireProduct; rear?: TireProduct }[];
+  }[];
 }
 
-export function getAutoResult(brand: string, model: string, year: number, mod: string): AutoResultProduct[] | null {
+export function getAutoResult(brand: string, model: string, year: number, mod: string, filter?: FilterState): AutoResultProduct[] | null {
   const key = `${brand}:${model}:${year}`;
   const mods = AUTO_MODIFICATIONS_BY_KEY[key];
   if (!mods) return null;
@@ -683,47 +685,64 @@ export function getAutoResult(brand: string, model: string, year: number, mod: s
   const modData = mods.find((m) => m.id === mod);
   if (!modData) return null;
 
-  // Структура секций как в шаблоне auto-selected.html:
-  // 1. Одиночный первый размер (без header)
-  // 2. «Рекомендация производителя» — пара sizes[1]+sizes[2]
-  // 3. «Лучшая альтернатива» — остальные размеры парами
   const result: AutoResultProduct[] = [];
   const sizes = modData.sizes;
 
+  const szKey = (s: { width: number; profile: number; diameter: number }) =>
+    `${s.width}-${s.profile}-${s.diameter}`;
   const sizeOf = (s: { width: number; profile: number; diameter: number }) =>
     `${s.width}/${s.profile} R${s.diameter}`;
 
-  // Одиночный первый размер
+  const matchProduct = (w: number, p: number, d: number) => {
+    const product = findMatchingProduct(w, p, d);
+    if (!product) return null;
+    if (filter) {
+      if (filter.priceMin != null && product.price < filter.priceMin) return null;
+      if (filter.priceMax != null && product.price > filter.priceMax) return null;
+      if (filter.country && product.country !== filter.country) return null;
+    }
+    return product;
+  };
+
+  const recommendedItems: AutoResultProduct["items"] = [];
+  const altItems: AutoResultProduct["items"] = [];
+
   if (sizes[0]) {
-    const p = findMatchingProduct(sizes[0].width, sizes[0].profile, sizes[0].diameter);
-    if (p) result.push({ categorySection: "", sizeLabel: sizeOf(sizes[0]), products: [p] });
+    const p = matchProduct(sizes[0].width, sizes[0].profile, sizes[0].diameter);
+    if (p) recommendedItems.push({ sizeLabel: sizeOf(sizes[0]), sizeKeys: [szKey(sizes[0])], sizes: [{ front: p }] });
   }
 
-  // Рекомендованная пара
   if (sizes[1] && sizes[2]) {
-    const front = findMatchingProduct(sizes[1].width, sizes[1].profile, sizes[1].diameter);
-    const rear = findMatchingProduct(sizes[2].width, sizes[2].profile, sizes[2].diameter);
+    const front = matchProduct(sizes[1].width, sizes[1].profile, sizes[1].diameter);
+    const rear = matchProduct(sizes[2].width, sizes[2].profile, sizes[2].diameter);
     if (front && rear) {
-      result.push({
-        categorySection: "Рекомендация производителя",
+      recommendedItems.push({
         sizeLabel: `${sizeOf(sizes[1])} - ${sizeOf(sizes[2])}`,
-        products: [front, rear],
+        sizeKeys: [szKey(sizes[1]), szKey(sizes[2])],
+        sizes: [{ front, rear }],
       });
     }
   }
 
-  // Лучшая альтернатива — остальные пары
+  if (recommendedItems.length > 0) {
+    result.push({ categorySection: "Рекомендация производителя", items: recommendedItems });
+  }
+
   const alt = sizes.slice(3);
   for (let i = 0; i + 1 < alt.length; i += 2) {
-    const front = findMatchingProduct(alt[i].width, alt[i].profile, alt[i].diameter);
-    const rear = findMatchingProduct(alt[i + 1].width, alt[i + 1].profile, alt[i + 1].diameter);
+    const front = matchProduct(alt[i].width, alt[i].profile, alt[i].diameter);
+    const rear = matchProduct(alt[i + 1].width, alt[i + 1].profile, alt[i + 1].diameter);
     if (front && rear) {
-      result.push({
-        categorySection: "Лучшая альтернатива",
+      altItems.push({
         sizeLabel: `${sizeOf(alt[i])} - ${sizeOf(alt[i + 1])}`,
-        products: [front, rear],
+        sizeKeys: [szKey(alt[i]), szKey(alt[i + 1])],
+        sizes: [{ front, rear }],
       });
     }
+  }
+
+  if (altItems.length > 0) {
+    result.push({ categorySection: "Лучшая альтернатива", items: altItems });
   }
 
   return result.length > 0 ? result : null;
@@ -736,8 +755,12 @@ export function getAutoResult(brand: string, model: string, year: number, mod: s
 export interface CarOption {
   label: string;
   width: number;
-  height: number;
+  height?: number; // профиль (для шин), для дисков отсутствует
   diameter: number;
+  checked?: boolean;
+  key: string; // "w-p-d" для связи с AutoResultProduct.items[].sizeKeys
+  pcd?: string; // диски
+  et?: number; // диски
 }
 
 export interface CarSectionData {
@@ -762,35 +785,33 @@ export function getCarBlock(brand: string, model: string, year: number, mod: str
   const carModel = carBrand?.models.find((m) => m.slug === model);
   const sizes = modData.sizes;
 
+  const szKey = (s: { width: number; profile: number; diameter: number }) =>
+    `${s.width}-${s.profile}-${s.diameter}`;
   const sizeOf = (s: { width: number; profile: number; diameter: number }) =>
     `${s.width}/${s.profile} R${s.diameter}`;
 
   const sections: CarSectionData[] = [];
 
-  // Рекомендовано: одиночный первый размер + пара
   const recommended: CarOption[] = [];
   if (sizes[0]) {
-    recommended.push({ label: sizeOf(sizes[0]), width: sizes[0].width, height: sizes[0].profile, diameter: sizes[0].diameter });
+    recommended.push({ label: sizeOf(sizes[0]), width: sizes[0].width, height: sizes[0].profile, diameter: sizes[0].diameter, key: szKey(sizes[0]), checked: true });
   }
   if (sizes[1] && sizes[2]) {
     recommended.push({
       label: `${sizeOf(sizes[1])} - ${sizeOf(sizes[2])}`,
-      width: sizes[2].width,
-      height: sizes[2].profile,
-      diameter: sizes[2].diameter,
+      width: sizes[2].width, height: sizes[2].profile, diameter: sizes[2].diameter,
+      key: szKey(sizes[1]),
     });
   }
   if (recommended.length) sections.push({ name: "Рекомендовано", options: recommended });
 
-  // Лучшая альтернатива: остальные размеры парами
   const alt: CarOption[] = [];
   const rest = sizes.slice(3);
   for (let i = 0; i + 1 < rest.length; i += 2) {
     alt.push({
       label: `${sizeOf(rest[i])} - ${sizeOf(rest[i + 1])}`,
-      width: rest[i + 1].width,
-      height: rest[i + 1].profile,
-      diameter: rest[i + 1].diameter,
+      width: rest[i + 1].width, height: rest[i + 1].profile, diameter: rest[i + 1].diameter,
+      key: szKey(rest[i]),
     });
   }
   if (alt.length) sections.push({ name: "Лучшая альтернатива", options: alt });

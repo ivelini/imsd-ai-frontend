@@ -198,8 +198,9 @@ export async function fetchAutoResult(
   model: string,
   year: number,
   mod: string,
+  filter?: FilterState,
 ): Promise<AutoResultProduct[] | null> {
-  return delay(50, getAutoResult(brand, model, year, mod));
+  return delay(50, getAutoResult(brand, model, year, mod, filter));
 }
 
 // ---------------------------------------------------------------------------
@@ -282,8 +283,9 @@ export async function fetchWheelsAutoResult(
   model: string,
   year: number,
   mod: string,
+  filter?: FilterState,
 ): Promise<WheelAutoResultItem[] | null> {
-  return delay(50, getWheelsAutoResult(brand, model, year, mod));
+  return delay(50, getWheelsAutoResult(brand, model, year, mod, filter));
 }
 
 export { getWheelsCarBlock };

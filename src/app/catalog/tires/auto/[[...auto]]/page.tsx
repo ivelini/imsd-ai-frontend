@@ -10,9 +10,8 @@ import {
   getCarBlock,
   getCatalogFilters,
 } from "@/shared/api/data";
-import { CarBlock } from "@/features/catalog/components/CarBlock";
 import { CatalogFilter, type AutoFilterData } from "@/features/catalog/components/CatalogFilter";
-import { CategorySection } from "@/features/catalog/components/CategorySection";
+import { AutoResultView } from "@/features/catalog/components/AutoResultView";
 import { SeoBlock } from "@/features/catalog/components/SeoBlock";
 import { parseCatalogParams, buildQueryString } from "@/shared/lib/parseParams";
 import { resolveCityLabel } from "@/shared/lib/cityUrl";
@@ -178,7 +177,7 @@ export default async function AutoPage({ params, searchParams }: PageProps) {
 
   // Уровень 4: результат с CarBlock + парами шин
   const [result, carBlock, filters, brands, models, years, modifications] = await Promise.all([
-    fetchAutoResult(brand, model, year, mod),
+    fetchAutoResult(brand, model, year, mod, current),
     getCarBlock(brand, model, year, mod),
     getCatalogFilters(),
     getAutoBrands(),
@@ -224,18 +223,14 @@ export default async function AutoPage({ params, searchParams }: PageProps) {
           }}
         />
         <div className="catalog-with-products">
-          {carBlock && <CarBlock data={carBlock} />}
-
-          {result.map((section, si) => (
-            <CategorySection
-              key={si}
-              header={section.categorySection || undefined}
-              sizeLabel={section.sizeLabel}
-              products={section.products}
+          {carBlock && (
+            <AutoResultView
+              carBlock={carBlock}
+              sections={result}
               cityLabel={cityLabel}
               cityValue={cityValue}
             />
-          ))}
+          )}
         </div>
       </div>
 

@@ -1,8 +1,17 @@
 // Блок выбранного авто: .car-block с чекбоксами размеров (фаза 2)
-// Разметка 1-в-1 с .template/catalog/auto-selected.html
-import type { CarBlockData } from "@/shared/api/data";
+// Клиентский: чекбоксы управляют видимостью секций каталога через onSelectionChange
+"use client";
 
-export function CarBlock({ data }: { data: CarBlockData }) {
+type CarBlockOption = { label: string; width: number; diameter: number; checked?: boolean; key: string; pcd?: string; et?: number; height?: number };
+type CarBlockSection = { name: string; options: CarBlockOption[] };
+
+type CarBlockProps = {
+  data: { name: string; sections: CarBlockSection[] };
+  selectedKeys: Set<string>;
+  onToggle: (key: string) => void;
+};
+
+export function CarBlock({ data, selectedKeys, onToggle }: CarBlockProps) {
   return (
     <div className="car-block">
       <div className="car-name">{data.name}</div>
@@ -22,6 +31,9 @@ export function CarBlock({ data }: { data: CarBlockData }) {
                         data-width={opt.width}
                         data-height={opt.height}
                         data-diameter={opt.diameter}
+                        data-key={opt.key}
+                        checked={selectedKeys.has(opt.key)}
+                        onChange={() => onToggle(opt.key)}
                       />
                       <label htmlFor={id}>{opt.label}</label>
                     </div>
