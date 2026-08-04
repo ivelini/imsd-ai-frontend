@@ -135,6 +135,63 @@ import type { FilterOptions, FilterState, TireProduct } from "@/features/catalog
 export { getTireModel, getAutoResult, getCarBlock, SEO_CONTENT };
 export type { AutoBrandData, AutoModData, AutoResultProduct, CarBlockData, FilterOptions, TireProduct };
 
+// ---------------------------------------------------------------------------
+// Product (страница товара)
+// ---------------------------------------------------------------------------
+import type { ProductDetailData } from "@/features/product/types";
+import { SEASON_LABELS } from "@/data/catalog";
+
+export type { ProductDetailData };
+
+export async function getProduct(
+  modelSlug: string,
+  sizeSlug: string,
+): Promise<ProductDetailData | null> {
+  const product = ALL_PRODUCTS.find(
+    (p) => p.modelSlug === modelSlug && p.sizeSlug === sizeSlug,
+  );
+  if (!product) return null;
+
+  const seasonLabel = SEASON_LABELS[product.season] ?? product.season;
+  const loadSpeedLabel = `${product.loadIndex}${product.speedRating}`;
+  const spikesLabel = product.season === "winter" ? "Да" : "Нет";
+  const runFlatLabel = ["michelin", "pirelli"].includes(product.brandId) ? "Да" : "Нет";
+
+  const quantityOptions = [1, 2, 3, 4].map((q) => ({
+    value: q,
+    label: `${(product.price * q).toLocaleString("ru-RU")} ₽ - ${q} шт.`,
+  }));
+
+  return delay(50, {
+    ...product,
+    images: [product.image, product.image, product.image, product.image],
+    seasonLabel,
+    loadSpeedLabel,
+    spikesLabel,
+    runFlatLabel,
+    productionCountryLabel: product.countryLabel,
+    quantityOptions,
+    pickupDate: "8 авг (сб)",
+    deliveryLabel: "бесплатно",
+    storeAddress: "Челябинск - Свердловский тракт 3Н (Автоальянс)",
+    storeHours: "Рабочие дни: 09:00-19:00 / Выходные: 09:00-17:00",
+    descriptionHtml: `<p>${product.modelName} — ${
+      product.season === "summer" ? "летняя" : product.season === "winter" ? "зимняя" : "всесезонная"
+    } шина, разработанная для обеспечения высокого уровня безопасности, комфорта и долговечности.</p>
+<p>Шина ${product.modelName} — это выбор водителей, которые ценят уверенное сцепление на мокрой и сухой дороге, предсказуемое поведение автомобиля в поворотах и низкий уровень шума при движении. Технология изготовления протектора гарантирует равномерный износ и высокую ходимость.</p>
+<p>Инновационный состав резиновой смеси позволяет шине сохранять эластичность при низких температурах, обеспечивая стабильное пятно контакта и короткий тормозной путь. Ламелизация блоков протектора эффективно отводит воду и снежную шугу из зоны контакта, снижая риск аквапланирования.</p>
+<p>Дизайн протектора оптимизирован для максимальной курсовой устойчивости и минимального сопротивления качению, что положительно влияет на расход топлива. Усиленная конструкция боковины повышает стойкость к механическим повреждениям и продлевает срок службы шины.</p>
+<p>Шины ${product.modelName} производятся на современном оборудовании с многоступенчатым контролем качества. Каждая шина проходит проверку на геометрическую точность, балансировку и соответствие заявленным характеристикам перед отгрузкой.</p>`,
+    availabilityText:
+      "Информация о наличии продукта обновляется в реальном времени. На складе в Челябинске поддерживается неснижаемый остаток наиболее востребованных типоразмеров. Точное количество можно уточнить у менеджера по телефону.",
+    deliveryText:
+      "Доставка осуществляется по всей России. Самовывоз со склада в Челябинске — бесплатно. Доставка до ПВЗ СДЭК, Boxberry, Почта России — от 300₽. Курьерская доставка по Челябинску — 400₽. Отправка транспортной компанией в другие регионы — от 600₽.",
+    warrantyText:
+      "Гарантия на все шины интернет-магазина «Автоальянс» составляет 12 месяцев с даты покупки. Гарантийный срок службы шин — 5 лет с даты изготовления. Гарантия распространяется на производственные дефекты. Гарантия не распространяется на механические повреждения, возникшие в результате неправильной эксплуатации.",
+    reviewCount: 25,
+  });
+}
+
 const PER_PAGE = 12;
 
 export async function getCatalogFilters(): Promise<FilterOptions> {
