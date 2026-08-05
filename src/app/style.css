@@ -5176,3 +5176,29 @@ input[type="checkbox"] {
     margin-top: 40px;
   }
 }
+/* Фильтр главной (05.08.2026): в мокапе id радио перепутаны
+   (:has(#cat-wheels) показывает блок дисков). React рендерит один блок —
+   :has-управление отключаем, рендерящийся блок всегда виден. */
+.filter-content-item.wheel {
+  display: block;
+}
+.filter-block:has(#cat-wheels:checked) .filter-content-item.disk,
+.filter-block:has(#cat-wheels:checked) .filter-content-item.auto {
+  display: block;
+}
+/* Переключатель «По параметрам/По автомобилю» на главной (05.08.2026):
+   мокап управлял им через #filter-top-switcher (нет в DOM) — класс-модификатор */
+.switcher-wrap.switcher-wrap--auto .switcher-circle {
+  transform: translateX(100%);
+}
+/* В режиме auto активен «По автомобилю» (тёмный), «По параметрам» — серый */
+.switcher-wrap.switcher-wrap--auto .filter-switcher-option:first-child {
+  color: var(--color-gray);
+}
+.switcher-wrap.switcher-wrap--auto .filter-switcher-option:last-child {
+  color: var(--color-text);
+}
+/* Блок авто в React рендерится только в режиме auto — виден всегда */
+.filter-content-item.auto {
+  display: block;
+}

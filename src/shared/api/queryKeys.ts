@@ -5,6 +5,10 @@ export const queryKeys = {
   layout: {
     geo: ["layout", "geo"] as const,
   },
+  catalog: {
+    filterOptions: ["catalog", "filter-options"] as const,
+    wheelsFilterOptions: ["catalog", "wheels-filter-options"] as const,
+  },
   cart: {
     items: ["cart", "items"] as const,
   },
