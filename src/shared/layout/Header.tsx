@@ -22,9 +22,9 @@ export function Header({ nav }: HeaderProps) {
         </div>
         <div className="navigation-block">
           <ul>
-            {nav.navLinks.map((link) => (
-              <li key={link.label}>
-                <a href={link.href}>{link.label}</a>
+            {nav.headerLinks.map((link) => (
+              <li key={link.link_name}>
+                <a href={link.link}>{link.link_name}</a>
               </li>
             ))}
           </ul>

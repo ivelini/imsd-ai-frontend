@@ -1,5 +1,7 @@
 // Меню, подвал, соцсети, бенефиты из .template/*.html
-// Фаза 1: заменить на API (Laravel) при появлении страниц
+// Фаза 1: заменить на API (Laravel) при появлении страниц.
+// NAV_LINKS/FOOTER_GROUPS удалены (05.08.2026): ссылки шапки/футера приходят
+// с бэка по GET /api/service_pages → src/data/servicePages.ts.
 
 export interface NavLink {
   label: string;
@@ -11,16 +13,6 @@ export const PHONE = {
   menu: "8 (351) 7000-319",
   footer: "8-351-700-03-19",
 };
-
-export const NAV_LINKS: NavLink[] = [
-  { label: "Отзывы о нас", href: "#" },
-  { label: "Новости и акции", href: "#" },
-  { label: "Статьи", href: "#" },
-  { label: "Доставка", href: "#" },
-  { label: "Оплата", href: "#" },
-  { label: "Возврат", href: "#" },
-  { label: "Контакты", href: "#" },
-];
 
 export interface MenuGroup {
   title: string;
@@ -51,25 +43,6 @@ export const CATALOG_MENU_GROUPS: MenuGroup[] = [
       { label: "Магазины", href: "#" },
     ],
   },
-];
-
-export const FOOTER_GROUPS: NavLink[][] = [
-  [
-    { label: "Каталог", href: "#" },
-    { label: "Компания", href: "#" },
-    { label: "Новости и акции", href: "#" },
-    { label: "Статьи", href: "#" },
-    { label: "Доставка", href: "#" },
-    { label: "Оплата", href: "#" },
-  ],
-  [
-    { label: "Компания", href: "#" },
-    { label: "Сервис", href: "#" },
-    { label: "Доставка и оплата", href: "#" },
-    { label: "Гарантия", href: "#" },
-    { label: "Отзывы", href: "#" },
-    { label: "Магазины", href: "#" },
-  ],
 ];
 
 export const SOCIALS = ["tg", "wa", "vib", "vk", "fb", "inst", "youtube"] as const;

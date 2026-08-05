@@ -24,22 +24,26 @@ function delay<T>(ms: number, value: T): Promise<T> {
 // Layout: навигация, подвал, меню, бенефиты
 // ---------------------------------------------------------------------------
 import {
-  NAV_LINKS,
   PHONE,
   CATALOG_MENU_GROUPS,
-  FOOTER_GROUPS,
   SOCIALS,
   MENU_SOCIALS,
   BENEFITS,
   FOOTER_COPYRIGHT,
 } from "@/data/nav";
 import type { NavLink, MenuGroup, Benefit } from "@/data/nav";
+import { SERVICE_PAGES } from "@/data/servicePages";
+import type { ServicePageLink, ServicePage } from "@/data/servicePages";
+
+export type { ServicePageLink, ServicePage };
 
 export interface NavData {
   phone: typeof PHONE;
-  navLinks: NavLink[];
+  /** Шапка (navigation-block): items блока type=header из /api/service_pages */
+  headerLinks: ServicePageLink[];
+  /** Футер: items блока type=footer из /api/service_pages */
+  footerLinks: ServicePageLink[];
   catalogMenuGroups: MenuGroup[];
-  footerGroups: NavLink[][];
   socials: readonly string[];
   menuSocials: readonly string[];
   benefits: Benefit[];
@@ -47,16 +51,32 @@ export interface NavData {
 }
 
 export async function getNav(): Promise<NavData> {
+  const headerLinks =
+    SERVICE_PAGES.find((b) => b.type === "header")?.items ?? [];
+  const footerLinks =
+    SERVICE_PAGES.find((b) => b.type === "footer")?.items ?? [];
   return delay(50, {
     phone: PHONE,
-    navLinks: NAV_LINKS,
+    headerLinks,
+    footerLinks,
     catalogMenuGroups: CATALOG_MENU_GROUPS,
-    footerGroups: FOOTER_GROUPS,
     socials: SOCIALS,
     menuSocials: MENU_SOCIALS,
     benefits: BENEFITS,
     footerCopyright: FOOTER_COPYRIGHT,
   });
+}
+
+// ---------------------------------------------------------------------------
+// Service pages: GET /api/service_page/<slug>
+// ---------------------------------------------------------------------------
+import { SERVICE_PAGE_CONTENT } from "@/data/servicePages";
+
+export async function getServicePage(
+  slug: string,
+): Promise<ServicePage | null> {
+  const page = SERVICE_PAGE_CONTENT[slug];
+  return delay(30, page ? { slug, ...page } : null);
 }
 
 // ---------------------------------------------------------------------------

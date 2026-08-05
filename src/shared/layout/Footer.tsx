@@ -15,15 +15,20 @@ export function Footer({ nav }: FooterProps) {
           <Button className="footer-get-call" type="button">Заказать звонок</Button>
           <div className="footer-group-city">{nav.footerCopyright}</div>
         </div>
-        {nav.footerGroups.map((group, i) => (
-          <div className="footer-group fg-hide" key={i}>
-            {group.map((link) => (
-              <a href={link.href} className="footer-group-link" key={link.label}>
-                {link.label}
-              </a>
-            ))}
-          </div>
-        ))}
+        {/* Футер: плоский items от /api/service_pages делим пополам на 2 колонки
+            (мокап: 2 группы .fg-hide по 6 ссылок) */}
+        {[nav.footerLinks.slice(0, Math.ceil(nav.footerLinks.length / 2)),
+          nav.footerLinks.slice(Math.ceil(nav.footerLinks.length / 2))].map(
+          (group, i) => (
+            <div className="footer-group fg-hide" key={i}>
+              {group.map((link) => (
+                <a href={link.link} className="footer-group-link" key={link.link_name}>
+                  {link.link_name}
+                </a>
+              ))}
+            </div>
+          ),
+        )}
         <div className="footer-group"></div>
         <div className="footer-group footer-group-center fg-hide-2">
           <p className="we-are-in-social">Мы в соцсетях</p>
