@@ -32,7 +32,7 @@ export default async function RootLayout({
               <CatalogMenu nav={nav} />
               <GeoPopup />
               <Header nav={nav} />
-              <Benefits benefits={nav.benefits} />
+              <Benefits benefits={nav.attentionBlocks} />
               {children}
               <Footer nav={nav} />
 

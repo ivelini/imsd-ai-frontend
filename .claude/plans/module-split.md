@@ -122,6 +122,7 @@
   - Авто: `/catalog/tires/auto/[[...auto]]` — каскад марка→модель→год→модификация → результат с парами шин.
   - Модель/товар: `/tires/[modelSlug]`, `/tires/[modelSlug]/[sizeSlug]` (185-60-r15-84h); диски — `/catalog/wheels` (заглушка, шаблона нет).
   - Сервисные: `/cart`, `/checkout`, `/order/[id]`, `/order-status` (гостевая проверка), `/auth/login`, `/auth/register`, `/articles`, `/articles/[id]`.
+  - Сервисные страницы: `/service-page/[slug]` (добавлено 05.08.2026 — контент по `GET /api/service_page/<slug>`).
   - ЛК: `/account` → `/account/profile`, `/account/orders`, `/account/orders/[id]`, `/account/garage`, `/account/favorites`, `/account/addresses` (макетов нет — верстать по образцу шаблона).
 
 **Фаза 2 — Каталог** — ✅ ВЫПОЛНЕНО 04.08.2026
@@ -166,6 +167,13 @@
 - Статьи: мок `src/data/articles.ts` (9 статей, slug/дата/анонс/contentHtml), `getArticles/getArticle/getRelatedArticles`, `ArticlesList` (NewsCard + ссылки `/articles/[slug]`), `ArticlePage` (+ похожие); NewsCard получил href, опечатка «Подребнее» → «Подробнее».
 - Роуты: `/cart`, `/checkout`, `/order/[id]`, `/order-status`, `/auth/login`, `/auth/register`, `/articles`, `/articles/[id]` — заглушки фазы 1 заменены. `/account` — минимум (приветствие + выход); `/account/*` — заглушки.
 - Решения 05.08.2026: RHF+Zod отложены до API (формы на useState + HTML-валидация); мок-пагинация статей не воспроизводится (9 статей — 1 страница); build локально не гонялся (dev-контейнер), проверено lint/tsc/SSR-ответы 30034.
+
+**Доработки 05.08.2026 (после фазы 4)** — подробности в `.claude/plans/service-pages.md`:
+- Механика сервисных страниц: шапка/футер из мок-`/api/service_pages` (`{type, items[{link, link_name}]}`), роут `/service-page/[slug]` по `GET /api/service_page/<slug>` (10 страниц, notFound, generateMetadata). `NAV_LINKS`/`FOOTER_GROUPS` удалены.
+- Хедер: logo → `/`, статус заказа/корзина — ссылки; кнопка «Каталог» открывает меню (был баг с `href="#"`); попап меню прижат слева и на весь экран (fixed без left/top центрировался во flex-родителе — артефакт мокапа).
+- Главная переведена на структуру `GET /api/service-page/main` (мок `HOME_DATA`): attention_blocks (плашки, color hex, link/link_name), slider.tires/wheels (цены числа, season у шин), news, description, seo (title/description; rating и h1 убраны из API). Заголовки секций, DiscountBlock, ThreeBlocks — статичны. Контракт — память `home-api-main`.
+- Слайдеры главной: стрелки ←→ (scrollBy, disabled на краях) + нативный scroll-snap; иконки сезонности в карточке — SeasonIcons (у дисков season в API нет — пусто, подсвечено бэку).
+- Стартовая страница каталога `/catalog` (из .template/catalog/start.html): 4 карточки (шины/диски × параметры/авто) + бренды (14 шин, 12 дисков, транслит-слаги). Мок `src/data/catalogStart.ts` (имитация /api/catalog-start), CSS catalog-start-* перенесён из шаблона (в шаблоне появился после копии — diff style.css!). Иконки карточек — огромные svg в `catalog-start-icons.tsx`.
 
 **Фаза 5 — Верификация**
 - Ручная визуальная проверка на 5 разрешениях (390/768/1024/1366/1920): отсутствие переполнений, битых картинок, расхождений с мокапом.

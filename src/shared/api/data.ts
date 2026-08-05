@@ -2,7 +2,6 @@
 // Сейчас: setTimeout + src/data/*. При API: замена на fetch.
 // Используется и Server Components (await), и Client Components (React Query).
 import type { PaginatedResult } from "./types";
-import type { SectionProduct, NewsItem } from "@/features/home/types";
 import type { CartItem } from "@/features/cart/types";
 
 // ---------------------------------------------------------------------------
@@ -28,10 +27,10 @@ import {
   CATALOG_MENU_GROUPS,
   SOCIALS,
   MENU_SOCIALS,
-  BENEFITS,
   FOOTER_COPYRIGHT,
 } from "@/data/nav";
-import type { NavLink, MenuGroup, Benefit } from "@/data/nav";
+import type { MenuGroup } from "@/data/nav";
+import { HOME_DATA } from "@/data/products";
 import { SERVICE_PAGES } from "@/data/servicePages";
 import type { ServicePageLink, ServicePage } from "@/data/servicePages";
 
@@ -46,7 +45,8 @@ export interface NavData {
   catalogMenuGroups: MenuGroup[];
   socials: readonly string[];
   menuSocials: readonly string[];
-  benefits: Benefit[];
+  /** Плашки .benefits — attention_blocks из /api/service-page/main */
+  attentionBlocks: AttentionBlock[];
   footerCopyright: string;
 }
 
@@ -62,7 +62,7 @@ export async function getNav(): Promise<NavData> {
     catalogMenuGroups: CATALOG_MENU_GROUPS,
     socials: SOCIALS,
     menuSocials: MENU_SOCIALS,
-    benefits: BENEFITS,
+    attentionBlocks: HOME_DATA.attention_blocks,
     footerCopyright: FOOTER_COPYRIGHT,
   });
 }
@@ -107,27 +107,32 @@ export async function getGeo(): Promise<GeoData> {
 }
 
 // ---------------------------------------------------------------------------
-// Home: товары, новости, о компании
+// Home: GET /api/service-page/main (мок) — attention_blocks, slider, news,
+// description, seo. Структура 1-в-1 с ответом бэка.
 // ---------------------------------------------------------------------------
-import {
-  WHEELS_PRODUCTS,
-  DISK_PRODUCTS,
-  NEWS_ITEMS,
-  ABOUT_TEXT,
-} from "@/data/products";
+import type { HomeData, AttentionBlock } from "@/features/home/types";
 
-export async function getHomeProducts(
-  category: "wheels" | "disks",
-): Promise<SectionProduct[]> {
-  return delay(50, category === "wheels" ? WHEELS_PRODUCTS : DISK_PRODUCTS);
+export type { HomeData, AttentionBlock };
+
+export async function getHomeData(): Promise<HomeData> {
+  return delay(50, HOME_DATA);
 }
 
-export async function getNews(): Promise<NewsItem[]> {
-  return delay(50, NEWS_ITEMS);
+/** attention_blocks — нужны лейауту (плашки .benefits на всех страницах) */
+export async function getAttentionBlocks(): Promise<AttentionBlock[]> {
+  return delay(30, HOME_DATA.attention_blocks);
 }
 
-export async function getAboutText(): Promise<string> {
-  return delay(50, ABOUT_TEXT);
+// ---------------------------------------------------------------------------
+// Catalog: стартовая страница /catalog (карточки + бренды)
+// ---------------------------------------------------------------------------
+import { CATALOG_START } from "@/data/catalogStart";
+import type { CatalogStartData } from "@/data/catalogStart";
+
+export type { CatalogStartData };
+
+export async function getCatalogStart(): Promise<CatalogStartData> {
+  return delay(30, CATALOG_START);
 }
 
 // ---------------------------------------------------------------------------

@@ -4609,3 +4609,93 @@ input[type="checkbox"] {
 		max-width: 100%;
 	}
 }
+
+/* ===== Стартовая страница каталога (catalog/start.html) — 05.08.2026 ===== */
+.catalog-start-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px;
+}
+.catalog-start-card {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 20px;
+  border: 1px solid var(--color-border-soft);
+  border-radius: var(--radius-lg);
+  background: var(--color-white);
+  text-decoration: none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+.catalog-start-card:hover {
+  border-color: var(--color-red);
+  box-shadow: 0 4px 15px var(--shadow-1);
+}
+.catalog-start-card-icon {
+  height: 44px;
+  width: auto;
+}
+.catalog-start-card-info {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: auto;
+}
+.catalog-start-card-title {
+  color: var(--color-text-dark);
+  font-size: 17px;
+  font-weight: 700;
+  line-height: 130%;
+  transition: color 0.2s ease;
+}
+.catalog-start-card:hover .catalog-start-card-title {
+  color: var(--color-red);
+}
+.catalog-start-card-sub {
+  color: var(--color-gray);
+  font-size: 13px;
+  font-weight: 400;
+  line-height: 150%;
+}
+.catalog-brands {
+  margin-top: 50px;
+}
+.catalog-brands-title {
+  color: var(--color-text-dark);
+  font-size: 24px;
+  font-weight: 700;
+  line-height: 150%;
+  margin-bottom: 20px;
+}
+.catalog-brands-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.catalog-brand-link {
+  padding: 9px 16px;
+  border: 1px solid var(--color-border-soft);
+  border-radius: var(--radius-sm);
+  color: var(--color-text);
+  font-size: 14px;
+  font-weight: 400;
+  text-decoration: none;
+  transition: color 0.2s ease, border-color 0.2s ease;
+}
+.catalog-brand-link:hover {
+  color: var(--color-red);
+  border-color: var(--color-red);
+}
+@media (max-width: 1365px) {
+  .catalog-start-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+@media (max-width: 639px) {
+  .catalog-start-grid {
+    grid-template-columns: 1fr;
+  }
+  .catalog-brands {
+    margin-top: 40px;
+  }
+}

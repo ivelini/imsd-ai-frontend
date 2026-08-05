@@ -30,6 +30,7 @@ export function ArticlePage({
             {related.map((a) => (
               <NewsCard
                 key={a.slug}
+                image="/assets/img/news.png"
                 title={a.title}
                 text={a.text}
                 href={`/articles/${a.slug}`}

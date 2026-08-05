@@ -1,4 +1,6 @@
 // Шапка: серверная структура + клиентские острова (03.08.2026)
+// Лого → главная, статус заказа/вход/корзина → роуты (05.08.2026)
+import Link from "next/link";
 import type { NavData } from "@/shared/api/data";
 import { CityBadge } from "./client-islands/CityBadge";
 import { MenuToggle } from "./client-islands/MenuToggle";
@@ -35,9 +37,9 @@ export function Header({ nav }: HeaderProps) {
       <div className="additional-menu">
         <div className="gr1">
           <MenuToggle variant="burger" />
-          <div className="logo">
+          <Link href="/" className="logo" aria-label="На главную">
             <img src="/assets/img/logo.svg" alt="" />
-          </div>
+          </Link>
           <MenuToggle variant="catalog" />
         </div>
         <div className="gr2">
@@ -46,17 +48,21 @@ export function Header({ nav }: HeaderProps) {
             <SearchIcon />
           </div>
           <div className="user-panel">
-            <div className="status-order header-icon-and-btn" id="order-status">
+            <Link
+              href="/order-status"
+              className="status-order header-icon-and-btn"
+              id="order-status"
+            >
               <img src="/assets/img/note.svg" alt="" />
               <p className="header-icon-and-btn-text hide-on-mobile">Статус заказа</p>
               <p className="header-icon-and-btn-text show-on-mobile">Мой заказ</p>
-            </div>
+            </Link>
             <LoginBadge />
-            <div className="cart header-icon-and-btn" id="busket">
+            <Link href="/cart" className="cart header-icon-and-btn" id="busket">
               <img src="/assets/img/busket.svg" alt="" />
               <p className="header-icon-and-btn-text">Корзина</p>
               <CartBadge />
-            </div>
+            </Link>
           </div>
         </div>
       </div>

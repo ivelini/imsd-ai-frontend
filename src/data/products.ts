@@ -1,111 +1,138 @@
-// Мок-данные главной из .template/index.html
-// Фаза 1: заменить на API (Laravel)
-import type { SectionProduct, NewsItem } from "@/features/home/types";
+// Мок-данные главной (05.08.2026)
+// Имитация ответа GET /api/service-page/main (структура 1-в-1, поля как у бэка).
+// Цены — числа (формат на фронте); заголовки секций и блоки скидок — статичны
+// (решение 05.08.2026: их нет в API).
+import type { HomeData } from "@/features/home/types";
 
-export type { SectionProduct, NewsItem };
-
-export const WHEELS_PRODUCTS: SectionProduct[] = [
-  {
-    id: "wheel-1",
-    image: "/assets/img/wheel-product.png",
-    title: "Шина Viatti V-130 Strada Asimmetrico 185/60 R15 84H летняя",
-    rating: "4.8",
-    price: "29 999 ₽",
-    oldPrice: "32 200 ₽",
+export const HOME_DATA: HomeData = {
+  attention_blocks: [
+    {
+      title: "20% на услуги шиномонтажа",
+      link: "/service-page/servis",
+      link_name: "Сервис",
+      color: "#dd062a",
+    },
+    {
+      title: "Сборка комплекта шин и дисков бесплатно",
+      link: "/service-page/dostavka-i-oplata",
+      link_name: "Доставка и оплата",
+      color: "#ffc10a",
+    },
+    {
+      title: "Хранение до монтажа бесплатно",
+      link: "/service-page/magaziny",
+      link_name: "Магазины",
+      color: "#178e42",
+    },
+  ],
+  slider: {
+    tires: [
+      {
+        image: "/assets/img/wheel-product.png",
+        title: "Шина Viatti V-130 Strada Asimmetrico 185/60 R15 84H летняя",
+        link: "/tires/viatti-strada-2/185-60-r15-84h",
+        season: "summer",
+        price: 29999,
+        old_price: 32200,
+      },
+      {
+        image: "/assets/img/wheel-product.png",
+        title: "Шина Viatti V-130 Strada Asimmetrico 185/60 R15 84H летняя",
+        link: "/tires/viatti-strada-2/185-60-r15-84h",
+        season: "summer",
+        price: 29999,
+        old_price: 32200,
+      },
+      {
+        image: "/assets/img/wheel-product.png",
+        title: "Шина Viatti V-130 Strada Asimmetrico 185/60 R15 84H летняя",
+        link: "/tires/viatti-strada-2/185-60-r15-84h",
+        season: "summer",
+        price: 29999,
+        old_price: 32200,
+      },
+      {
+        image: "/assets/img/wheel-product.png",
+        title: "Шина Viatti V-130 Strada Asimmetrico 185/60 R15 84H летняя",
+        link: "/tires/viatti-strada-2/185-60-r15-84h",
+        season: "summer",
+        price: 29999,
+        old_price: 32200,
+      },
+      {
+        image: "/assets/img/wheel-product.png",
+        title: "Шина Viatti V-130 Strada Asimmetrico 185/60 R15 84H летняя",
+        link: "/tires/viatti-strada-2/185-60-r15-84h",
+        season: "summer",
+        price: 29999,
+        old_price: 32200,
+      },
+    ],
+    wheels: [
+      {
+        image: "/assets/img/disk-1.png",
+        title: "Диск R15 5×100 45 мм 6J",
+        link: "/catalog/wheels",
+        price: 10990,
+        old_price: 12500,
+      },
+      {
+        image: "/assets/img/disk-2.png",
+        title: "Диск R16 5×112 40 мм 7J",
+        link: "/catalog/wheels",
+        price: 12990,
+        old_price: 14500,
+      },
+      {
+        image: "/assets/img/disk-1.png",
+        title: "Диск R15 5×100 45 мм 6J",
+        link: "/catalog/wheels",
+        price: 10990,
+        old_price: 12500,
+      },
+      {
+        image: "/assets/img/disk-2.png",
+        title: "Диск R16 5×112 40 мм 7J",
+        link: "/catalog/wheels",
+        price: 12990,
+        old_price: 14500,
+      },
+      {
+        image: "/assets/img/disk-1.png",
+        title: "Диск R15 5×100 45 мм 6J",
+        link: "/catalog/wheels",
+        price: 10990,
+        old_price: 12500,
+      },
+    ],
   },
-  {
-    id: "wheel-2",
-    image: "/assets/img/wheel-product.png",
-    title: "Шина Viatti V-130 Strada Asimmetrico 185/60 R15 84H летняя",
-    rating: "4.8",
-    price: "29 999 ₽",
-    oldPrice: "32 200 ₽",
+  news: [
+    {
+      image: "/assets/img/news.png",
+      title: "Как выбрать зимнюю резину: советы автоэксперта",
+      link: "/articles/kak-vybrat-zimnyuyu-rezinu",
+      description:
+        "Разбираемся, чем отличаются шипованные и фрикционные шины, как выбрать протектор и индекс скорости.",
+    },
+    {
+      image: "/assets/img/news.png",
+      title: "Шиномонтаж: что нужно знать перед визитом",
+      link: "/articles/shinomontazh",
+      description:
+        "Рассказываем, как подготовиться к визиту в шиномонтаж и зачем нужна балансировка колёс.",
+    },
+    {
+      image: "/assets/img/news.png",
+      title: "Летние шины 2026: обзор новинок",
+      link: "/articles/letnie-shiny-2026",
+      description:
+        "Обзор самых интересных летних новинок сезона и технологий, которые заслуживают внимания.",
+    },
+  ],
+  description: `Интернет-магазин «Автоальянс» — это шины и диски для легковых автомобилей, кроссоверов и внедорожников. Собственный склад в Челябинске, широкий ассортимент известных брендов, шиномонтаж и бесплатное хранение комплекта до монтажа. Подберём резину под ваш автомобиль, поможем с выбором и доставим заказ в любой регион России.`,
+  seo: {
+    title: "Альянс — шины и диски",
+    description:
+      "Интернет-магазин шин и дисков в Челябинске: каталог зимних и летних шин, колёсные диски, шиномонтаж, доставка по России.",
   },
-  {
-    id: "wheel-3",
-    image: "/assets/img/wheel-product.png",
-    title: "Шина Viatti V-130 Strada Asimmetrico 185/60 R15 84H летняя",
-    rating: "4.8",
-    price: "29 999 ₽",
-    oldPrice: "32 200 ₽",
-  },
-  {
-    id: "wheel-4",
-    image: "/assets/img/wheel-product.png",
-    title: "Шина Viatti V-130 Strada Asimmetrico 185/60 R15 84H летняя",
-    rating: "4.8",
-    price: "29 999 ₽",
-    oldPrice: "32 200 ₽",
-  },
-  {
-    id: "wheel-5",
-    image: "/assets/img/wheel-product.png",
-    title: "Шина Viatti V-130 Strada Asimmetrico 185/60 R15 84H летняя",
-    rating: "4.8",
-    price: "29 999 ₽",
-    oldPrice: "32 200 ₽",
-  },
-];
-
-export const DISK_PRODUCTS: SectionProduct[] = [
-  {
-    id: "disk-1",
-    image: "/assets/img/disk-1.png",
-    title: "Диск ЛС Replica Concept Volkswagen VW548 GMF 20x9,0 5x112 ET33 DIA66,6",
-    rating: "4.8",
-    price: "29 999 ₽",
-    oldPrice: "32 200 ₽",
-  },
-  {
-    id: "disk-2",
-    image: "/assets/img/disk-1.png",
-    title: "Диск ЛС Replica Concept Volkswagen VW548 GMF 20x9,0 5x112 ET33 DIA66,6",
-    rating: "4.8",
-    price: "29 999 ₽",
-    oldPrice: "32 200 ₽",
-  },
-  {
-    id: "disk-3",
-    image: "/assets/img/disk-1.png",
-    title: "Диск ЛС Replica Concept Volkswagen VW548 GMF 20x9,0 5x112 ET33 DIA66,6",
-    rating: "4.8",
-    price: "29 999 ₽",
-    oldPrice: "32 200 ₽",
-  },
-  {
-    id: "disk-4",
-    image: "/assets/img/disk-2.png",
-    title: "Шина Viatti V-130 Strada Asimmetrico 185/60 R15 84H летняя",
-    rating: "4.8",
-    price: "29 999 ₽",
-    oldPrice: "32 200 ₽",
-  },
-  {
-    id: "disk-5",
-    image: "/assets/img/disk-2.png",
-    title: "Шина Viatti V-130 Strada Asimmetrico 185/60 R15 84H летняя",
-    rating: "4.8",
-    price: "29 999 ₽",
-    oldPrice: "32 200 ₽",
-  },
-];
-
-export const NEWS_ITEMS: NewsItem[] = [
-  {
-    id: "news-1",
-    title: "Новость очень важная заголовок2",
-    text: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure",
-  },
-  {
-    id: "news-2",
-    title: "Новость очень важная заголовок3",
-    text: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure",
-  },
-  {
-    id: "news-3",
-    title: "Новость очень важная заголовок4",
-    text: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure",
-  },
-];
-
-export const ABOUT_TEXT = `Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ante metus dictum at tempor commodo. Neque viverra justo nec ultrices dui. Risus ultricies tristique nulla aliquet enim. Sit amet consectetur adipiscing elit ut aliquam. Interdum consectetur libero id faucibus nisl tincidunt eget nullam. Mattis molestie a iaculis at erat. Nec ultrices dui sapien eget mi proin sed. Phasellus vestibulum lorem sed risus ultricies tristique nulla. Fames ac turpis egestas maecenas. Condimentum id venenatis a condimentum. Porttitor lacus luctus accumsan tortor posuere ac ut consequat semper. Amet commodo nulla facilisi nullam. Ultricies mi eget mauris pharetra et ultrices neque ornare aenean. Donec ultrices tincidunt arcu non sodales neque. Porta non pulvinar neque laoreet suspendisse interdum. Ultrices mi tempus imperdiet nulla malesuada pellentesque elit eget gravida. Massa placerat duis ultricies lacus. Volutpat commodo sed egestas egestas fringilla phasellus faucibus. Mauris in aliquam sem fringilla ut morbi tincidunt. Et netus et malesuada fames. Aliquam sem et tortor consequat id porta nibh venenatis. Scelerisque viverra mauris in aliquam sem fringilla ut morbi tincidunt. Integer vitae justo eget magna fermentum iaculis eu non. Non arcu risus quis varius quam. Faucibus nisl tincidunt eget nullam non. Malesuada fames ac turpis egestas integer eget aliquet nibh praesent. Non enim praesent elementum facilisis leo vel fringilla est ullamcorper. Varius morbi enim nunc faucibus. Tortor pretium Sapien et ligula ullamcorper malesuada proin libero nunc. Dolor sit amet consectetur adipiscing elit pellentesque. Id diam vel quam elementum pulvinar etiam. Ulla`;
+};

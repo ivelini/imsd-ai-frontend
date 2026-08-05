@@ -1,6 +1,8 @@
 // Главная: серверная с клиентскими островами (03.08.2026)
-// Данные через await getXxx() → props каруселям и секциям
-import { getHomeProducts, getNews, getAboutText } from "@/shared/api/data";
+// Данные — GET /api/service-page/main (мок getHomeData): slider, news,
+// description, seo. Заголовки секций и блоки скидок — статичны.
+import type { Metadata } from "next";
+import { getHomeData } from "@/shared/api/data";
 import { MainFilter } from "@/features/home/components/MainFilter";
 import { DiscountBlock } from "@/features/home/components/DiscountBlock";
 import { ThreeBlocks } from "@/features/home/components/ThreeBlocks";
@@ -8,13 +10,13 @@ import { HomeProductLists } from "@/features/home/components/ProductList";
 import { NewsSection } from "@/features/home/components/NewsSection";
 import { AboutCompany } from "@/features/home/components/AboutCompany";
 
+export async function generateMetadata(): Promise<Metadata> {
+  const { seo } = await getHomeData();
+  return { title: seo.title, description: seo.description };
+}
+
 export default async function Home() {
-  const [wheels, disks, news, aboutText] = await Promise.all([
-    getHomeProducts("wheels"),
-    getHomeProducts("disks"),
-    getNews(),
-    getAboutText(),
-  ]);
+  const data = await getHomeData();
 
   return (
     <>
@@ -25,9 +27,9 @@ export default async function Home() {
         </div>
       </div>
       <ThreeBlocks />
-      <HomeProductLists wheels={wheels} disks={disks} />
-      <NewsSection news={news} />
-      <AboutCompany text={aboutText} />
+      <HomeProductLists tires={data.slider.tires} wheels={data.slider.wheels} />
+      <NewsSection news={data.news} />
+      <AboutCompany text={data.description} />
     </>
   );
 }

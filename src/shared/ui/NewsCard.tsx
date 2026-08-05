@@ -1,18 +1,20 @@
 // Карточка новости: .news — общая для главной (features/home) и статей (features/articles)
-// href — ссылка на статью (/articles/[slug]); без href — новости главной (без перехода).
+// Данные главной — news из /api/service-page/main (image, title, link, description).
 // В мокапе опечатка «Подребнее» на главной — исправлено на «Подробнее» (артефакт).
 export function NewsCard({
+  image,
   title,
   text,
   href,
 }: {
+  image: string;
   title: string;
   text: string;
   href?: string;
 }) {
   return (
     <div className="news">
-      <img className="news-image" src="/assets/img/news.png" alt="" />
+      <img className="news-image" src={image} alt="" />
       {href ? (
         <a className="news-title" href={href}>
           {title}

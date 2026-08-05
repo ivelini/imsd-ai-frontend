@@ -49,15 +49,4 @@ export const SOCIALS = ["tg", "wa", "vib", "vk", "fb", "inst", "youtube"] as con
 
 export const MENU_SOCIALS = ["tg", "wa", "vib", "vk", "youtube"] as const;
 
-export interface Benefit {
-  type: "red" | "gold" | "green";
-  text: string;
-}
-
-export const BENEFITS: Benefit[] = [
-  { type: "red", text: "20% на услуги шиномонтажа" },
-  { type: "gold", text: "Сборка комплекта шин и дисков бесплатно" },
-  { type: "green", text: "Хранение до монтажа бесплатно" },
-];
-
 export const FOOTER_COPYRIGHT = "2023 г. Автоальянс";

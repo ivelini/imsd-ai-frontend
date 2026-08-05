@@ -20,9 +20,10 @@ export function MenuToggle({ variant }: MenuToggleProps) {
   }
 
   return (
-    <div className="catalog-button">
+    <div className="catalog-button" onClick={() => setMenuOpen(true)}>
       <CatalogIcon />
-      <a href="#" id="get-catalog">
+      {/* href="#" в мокапе — без обработчика даёт «#» в URL; preventDefault + всплытие на div */}
+      <a href="#" id="get-catalog" onClick={(e) => e.preventDefault()}>
         Каталог
       </a>
     </div>

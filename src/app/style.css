@@ -5020,3 +5020,159 @@ input[type="checkbox"] {
 .account-nav a:hover {
   text-decoration: none;
 }
+/* Ссылки-блоки шапки (05.08.2026): logo и user-panel — <Link> вместо div */
+.logo,
+.user-panel .header-icon-and-btn {
+  text-decoration: none;
+}
+/* Попап меню (05.08.2026): fixed без left/top в мокапе центрировался по
+   flex-родителю (артефакт — в мокапе JS задавал позицию). Явно слева и на
+   весь экран: у .catalog-page-open нет width/height (они в .catalog-page-hide,
+   классы взаимоисключающие), max-height:max-content схлопывает высоту. */
+.catalog-hidden-menu {
+  left: 0;
+  top: 0;
+  width: 100vw;
+  height: 100vh;
+}
+.catalog-page-open {
+  max-height: none;
+}
+/* Ссылка заголовка карточки главной (05.08.2026): в макете .product-title —
+   текст без ссылки; ссылка по API, стилизована под заголовок */
+.product-title a {
+  color: inherit;
+  text-decoration: none;
+}
+.product-title a:hover {
+  color: var(--color-red);
+}
+/* Слайдер главной (05.08.2026): стрелки в шапке секции, прокрутка scrollBy */
+.slider-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+}
+.slider-arrows {
+  display: flex;
+  gap: 10px;
+  flex-shrink: 0;
+}
+.slider-arrow {
+  width: 36px;
+  height: 36px;
+  border: 1px solid var(--color-border);
+  border-radius: 50%;
+  background: var(--color-white);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  padding: 0;
+  transition: border-color 0.2s;
+}
+.slider-arrow:hover:not(:disabled) {
+  border-color: var(--color-red);
+}
+.slider-arrow:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+@media (max-width: 639px) {
+  .slider-header {
+    padding: 0 20px;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+ * Перенос 05.08.2026: /catalog стартовая (из .template/catalog/start.html)
+ * --------------------------------------------------------------------------- */
+.catalog-start-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px;
+}
+.catalog-start-card {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 20px;
+  border: 1px solid var(--color-border-soft);
+  border-radius: var(--radius-lg);
+  background: var(--color-white);
+  text-decoration: none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+.catalog-start-card:hover {
+  border-color: var(--color-red);
+  box-shadow: 0 4px 15px var(--shadow-1);
+}
+.catalog-start-card-icon {
+  height: 44px;
+  width: auto;
+}
+.catalog-start-card-info {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: auto;
+}
+.catalog-start-card-title {
+  color: var(--color-text-dark);
+  font-size: 17px;
+  font-weight: 700;
+  line-height: 130%;
+  transition: color 0.2s ease;
+}
+.catalog-start-card:hover .catalog-start-card-title {
+  color: var(--color-red);
+}
+.catalog-start-card-sub {
+  color: var(--color-gray);
+  font-size: 13px;
+  font-weight: 400;
+  line-height: 150%;
+}
+.catalog-brands {
+  margin-top: 50px;
+}
+.catalog-brands-title {
+  color: var(--color-text-dark);
+  font-size: 24px;
+  font-weight: 700;
+  line-height: 150%;
+  margin-bottom: 20px;
+}
+.catalog-brands-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.catalog-brand-link {
+  padding: 9px 16px;
+  border: 1px solid var(--color-border-soft);
+  border-radius: var(--radius-sm);
+  color: var(--color-text);
+  font-size: 14px;
+  font-weight: 400;
+  text-decoration: none;
+  transition: color 0.2s ease, border-color 0.2s ease;
+}
+.catalog-brand-link:hover {
+  color: var(--color-red);
+  border-color: var(--color-red);
+}
+@media (max-width: 1365px) {
+  .catalog-start-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+@media (max-width: 639px) {
+  .catalog-start-grid {
+    grid-template-columns: 1fr;
+  }
+  .catalog-brands {
+    margin-top: 40px;
+  }
+}

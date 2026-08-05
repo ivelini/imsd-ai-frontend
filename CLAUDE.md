@@ -30,14 +30,17 @@
 - Подбор по авто: `/catalog/tires/auto/[[...auto]]` — каскад марка→модель→год→модификация → результат с парами.
 - Модель/товар: `/tires/[modelSlug]`, `/tires/[modelSlug]/[sizeSlug]` (типоразмер: `185-60-r15-84h`).
 - Диски: `/catalog/wheels` (заглушка, шаблона нет).
-- Сервисные: `/cart`, `/checkout`, `/order/[id]`, `/order-status`, `/auth/login|register`, `/articles`, `/articles/[id]`.
-- ЛК: `/account/*` (profile, orders, garage, favorites, addresses — макетов нет).
+- Сервисные: `/cart`, `/checkout`, `/order/[id]` (клиентская — заказ в localStorage-моке), `/order-status`, `/auth/login|register`, `/articles`, `/articles/[id]`.
+- Сервисные страницы: `/service-page/[slug]` — контент по `GET /api/service_page/<slug>`; ссылки шапки/футера — из `GET /api/service_pages` (мок `servicePages.ts`).
+- ЛК: `/account` (приветствие + выход из мок-сессии), `/account/*` (profile, orders, garage, favorites, addresses — заглушки, макетов нет).
 - `lang="ru"` в layout (в мокапе `lang="en"` — артефакт, не воспроизводить).
 
 ## Данные и состояние
 
-- `src/data/` — моки: `geo.ts` (88 городов), `nav.ts` (меню/подвал), `products.ts` (главная), `catalog.ts` (типоразмеры, опции фильтра, авто-словарь BMW, пары, SEO).
-- `src/stores/` — Zustand: `useUIStore` (город/попапы/меню), `useCartStore` (items, count, totals).
+- `src/data/` — моки, имитирующие ответы бэка: `geo.ts` (88 городов), `nav.ts` (телефоны, меню-каталог, соцсети), `servicePages.ts` (`/api/service_pages` + `/api/service_page/<slug>`, 10 страниц), `products.ts` (`/api/service-page/main` — attention_blocks, slider, news, description, seo), `catalog.ts` (типоразмеры, опции фильтра, авто-словарь BMW, пары, SEO), `articles.ts` (9 статей), `cart.ts` (бенефиты корзины), `checkout.ts` (способы доставки/оплаты).
+- Доступ — только через `shared/api/data.ts` (async с setTimeout; при API — замена на fetch + `rewrites()`). Детали контрактов: `.claude/plans/service-pages.md`, память `home-api-main`.
+- `src/stores/` — Zustand только для UI: `useUIStore` (город, попапы, меню). Корзина и сессия — React Query + localStorage (ключи `cart`, `orders`, `session`).
+- Кастомные дополнения к style.css (макетов нет: пустая корзина, страницы заказа/статуса, ЛК, слайдер главной, фиксы меню, сбросы button-семантизации) — в конце `src/app/style.css` с пометкой даты.
 
 ## Формат slug
 

@@ -1,16 +1,49 @@
-// Типы товаров главной страницы (03.08.2026)
+// Типы главной страницы (05.08.2026)
+// Структура ответа GET /api/service-page/main — поля как у бэка.
 
-export interface SectionProduct {
-  id: string;
-  image: string;
+/** Плашки-бенефиты: .benefit (раньше red/gold/green, теперь color hex) */
+export interface AttentionBlock {
   title: string;
-  rating: string;
-  price: string;
-  oldPrice: string;
+  /** Путь (по конвенции service_pages: link — путь, link_name — название) */
+  link: string;
+  link_name: string;
+  color: string;
 }
 
-export interface NewsItem {
-  id: string;
+/** Товар слайдера главной (шины/диски) */
+export interface SliderProduct {
+  image: string;
   title: string;
-  text: string;
+  link: string;
+  price: number;
+  old_price: number;
+}
+
+/** Товар-шина: дополнительно сезонность */
+export interface SliderTire extends SliderProduct {
+  season: "summer" | "winter" | "all-season";
+}
+
+/** Новость главной */
+export interface HomeNews {
+  image: string;
+  title: string;
+  link: string;
+  description: string;
+}
+
+export interface HomeSeo {
+  title: string;
+  description: string;
+}
+
+export interface HomeData {
+  attention_blocks: AttentionBlock[];
+  slider: {
+    tires: SliderTire[];
+    wheels: SliderProduct[];
+  };
+  news: HomeNews[];
+  description: string;
+  seo: HomeSeo;
 }
