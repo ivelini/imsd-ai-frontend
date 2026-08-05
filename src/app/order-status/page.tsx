@@ -1,6 +1,14 @@
-// Заглушка: Статус заказа (фаза 1)
-import { Placeholder } from "@/shared/ui/Placeholder";
+// Статус заказа (фаза 4)
+import { Breadcrumbs } from "@/shared/layout/Breadcrumbs";
+import { OrderStatusPage } from "@/features/checkout/components/OrderStatusPage";
 
 export default function Page() {
-  return <Placeholder name="Статус заказа" />;
+  return (
+    <>
+      <Breadcrumbs
+        crumbs={[{ label: "Главная", href: "/" }, { label: "Статус заказа" }]}
+      />
+      <OrderStatusPage />
+    </>
+  );
 }

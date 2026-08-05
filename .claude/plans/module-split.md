@@ -146,10 +146,26 @@
 - `generateMetadata` — динамический title/description
 - Роут: `/tires/[modelSlug]/[sizeSlug]`
 - Домен: `src/features/product/` (типы + компоненты)
+- `ImageLightbox` (shared/ui): затемнение, стрелки, миниатюры, ESC/X/оверлей
+- `SeasonIcons` (shared/ui): солнце/снежинка/all-season, инлайн-SVG 25×25
+- `ParamBadge` (shared/ui): p-badge + createPortal-попап (каталог + товар)
+- `CartPopup` (shared/ui): попап корзины, +/−, переход в корзину
+- `ConfirmRemovePopup` (shared/ui): подтверждение удаления
+- `BuyButton` (каталог): «Купить»/«Убрать» + скелетон до гидрации
+- `ProductParam` в `shared/types/product.ts` — общий для каталога и товара
+- `ProductBase.parameters: ProductParam[]` — динамический рендер в каталоге (4 шт.)
+- Механика города: `cityValue: null` = не выбран → нет `?city=` в URL
+- `docs/back-api-map/`: параметры товара в tires.md и wheels.md
 
-**Фаза 4 — Оформление и сервисные**
-- `CartPage`, `CartItem` — в `src/features/cart/components/`; `OrderPage` (шаги 1–3 с `.active` переключателями → контролируемые) — в `src/features/checkout/components/`; `AuthForm` (login/register) — в `src/features/auth/components/`; `ArticlesList`/`ArticlePage`, `NewsCard` — в `src/features/articles/components/`.
-- Роуты: `/cart`, `/checkout`, `/order/[id]`, `/order-status`, `/auth/login`, `/auth/register`, `/articles`, `/articles/[id]`.
+**Фаза 4 — Оформление и сервисные** — ✅ ВЫПОЛНЕНО 05.08.2026
+- `CartItemRow`, `CartPage` (пустое состояние + `.cart_total`) — `src/features/cart/components/`; `CartItem` расширен (`code`, `availability`).
+- `CheckoutPage` (шаги 1–3, `.active` → контролируемый state, город из useCity, сайдбар из корзины) — `src/features/checkout/components/`; опции (склады, ТК, оплата, agreement) — мок `src/data/checkout.ts`.
+- Мок-флоу заказа: `createOrder/getOrder/getOrderByNumber` в data.ts (localStorage «orders», label доставки/оплаты от «бэка»); `/order/[id]` — клиентская страница (useOrder), страница по образцу корзины + `.order-info`.
+- `/order-status` — форма ввода номера → статус заказа (useOrderByNumber, enabled).
+- Мок-сессия: `getSession/loginMock/registerMock/logoutMock` (localStorage), хуки в `features/auth/api/`, `AuthForm` (login/register, чекбокс-«Запомнить меня»), `LoginBadge` в шапке (имя → /account), `LogoutButton` + `AccountPage` в `/account`.
+- Статьи: мок `src/data/articles.ts` (9 статей, slug/дата/анонс/contentHtml), `getArticles/getArticle/getRelatedArticles`, `ArticlesList` (NewsCard + ссылки `/articles/[slug]`), `ArticlePage` (+ похожие); NewsCard получил href, опечатка «Подребнее» → «Подробнее».
+- Роуты: `/cart`, `/checkout`, `/order/[id]`, `/order-status`, `/auth/login`, `/auth/register`, `/articles`, `/articles/[id]` — заглушки фазы 1 заменены. `/account` — минимум (приветствие + выход); `/account/*` — заглушки.
+- Решения 05.08.2026: RHF+Zod отложены до API (формы на useState + HTML-валидация); мок-пагинация статей не воспроизводится (9 статей — 1 страница); build локально не гонялся (dev-контейнер), проверено lint/tsc/SSR-ответы 30034.
 
 **Фаза 5 — Верификация**
 - Ручная визуальная проверка на 5 разрешениях (390/768/1024/1366/1920): отсутствие переполнений, битых картинок, расхождений с мокапом.

@@ -12,7 +12,7 @@ export function NewsSection({ news }: NewsSectionProps) {
       <h2>Новости</h2>
       <div className="news-list">
         {news.map((n) => (
-          <NewsCard item={n} key={n.id} />
+          <NewsCard title={n.title} text={n.text} key={n.id} />
         ))}
       </div>
     </section>

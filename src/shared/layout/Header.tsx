@@ -3,6 +3,7 @@ import type { NavData } from "@/shared/api/data";
 import { CityBadge } from "./client-islands/CityBadge";
 import { MenuToggle } from "./client-islands/MenuToggle";
 import { CartBadge } from "./client-islands/CartBadge";
+import { LoginBadge } from "./client-islands/LoginBadge";
 import { SearchIcon } from "./icons";
 
 interface HeaderProps {
@@ -50,10 +51,7 @@ export function Header({ nav }: HeaderProps) {
               <p className="header-icon-and-btn-text hide-on-mobile">Статус заказа</p>
               <p className="header-icon-and-btn-text show-on-mobile">Мой заказ</p>
             </div>
-            <div className="login header-icon-and-btn" id="header-login">
-              <img src="/assets/img/login.svg" alt="" />
-              <p className="header-icon-and-btn-text">Войти</p>
-            </div>
+            <LoginBadge />
             <div className="cart header-icon-and-btn" id="busket">
               <img src="/assets/img/busket.svg" alt="" />
               <p className="header-icon-and-btn-text">Корзина</p>

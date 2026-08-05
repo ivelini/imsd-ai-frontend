@@ -1,6 +1,17 @@
-// Заглушка: Вход (фаза 1)
-import { Placeholder } from "@/shared/ui/Placeholder";
+// Вход (фаза 4)
+import { Breadcrumbs } from "@/shared/layout/Breadcrumbs";
+import { AuthForm } from "@/features/auth/components/AuthForm";
 
 export default function Page() {
-  return <Placeholder name="Вход" />;
+  return (
+    <>
+      <Breadcrumbs
+        crumbs={[{ label: "Главная", href: "/" }, { label: "Вход" }]}
+      />
+      <section className="auth-section container">
+        <h2>Вход</h2>
+        <AuthForm mode="login" />
+      </section>
+    </>
+  );
 }

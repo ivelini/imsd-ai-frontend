@@ -6,4 +6,8 @@ export interface CartItem {
   price: number;
   quantity: number;
   image: string;
+  /** Код товара (мокап: «Код товара: АА-00075632») — есть не у всех позиций */
+  code?: string;
+  /** Наличие (мокап: «>12 шт.») */
+  availability?: string;
 }

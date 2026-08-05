@@ -1,6 +1,17 @@
-// Заглушка: Корзина (фаза 1)
-import { Placeholder } from "@/shared/ui/Placeholder";
+// Корзина (фаза 4)
+import { getCartTotalInfo } from "@/shared/api/data";
+import { Breadcrumbs } from "@/shared/layout/Breadcrumbs";
+import { CartPage } from "@/features/cart/components/CartPage";
 
-export default function Page() {
-  return <Placeholder name="Корзина" />;
+export default async function Page() {
+  const { benefits } = await getCartTotalInfo();
+
+  return (
+    <>
+      <Breadcrumbs
+        crumbs={[{ label: "Главная", href: "/" }, { label: "Корзина" }]}
+      />
+      <CartPage benefits={benefits} />
+    </>
+  );
 }

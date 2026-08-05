@@ -131,6 +131,7 @@ import type {
   CarBlockData,
 } from "@/data/catalog";
 import type { FilterOptions, FilterState, TireProduct } from "@/features/catalog/types";
+import { CART_TOTAL_BENEFITS } from "@/data/cart";
 
 export { getTireModel, getAutoResult, getCarBlock, SEO_CONTENT };
 export type { AutoBrandData, AutoModData, AutoResultProduct, CarBlockData, FilterOptions, TireProduct };
@@ -405,8 +406,14 @@ const cartStore: CartItem[] = [
     price: 10100,
     quantity: 4,
     image: "/assets/img/wheel-product.png",
+    code: "АА-00075632",
+    availability: ">12 шт.",
   },
 ];
+
+export async function getCartTotalInfo(): Promise<{ benefits: string[] }> {
+  return delay(30, { benefits: [...CART_TOTAL_BENEFITS] });
+}
 
 export async function getCartItems(): Promise<CartItem[]> {
   // Пробуем восстановить из localStorage (если доступен)
@@ -432,6 +439,8 @@ export interface CartAddPayload {
   name: string;
   price: number;
   image: string;
+  code?: string;
+  availability?: string;
 }
 
 export async function addToCart(
@@ -472,3 +481,195 @@ export async function removeFromCart(id: string): Promise<void> {
   }
   return delay(30, undefined);
 }
+
+// ---------------------------------------------------------------------------
+// Checkout: опции оформления + мок-создание заказа
+// ---------------------------------------------------------------------------
+import {
+  CHECKOUT_DELIVERY,
+  CHECKOUT_PAYMENT,
+  CHECKOUT_AGREEMENT,
+} from "@/data/checkout";
+import type { DeliveryMethod, PaymentMethod } from "@/data/checkout";
+
+export interface CheckoutOptions {
+  delivery: DeliveryMethod[];
+  payment: PaymentMethod[];
+  agreement: string;
+}
+
+export async function getCheckoutOptions(): Promise<CheckoutOptions> {
+  return delay(30, {
+    delivery: CHECKOUT_DELIVERY,
+    payment: CHECKOUT_PAYMENT,
+    agreement: CHECKOUT_AGREEMENT,
+  });
+}
+
+/** Заказ — снимок корзины и данных формы (фаза 4, мок-хранилище в localStorage) */
+export interface Order {
+  id: string;
+  /** Человекочитаемый номер заказа, напр. «А-00001» */
+  number: string;
+  status: string;
+  items: CartItem[];
+  total: number;
+  recipient: {
+    lastName: string;
+    firstName: string;
+    middleName: string;
+    phone: string;
+    email: string;
+  };
+  /** Готовые строки от «бэка» (api-contract): label вместо id */
+  deliveryLabel: string;
+  deliveryAddress: string;
+  paymentLabel: string;
+}
+
+export interface CreateOrderPayload {
+  recipient: Order["recipient"];
+  deliveryMethodId: string;
+  deliveryAddress: string;
+  paymentMethodId: string;
+}
+
+// Мок-хранилище заказов в localStorage (createOrder выполняется на клиенте —
+// заказ должен пережить редирект на /order/[id], как корзина через «cart»)
+const ORDERS_KEY = "orders";
+
+function loadOrders(): Order[] {
+  if (typeof localStorage !== "undefined") {
+    try {
+      const stored = localStorage.getItem(ORDERS_KEY);
+      if (stored) return JSON.parse(stored) as Order[];
+    } catch {
+      /* пусто */
+    }
+  }
+  return [];
+}
+
+export async function createOrder(
+  payload: CreateOrderPayload,
+): Promise<Order> {
+  const items = [...cartStore];
+  const total = items.reduce((s, i) => s + i.price * i.quantity, 0);
+  const orders = loadOrders();
+  const delivery = CHECKOUT_DELIVERY.find(
+    (d) => d.id === payload.deliveryMethodId,
+  );
+  const payment = CHECKOUT_PAYMENT.find(
+    (p) => p.id === payload.paymentMethodId,
+  );
+  const order: Order = {
+    id: `order-${orders.length + 1}`,
+    number: `А-${String(orders.length + 1).padStart(5, "0")}`,
+    status: "Принят в обработку",
+    items,
+    total,
+    recipient: payload.recipient,
+    deliveryLabel: delivery?.title ?? payload.deliveryMethodId,
+    deliveryAddress: payload.deliveryAddress,
+    paymentLabel: payment?.label ?? payload.paymentMethodId,
+  };
+  orders.push(order);
+  localStorage.setItem(ORDERS_KEY, JSON.stringify(orders));
+  // Оформление завершено — корзина пуста (персист как в addToCart)
+  cartStore.length = 0;
+  if (typeof localStorage !== "undefined") {
+    localStorage.setItem("cart", JSON.stringify(cartStore));
+  }
+  return delay(50, order);
+}
+
+export async function getOrder(id: string): Promise<Order | null> {
+  return delay(30, loadOrders().find((o) => o.id === id) ?? null);
+}
+
+export async function getOrderByNumber(
+  number: string,
+): Promise<Order | null> {
+  const q = number.trim().toLowerCase();
+  return delay(30, loadOrders().find((o) => o.number.toLowerCase() === q) ?? null);
+}
+
+// ---------------------------------------------------------------------------
+// Auth: мок-сессия в localStorage (при API — Laravel Sanctum и т.п.)
+// ---------------------------------------------------------------------------
+export interface Session {
+  /** Имя пользователя (после входа по логину — сам логин) */
+  name: string;
+  /** Телефон или email */
+  login: string;
+}
+
+const SESSION_KEY = "session";
+
+export async function getSession(): Promise<Session | null> {
+  if (typeof localStorage !== "undefined") {
+    try {
+      const stored = localStorage.getItem(SESSION_KEY);
+      if (stored) return JSON.parse(stored) as Session;
+    } catch {
+      /* пусто */
+    }
+  }
+  return null;
+}
+
+export async function loginMock(
+  login: string,
+  _password: string,
+  _remember: boolean,
+): Promise<Session> {
+  // Мок принимает любые данные — имитация успешного входа
+  const session: Session = { name: login, login };
+  if (typeof localStorage !== "undefined") {
+    localStorage.setItem(SESSION_KEY, JSON.stringify(session));
+  }
+  return delay(30, session);
+}
+
+export async function registerMock(
+  name: string,
+  login: string,
+  _password: string,
+): Promise<Session> {
+  const session: Session = { name, login };
+  if (typeof localStorage !== "undefined") {
+    localStorage.setItem(SESSION_KEY, JSON.stringify(session));
+  }
+  return delay(30, session);
+}
+
+export async function logoutMock(): Promise<void> {
+  if (typeof localStorage !== "undefined") {
+    localStorage.removeItem(SESSION_KEY);
+  }
+  return delay(30, undefined);
+}
+
+// ---------------------------------------------------------------------------
+// Articles: статьи (список, одна, похожие)
+// ---------------------------------------------------------------------------
+import { ARTICLES } from "@/data/articles";
+import type { Article } from "@/data/articles";
+
+export type { Article };
+
+export async function getArticles(): Promise<Article[]> {
+  return delay(30, [...ARTICLES]);
+}
+
+export async function getArticle(slug: string): Promise<Article | null> {
+  return delay(30, ARTICLES.find((a) => a.slug === slug) ?? null);
+}
+
+export async function getRelatedArticles(
+  slug: string,
+): Promise<Article[]> {
+  const related = ARTICLES.filter((a) => a.slug !== slug).slice(0, 3);
+  return delay(30, related);
+}
+

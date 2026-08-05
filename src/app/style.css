@@ -4868,3 +4868,155 @@ input[type="checkbox"] {
 		max-width: 100%;
 	}
 }
+
+/* ---------------------------------------------------------------------------
+ * Фаза 4 (05.08.2026): дополнения React — нет в мокапе
+ * --------------------------------------------------------------------------- */
+/* Семантизация div→button в корзине: сброс дефолтных стилей кнопки */
+.cart_item_quantity_btn,
+.cart_item_total_delete {
+  background: none;
+  border: none;
+  padding: 0;
+  line-height: normal;
+}
+/* Пустое состояние корзины (макета нет — по образцу дизайна) */
+.cart-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+  padding: 80px 0;
+}
+.cart-empty-text {
+  font-size: 18px;
+  color: var(--color-gray);
+  margin: 0;
+}
+.cart-empty-button {
+  text-decoration: none;
+}
+/* Кнопка «Оформить заказ» в React — <button>, сброс дефолтного padding */
+.order_form_method_btn_submit {
+  padding: 0;
+  cursor: pointer;
+}
+/* Страница заказа (фаза 4, макета нет — по образцу корзины) */
+.order-status {
+  margin: 0 0 20px;
+  font-size: 16px;
+  color: var(--color-text);
+}
+.order-status b {
+  color: var(--color-red);
+  font-weight: 600;
+}
+.order-info {
+  margin: 40px 0 0;
+  max-width: 640px;
+}
+.order-info h3 {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--color-text-dark);
+  margin: 0 0 16px;
+}
+.order-info dl {
+  margin: 0;
+  border-top: 1px solid var(--color-border-soft);
+}
+.order-info dl > div {
+  display: flex;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--color-border-soft);
+}
+.order-info dt {
+  color: var(--color-gray);
+  font-size: 14px;
+}
+.order-info dd {
+  margin: 0;
+  font-size: 14px;
+  color: var(--color-text);
+  text-align: right;
+}
+/* Статус заказа (фаза 4) */
+.order-status-hint {
+  color: var(--color-gray);
+  font-size: 14px;
+  margin: 0 0 16px;
+}
+.order-status-search {
+  display: flex;
+  gap: 12px;
+  max-width: 480px;
+  margin: 0 0 24px;
+}
+.order-status-search input {
+  flex: 1;
+  min-width: 0;
+  height: 44px;
+  padding: 0 14px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  font-size: 15px;
+  color: var(--color-text);
+  background: var(--color-white);
+}
+.order-status-search input:focus {
+  outline: none;
+  border-color: var(--color-red);
+}
+.order-status-search .primary-button {
+  min-width: 140px;
+}
+.order-status-result {
+  font-size: 16px;
+  line-height: 1.7;
+  color: var(--color-text);
+}
+.order-status-result .primary-button {
+  display: inline-flex;
+  margin: 16px 0 0;
+  text-decoration: none;
+}
+.order-status-ok {
+  color: var(--color-red);
+  font-weight: 600;
+}
+/* ЛК и auth (фаза 4): сбросы кнопок-семантизации + кастом ЛК */
+.auth_submit {
+  padding: 0;
+}
+.auth_remember {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  width: 100%;
+  text-align: left;
+}
+.auth_submit:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+.account-greeting {
+  font-size: 16px;
+  color: var(--color-text);
+  margin: 0 0 24px;
+}
+.account-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin: 0 0 24px;
+}
+.account-nav a {
+  color: var(--color-red);
+  text-decoration: underline;
+}
+.account-nav a:hover {
+  text-decoration: none;
+}

@@ -8,6 +8,12 @@ export const queryKeys = {
   cart: {
     items: ["cart", "items"] as const,
   },
+  checkout: {
+    order: ["checkout", "order"] as const,
+  },
+  auth: {
+    session: ["auth", "session"] as const,
+  },
   account: {
     // placeholder для будущих хуков ЛК
   },
