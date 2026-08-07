@@ -1,5 +1,5 @@
 // Каталог дисков: серверная страница с клиентским фильтром (фаза 2)
-import { getWheelsFilters, getWheelsProducts } from "@/shared/api/data";
+import { getWheelsFilters, getWheelsProducts, getGeo } from "@/shared/api/data";
 import { parseWheelsParams, buildWheelsUrl } from "@/shared/lib/parseParams";
 import { resolveCityLabel } from "@/shared/lib/cityUrl";
 import { CatalogFilter } from "@/features/catalog/components/CatalogFilter";
@@ -16,11 +16,12 @@ export default async function WheelsCatalogPage({ params, searchParams }: PagePr
   const filter = parseWheelsParams(resolvedParams, resolvedSearchParams);
   const cityValue = typeof resolvedSearchParams.city === "string" ? resolvedSearchParams.city : undefined;
 
-  const [filters, result] = await Promise.all([
+  const [filters, result, geo] = await Promise.all([
     getWheelsFilters(),
     getWheelsProducts(filter),
+    getGeo(),
   ]);
-  const cityLabel = resolveCityLabel(cityValue);
+  const cityLabel = resolveCityLabel(cityValue, geo.cities, geo.defaultCity);
 
   return (
     <section className="catalog-section container">

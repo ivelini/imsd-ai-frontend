@@ -2,7 +2,7 @@
 // ~500 товаров, 4 бренда авто, справочники фильтра, SEO
 // Мок имитирует ответ бэкенда: value — латинские slug (совпадают с URL),
 // label/готовые строки формируются здесь (как это сделает API).
-import type { TireProduct, FilterOptions, FilterOption, FilterState } from "@/features/catalog/types";
+import type { TireProduct, FilterOptions, FilterOption, FilterState, SeoContent } from "@/features/catalog/types";
 
 // ============================================================================
 // Словари «бэка»: value → готовый label для отображения
@@ -862,7 +862,7 @@ function findMatchingProduct(width: number, profile: number, diameter: number): 
 // SEO-контент (статичный, из шаблона .template/catalog/index.html)
 // ============================================================================
 
-export const SEO_CONTENT = {
+export const SEO_CONTENT: SeoContent = {
   title: "Шины в Челябинске",
   subtitle: "Шины Viatti",
   features: [

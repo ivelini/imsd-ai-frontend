@@ -9,6 +9,8 @@ import {
   fetchAutoResult,
   getCarBlock,
   getCatalogFilters,
+  getGeo,
+  getSeoContent,
 } from "@/shared/api/data";
 import { CatalogFilter, type AutoFilterData } from "@/features/catalog/components/CatalogFilter";
 import { AutoResultView } from "@/features/catalog/components/AutoResultView";
@@ -42,13 +44,14 @@ async function CatalogLayout({
 }
 
 export default async function AutoPage({ params, searchParams }: PageProps) {
-  const [resolved, resolvedSearch] = await Promise.all([params, searchParams]);
+  const [resolved, resolvedSearch, geo] = await Promise.all([params, searchParams, getGeo()]);
   const segments = resolved.auto ?? [];
   // Query-фильтры вкладки «По автомобилю» (цена/доставка/страна) — в URL каскада;
   // параметры шин в каскад не попадают (хранятся в сторе filterParams)
   const current = parseCatalogParams({ params: [] }, resolvedSearch);
   const cityValue = typeof resolvedSearch.city === "string" ? resolvedSearch.city : undefined;
-  const cityLabel = resolveCityLabel(cityValue);
+  const cityLabel = resolveCityLabel(cityValue, geo.cities, geo.defaultCity);
+  const seo = await getSeoContent();
   const qs = buildQueryString(current, false, cityValue);
   // segments: [brand?, model?, year?, mod?]
 
@@ -69,7 +72,7 @@ export default async function AutoPage({ params, searchParams }: PageProps) {
             </div>
           </div>
         </CatalogLayout>
-        <SeoBlock />
+        <SeoBlock content={seo} />
       </section>
     );
   }
@@ -98,7 +101,7 @@ export default async function AutoPage({ params, searchParams }: PageProps) {
             </div>
           </div>
         </CatalogLayout>
-        <SeoBlock />
+        <SeoBlock content={seo} />
       </section>
     );
   }
@@ -128,7 +131,7 @@ export default async function AutoPage({ params, searchParams }: PageProps) {
             </div>
           </div>
         </CatalogLayout>
-        <SeoBlock />
+        <SeoBlock content={seo} />
       </section>
     );
   }
@@ -170,7 +173,7 @@ export default async function AutoPage({ params, searchParams }: PageProps) {
             </div>
           </div>
         </CatalogLayout>
-        <SeoBlock />
+        <SeoBlock content={seo} />
       </section>
     );
   }
@@ -234,7 +237,7 @@ export default async function AutoPage({ params, searchParams }: PageProps) {
         </div>
       </div>
 
-      <SeoBlock />
+      <SeoBlock content={seo} />
     </section>
   );
 }

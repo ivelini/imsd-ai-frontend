@@ -5,7 +5,7 @@ import { appendCityParam } from "@/shared/lib/cityUrl";
 import { ParamBadge } from "@/shared/ui/ParamBadge";
 import { SeasonIcons } from "@/shared/ui/SeasonIcons";
 import { BuyButton } from "./BuyButton";
-import { EuLabel } from "./EuLabel";
+import { EuLabel } from "@/shared/ui/EuLabel";
 import { CardCityBadge } from "./CardCityBadge";
 
 function formatPrice(n: number): string {
@@ -21,15 +21,14 @@ interface ProductCardProps {
 }
 
 export function ProductCard({ product, showLink = true, pair = false, cityLabel, cityValue }: ProductCardProps) {
-  const categoryPath = (product as any).category === "wheels" ? "wheels" : "tires";
-  const href = appendCityParam(`/${categoryPath}/${product.modelSlug}/${product.sizeSlug}`, cityValue ?? "");
+  const href = appendCityParam(`/${product.category}/${product.modelSlug}/${product.sizeSlug}`, cityValue ?? "");
 
   return (
     <div className={`catalog-product${pair ? " product-pair" : ""}`}>
       {/* Изображение */}
       <div className="catalog-product-image">
         <div className="catalog-product-image-panel">
-          <SeasonIcons season={(product as any).season} />
+          <SeasonIcons season={product.season} />
         </div>
         <img src={product.image} alt={product.modelName} />
         {product.euLabel && <EuLabel {...product.euLabel} />}

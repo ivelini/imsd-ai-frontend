@@ -4,7 +4,7 @@ import Link from "next/link";
 import type { NavData } from "@/shared/api/data";
 import { CityBadge } from "./client-islands/CityBadge";
 import { MenuToggle } from "./client-islands/MenuToggle";
-import { CartBadge } from "./client-islands/CartBadge";
+import { CartBadge } from "@/features/cart/components/CartBadge";
 import { LoginBadge } from "./client-islands/LoginBadge";
 import { SearchIcon } from "./icons";
 

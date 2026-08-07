@@ -1,18 +1,9 @@
 // Моки статей (фаза 4, 05.08.2026)
 // Заголовки 9 статей — из мокапа article/index.html; тексты и даты — сгенерированы
 // по образцу article/view.html (контент: <p>, <h3>, <ul> — как вернёт бэк).
+import type { Article } from "@/features/articles/types";
 
-export interface Article {
-  /** slug в URL: /articles/[slug] */
-  slug: string;
-  title: string;
-  /** Анонс для карточки (.news-text) */
-  text: string;
-  /** Дата публикации (.article-meta) — готовая строка от «бэка» */
-  date: string;
-  /** Контент статьи (.article-content): <p>, <h3>, <ul> */
-  contentHtml: string;
-}
+export type { Article };
 
 const ANNOUNCEMENTS: Record<string, string> = {
   "kak-vybrat-zimnyuyu-rezinu":

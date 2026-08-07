@@ -1,45 +1,28 @@
 "use client";
 // Количество + кнопка «Добавить в корзину»/«Убрать» + попапы (фаза 3, 04.08.2026)
-import { useState, useEffect } from "react";
-import { useAddToCart } from "@/features/cart/api/useAddToCart";
-import { useRemoveFromCart } from "@/features/cart/api/useRemoveFromCart";
-import { useCart } from "@/features/cart/api/useCart";
-import { CartPopup } from "@/shared/ui/CartPopup";
+import { useState } from "react";
+import { useCartItemActions } from "@/features/cart/api/useCartItemActions";
+import { CartPopup } from "@/features/cart/components/CartPopup";
 import { ConfirmRemovePopup } from "@/shared/ui/ConfirmRemovePopup";
 import type { ProductDetailData } from "../types";
 
 export function AddToCartBlock({ product }: { product: ProductDetailData }) {
   const [quantity, setQuantity] = useState(1);
-  const [popupOpen, setPopupOpen] = useState(false);
-  const [confirmOpen, setConfirmOpen] = useState(false);
-  const [ready, setReady] = useState(false);
-  const { mutate, isPending } = useAddToCart();
-  const { mutate: remove } = useRemoveFromCart();
-  const { data: items } = useCart();
-
-  // После mount — рендер по данным корзины (post-hydration update)
-  useEffect(() => setReady(true), []);
-
-  // Найти добавленный товар в корзине (по id продукта)
-  const cartItem = items?.find((i) => i.id === product.id);
-  const isInCart = !!cartItem;
-
-  const handleAdd = () => {
-    mutate(
-      {
-        item: {
-          id: product.id,
-          name: product.title,
-          price: product.price,
-          image: product.image,
-        },
-        quantity,
-      },
-      {
-        onSuccess: () => setPopupOpen(true),
-      },
-    );
-  };
+  const {
+    cartItem,
+    isInCart,
+    isPending,
+    ready,
+    handleAdd,
+    handleRemove,
+    popupOpen,
+    confirmOpen,
+    setPopupOpen,
+    setConfirmOpen,
+  } = useCartItemActions(
+    { id: product.id, name: product.title, price: product.price, image: product.image },
+    quantity,
+  );
 
   return (
     <>
@@ -97,10 +80,7 @@ export function AddToCartBlock({ product }: { product: ProductDetailData }) {
       {confirmOpen && (
         <ConfirmRemovePopup
           name={product.title}
-          onConfirm={() => {
-            remove(product.id);
-            setConfirmOpen(false);
-          }}
+          onConfirm={handleRemove}
           onClose={() => setConfirmOpen(false)}
         />
       )}

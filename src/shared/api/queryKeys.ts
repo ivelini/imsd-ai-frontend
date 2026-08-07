@@ -8,6 +8,14 @@ export const queryKeys = {
   catalog: {
     filterOptions: ["catalog", "filter-options"] as const,
     wheelsFilterOptions: ["catalog", "wheels-filter-options"] as const,
+    auto: {
+      models: (category: string, brand: string) =>
+        ["auto", "models", category, brand] as const,
+      years: (category: string, brand: string, model: string) =>
+        ["auto", "years", category, brand, model] as const,
+      mods: (category: string, brand: string, model: string, year: string) =>
+        ["auto", "mods", category, brand, model, year] as const,
+    },
   },
   cart: {
     items: ["cart", "items"] as const,

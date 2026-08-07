@@ -80,36 +80,34 @@ export function CatalogFilter({ options, current, initialTab = "params", autoDat
   const autoBase = isWheels ? "/catalog/wheels/auto" : "/catalog/tires/auto";
   const catalogBase = isWheels ? "/catalog/wheels" : "/catalog/tires";
   const buildUrl = isWheels ? buildWheelsUrl : buildCatalogUrl;
-  // Память фильтров: раздельная для шин и дисков
-  const filterParams = useFilterStore((s) => isWheels ? s.wheelsFilterParams : s.filterParams);
-  const setFilterParams = useFilterStore((s) => isWheels ? s.setWheelsFilterParams : s.setFilterParams);
-  const filterAuto = useFilterStore((s) => isWheels ? s.wheelsFilterAuto : s.filterAuto);
-  const setFilterAuto = useFilterStore((s) => isWheels ? s.setWheelsFilterAuto : s.setFilterAuto);
+  // Память фильтров: раздельная для шин и дисков (параметризовано категорией)
+  const cat: "tires" | "wheels" = isWheels ? "wheels" : "tires";
+  const filterParams = useFilterStore((s) => s.filters[cat].params);
+  const filterAuto = useFilterStore((s) => s.filters[cat].auto);
   // Память выбора авто-каскада (марка/модель/год/модификация)
-  const storedAuto = useFilterStore((s) => isWheels ? s.wheelsAutoFilter : s.autoFilter);
-  const setStoredAuto = useFilterStore((s) => isWheels ? s.setWheelsAutoFilter : s.setAutoFilter);
-  const resetFilterParams = useFilterStore((s) => isWheels ? s.resetWheelsFilterParams : s.resetFilterParams);
-  const resetFilterAuto = useFilterStore((s) => isWheels ? s.resetWheelsFilterAuto : s.resetFilterAuto);
-  const resetAuto = useFilterStore((s) => isWheels ? s.resetWheelsAutoFilter : s.resetAutoFilter);
+  const storedAuto = useFilterStore((s) => s.filters[cat].autoSelect);
+  const setFilter = useFilterStore((s) => s.setFilter);
+  const setAutoFilter = useFilterStore((s) => s.setAutoFilter);
+  const resetFilter = useFilterStore((s) => s.resetFilter);
 
   // URL — источник истины для соответствующей вкладки:
-  // каталог (trackUrl) → filterParams; каскад → filterAuto
+  // каталог (trackUrl) → params; каскад → auto
   useEffect(() => {
-    if (trackUrl) setFilterParams(current);
-    else setFilterAuto(current);
-  }, [trackUrl, current, setFilterParams, setFilterAuto]);
+    if (trackUrl) setFilter(cat, "params", current);
+    else setFilter(cat, "auto", current);
+  }, [trackUrl, current, cat, setFilter]);
 
   // На каскаде: запоминаем текущий выбор авто из сегментов URL (для возврата на вкладку)
   useEffect(() => {
     if (!trackUrl && autoData?.brand) {
-      setStoredAuto({
+      setAutoFilter(cat, {
         brand: autoData.brand,
         model: autoData.model,
         year: autoData.year,
         mod: autoData.mod,
       });
     }
-  }, [trackUrl, autoData?.brand, autoData?.model, autoData?.year, autoData?.mod, setStoredAuto]);
+  }, [trackUrl, autoData?.brand, autoData?.model, autoData?.year, autoData?.mod, cat, setAutoFilter]);
 
   // Актуальные значения: зависят от вкладки (цена/доставка/страна — раздельные)
   const effective: FilterState = tab === "params" ? filterParams : filterAuto;
@@ -142,10 +140,10 @@ export function CatalogFilter({ options, current, initialTab = "params", autoDat
   function apply(overrides: Partial<FilterState>) {
     const next = { ...effective, ...overrides };
     if (tab === "params") {
-      setFilterParams(next);
+      setFilter(cat, "params", next);
       router.push(buildUrl(next, cityValue));
     } else {
-      setFilterAuto(next);
+      setFilter(cat, "auto", next);
       const autoPath = pathname.startsWith(autoBase) ? pathname : autoBase;
       router.push(`${autoPath}${buildQueryString(next, false, cityValue)}`);
     }
@@ -153,9 +151,9 @@ export function CatalogFilter({ options, current, initialTab = "params", autoDat
 
   /** Сброс всех фильтров с учётом вкладки */
   const resetAll = () => {
-    resetFilterParams();
-    resetFilterAuto();
-    resetAuto();
+    resetFilter(cat, "params");
+    resetFilter(cat, "auto");
+    resetFilter(cat, "autoSelect");
     if (tab === "car") {
       router.push(`${autoBase}${buildQueryString({}, false, cityValue)}`);
     } else if (isWheels) {

@@ -4,7 +4,7 @@
 // Данные — useOrder (React Query, localStorage-мок).
 import Link from "next/link";
 import { useOrder } from "@/features/checkout/api/useOrder";
-import type { Order } from "@/shared/api/data";
+import type { Order } from "@/features/checkout/types";
 
 const formatPrice = (n: number) => n.toLocaleString("ru-RU") + " ₽";
 

@@ -13,10 +13,11 @@ import {
   getWheelsAutoYears,
   getWheelsAutoModifications,
 } from "@/shared/api/data";
+import { queryKeys } from "@/shared/api/queryKeys";
 
 export function useAutoModels(brand: string, enabled: boolean, category: "tires" | "wheels" = "tires") {
   return useQuery({
-    queryKey: ["auto", "models", category, brand],
+    queryKey: queryKeys.catalog.auto.models(category, brand),
     queryFn: () =>
       category === "wheels" ? getWheelsAutoModels(brand) : getAutoModels(brand),
     enabled: enabled && !!brand,
@@ -25,7 +26,7 @@ export function useAutoModels(brand: string, enabled: boolean, category: "tires"
 
 export function useAutoYears(brand: string, model: string, enabled: boolean, category: "tires" | "wheels" = "tires") {
   return useQuery({
-    queryKey: ["auto", "years", category, brand, model],
+    queryKey: queryKeys.catalog.auto.years(category, brand, model),
     queryFn: () =>
       category === "wheels"
         ? getWheelsAutoYears(brand, model)
@@ -42,7 +43,7 @@ export function useAutoModifications(
   category: "tires" | "wheels" = "tires",
 ) {
   return useQuery({
-    queryKey: ["auto", "mods", category, brand, model, year],
+    queryKey: queryKeys.catalog.auto.mods(category, brand, model, year),
     queryFn: () =>
       category === "wheels"
         ? getWheelsAutoModifications(brand, model, Number(year))

@@ -1,7 +1,7 @@
 "use client";
 // Попап подтверждения удаления товара из корзины (фаза 3, 04.08.2026)
 // Переиспользуемый — каталог, страница товара
-import { useEffect, useCallback } from "react";
+import { useEsc } from "@/shared/lib/useEsc";
 
 interface ConfirmRemovePopupProps {
   name: string; // название товара
@@ -10,18 +10,7 @@ interface ConfirmRemovePopupProps {
 }
 
 export function ConfirmRemovePopup({ name, onConfirm, onClose }: ConfirmRemovePopupProps) {
-  // ESC → закрыть
-  const handleKeyDown = useCallback(
-    (e: KeyboardEvent) => {
-      if (e.key === "Escape") onClose();
-    },
-    [onClose],
-  );
-
-  useEffect(() => {
-    document.addEventListener("keydown", handleKeyDown);
-    return () => document.removeEventListener("keydown", handleKeyDown);
-  }, [handleKeyDown]);
+  useEsc(onClose);
 
   return (
     <div className="confirm-popup-overlay" onClick={onClose}>

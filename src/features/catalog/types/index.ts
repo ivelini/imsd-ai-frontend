@@ -13,6 +13,8 @@ export interface FilterOption {
 
 export interface ProductBase {
   id: string;
+  category: "tires" | "wheels";
+  season?: string; // только у шин; у дисков нет
   brandId: string;
   brandName: string;
   modelSlug: string;
@@ -87,6 +89,40 @@ export interface FilterState {
   delivery?: string[];
   country?: string;
   page?: number;
+}
+
+// ============================================================================
+// Стартовая страница каталога (/api/catalog-start)
+// ============================================================================
+
+export interface CatalogStartCard {
+  id: "tires-params" | "tires-auto" | "wheels-params" | "wheels-auto";
+  /** Какую иконку показать: tire/disk (svg на фронте) */
+  icon: "tire" | "disk";
+  title: string;
+  sub: string;
+  link: string;
+}
+
+export interface BrandLink {
+  /** Путь: /catalog/tires/<slug> или /catalog/wheels/<slug> */
+  link: string;
+  link_name: string;
+}
+
+export interface CatalogStartData {
+  cards: CatalogStartCard[];
+  tireBrands: BrandLink[];
+  wheelBrands: BrandLink[];
+}
+
+/** SEO-контент под каталогом (готовые строки от «бэка») */
+export interface SeoContent {
+  title: string;
+  subtitle: string;
+  features: string[];
+  advantages: string;
+  sizes: string[];
 }
 
 export interface FilterOptions {

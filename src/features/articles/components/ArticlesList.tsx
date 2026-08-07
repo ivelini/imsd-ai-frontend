@@ -1,6 +1,6 @@
 // Список статей: .news-list из NewsCard (фаза 4). Серверный — данные через props.
 import { NewsCard } from "@/shared/ui/NewsCard";
-import type { Article } from "@/shared/api/data";
+import type { Article } from "@/features/articles/types";
 
 export function ArticlesList({ articles }: { articles: Article[] }) {
   return (

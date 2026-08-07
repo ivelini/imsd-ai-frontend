@@ -1,10 +1,16 @@
 // Утилиты для города в URL (city query-параметр)
-import { DEFAULT_CITY, GEO_CITIES } from "@/data/geo";
 
-/** Резолв label города по value (для серверных компонентов) */
-export function resolveCityLabel(value?: string): string {
-  if (!value) return DEFAULT_CITY;
-  return GEO_CITIES.find((c) => c.value === value)?.label ?? DEFAULT_CITY;
+/**
+ * Резолв label города по value (для серверных компонентов).
+ * cities/defaultCity — из getGeo() (shared/api/data.ts), не из моков напрямую.
+ */
+export function resolveCityLabel(
+  value: string | undefined,
+  cities: { value: string; label: string }[],
+  defaultCity: string,
+): string {
+  if (!value) return defaultCity;
+  return cities.find((c) => c.value === value)?.label ?? defaultCity;
 }
 
 export const CITY_PARAM = "city";

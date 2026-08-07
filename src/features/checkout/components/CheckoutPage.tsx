@@ -6,8 +6,8 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useCart } from "@/features/cart/api/useCart";
 import { useCity } from "@/shared/layout/api/useCity";
-import { createOrder } from "@/shared/api/data";
-import type { CheckoutOptions, Order } from "@/shared/api/data";
+import { useCreateOrder } from "@/features/checkout/api/useCreateOrder";
+import type { CheckoutOptions } from "@/features/checkout/types";
 
 const formatPrice = (n: number) => n.toLocaleString("ru-RU") + " ₽";
 
@@ -21,6 +21,7 @@ export function CheckoutPage({ options, benefits }: CheckoutPageProps) {
   const router = useRouter();
   const { data: items = [], isLoading } = useCart();
   const { cityLabel } = useCity();
+  const { mutate: createOrder, isPending } = useCreateOrder();
 
   // Шаг 1 — получатель (без RHF/Zod до API, см. решение 05.08.2026)
   const [lastName, setLastName] = useState("");
@@ -33,22 +34,22 @@ export function CheckoutPage({ options, benefits }: CheckoutPageProps) {
   const [deliveryId, setDeliveryId] = useState<string>(options.delivery[0]?.id ?? "pickup");
   const [deliveryAddress, setDeliveryAddress] = useState("");
   const [paymentId, setPaymentId] = useState<string>(options.payment[0]?.id ?? "cash");
-  const [pending, setPending] = useState(false);
 
   if (isLoading) return null;
 
   const total = items.reduce((sum, i) => sum + i.price * i.quantity, 0);
 
-  const handleSubmit = async () => {
-    if (pending) return;
-    setPending(true);
-    const order: Order = await createOrder({
-      recipient: { lastName, firstName, middleName, phone, email },
-      deliveryMethodId: deliveryId,
-      deliveryAddress,
-      paymentMethodId: paymentId,
-    });
-    router.push(`/order/${order.id}`);
+  const handleSubmit = () => {
+    if (isPending) return;
+    createOrder(
+      {
+        recipient: { lastName, firstName, middleName, phone, email },
+        deliveryMethodId: deliveryId,
+        deliveryAddress,
+        paymentMethodId: paymentId,
+      },
+      { onSuccess: (order) => router.push(`/order/${order.id}`) },
+    );
   };
 
   return (

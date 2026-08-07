@@ -1,7 +1,7 @@
 "use client";
 // Галерея товара: основное изображение + thumbnails + EU-лейбл + лайтбокс (фаза 3, 04.08.2026)
 import { useState } from "react";
-import { EuLabel } from "@/features/catalog/components/EuLabel";
+import { EuLabel } from "@/shared/ui/EuLabel";
 import { ImageLightbox } from "@/shared/ui/ImageLightbox";
 import { SeasonIcons } from "@/shared/ui/SeasonIcons";
 

@@ -2,6 +2,7 @@
 // Лайтбокс: затемнённый фон + листание изображений (фаза 3, 04.08.2026)
 // Переиспользуемый компонент — для страницы товара и каталога
 import { useState, useEffect, useCallback } from "react";
+import { useEsc } from "@/shared/lib/useEsc";
 
 interface ImageLightboxProps {
   images: string[];
@@ -20,14 +21,15 @@ export function ImageLightbox({ images, initialIndex = 0, onClose }: ImageLightb
     setActiveIndex((i) => (i < images.length - 1 ? i + 1 : 0));
   }, [images.length]);
 
-  // ESC → закрыть
+  useEsc(onClose);
+
+  // Стрелки — листание (Escape закрывает через useEsc)
   const handleKeyDown = useCallback(
     (e: KeyboardEvent) => {
-      if (e.key === "Escape") onClose();
       if (e.key === "ArrowLeft") goPrev();
       if (e.key === "ArrowRight") goNext();
     },
-    [onClose, goPrev, goNext],
+    [goPrev, goNext],
   );
 
   useEffect(() => {

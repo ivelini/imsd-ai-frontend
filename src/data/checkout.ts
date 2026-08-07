@@ -1,27 +1,8 @@
 // Моки оформления заказа (фаза 4, 05.08.2026)
 // Готовые строки для отображения — имитация ответа бэка (см. api-contract.md).
+import type { DeliveryMethod, PaymentMethod } from "@/features/checkout/types";
 
-export interface DeliveryMethod {
-  /** id совпадает с value, которое уйдёт на бэк при API */
-  id: "pickup" | "courier" | "tk";
-  icon: string;
-  title: string;
-  /** Часть title, подсвеченная красным (в мокапе — <span>бесплатно</span>) */
-  highlight?: string;
-  /** Текст title после подсветки */
-  titleAfter?: string;
-  /** Точки самовывоза (только pickup) — готовые строки */
-  points?: string[];
-  /** Плейсхолдер поля ввода (courier/tk) */
-  inputPlaceholder?: string;
-  /** Подсказка под полем */
-  inputPrompt?: string;
-}
-
-export interface PaymentMethod {
-  id: "cash" | "card";
-  label: string;
-}
+export type { DeliveryMethod, PaymentMethod };
 
 export const CHECKOUT_DELIVERY: DeliveryMethod[] = [
   {

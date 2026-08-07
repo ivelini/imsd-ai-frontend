@@ -1,8 +1,8 @@
 "use client";
 // Попап «Товар добавлен в корзину» (фаза 3, 04.08.2026)
 // Переиспользуемый — страница товара, каталог
-import { useEffect, useCallback } from "react";
 import { useUpdateCartItem } from "@/features/cart/api/useUpdateCartItem";
+import { useEsc } from "@/shared/lib/useEsc";
 import type { CartItem } from "@/features/cart/types";
 
 const formatPrice = (n: number) => n.toLocaleString("ru-RU") + " ₽";
@@ -16,19 +16,7 @@ interface CartPopupProps {
 
 export function CartPopup({ item, addedQuantity = 1, onClose }: CartPopupProps) {
   const { mutate: changeQuantity } = useUpdateCartItem();
-
-  // ESC → закрыть
-  const handleKeyDown = useCallback(
-    (e: KeyboardEvent) => {
-      if (e.key === "Escape") onClose();
-    },
-    [onClose],
-  );
-
-  useEffect(() => {
-    document.addEventListener("keydown", handleKeyDown);
-    return () => document.removeEventListener("keydown", handleKeyDown);
-  }, [handleKeyDown]);
+  useEsc(onClose);
 
   return (
     <div className="cart_popup_overlay" onClick={onClose}>

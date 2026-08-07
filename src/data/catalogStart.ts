@@ -1,27 +1,13 @@
 // Мок стартовой страницы каталога (05.08.2026)
 // Имитация GET /api/catalog-start (карточки + бренды) — из .template/catalog/start.html.
 // Ссылки — реальные роуты фронта; бренды — транслит (конвенция slug).
+import type {
+  CatalogStartCard,
+  BrandLink,
+  CatalogStartData,
+} from "@/features/catalog/types";
 
-export interface CatalogStartCard {
-  id: "tires-params" | "tires-auto" | "wheels-params" | "wheels-auto";
-  /** Какую иконку показать: tire/disk (svg на фронте) */
-  icon: "tire" | "disk";
-  title: string;
-  sub: string;
-  link: string;
-}
-
-export interface BrandLink {
-  /** Путь: /catalog/tires/<slug> или /catalog/wheels/<slug> */
-  link: string;
-  link_name: string;
-}
-
-export interface CatalogStartData {
-  cards: CatalogStartCard[];
-  tireBrands: BrandLink[];
-  wheelBrands: BrandLink[];
-}
+export type { CatalogStartCard, BrandLink, CatalogStartData };
 
 const TIRE_BRANDS = [
   "Viatti", "Michelin", "Nokian Tyres", "Bridgestone", "Continental",

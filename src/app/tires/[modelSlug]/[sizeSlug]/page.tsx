@@ -1,7 +1,7 @@
 // Страница товара (фаза 3, 04.08.2026)
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
-import { getProduct } from "@/shared/api/data";
+import { getProduct, getGeo } from "@/shared/api/data";
 import { resolveCityLabel, appendCityParam } from "@/shared/lib/cityUrl";
 import { Breadcrumbs } from "@/shared/layout/Breadcrumbs";
 import { ProductGallery } from "@/features/product/components/ProductGallery";
@@ -24,13 +24,13 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 }
 
 export default async function ProductPage({ params, searchParams }: PageProps) {
-  const [{ modelSlug, sizeSlug }, resolvedSearch] = await Promise.all([params, searchParams]);
+  const [{ modelSlug, sizeSlug }, resolvedSearch, geo] = await Promise.all([params, searchParams, getGeo()]);
   const product = await getProduct(modelSlug, sizeSlug);
 
   if (!product) notFound();
 
   const cityValue = typeof resolvedSearch.city === "string" ? resolvedSearch.city : undefined;
-  const cityLabel = resolveCityLabel(cityValue);
+  const cityLabel = resolveCityLabel(cityValue, geo.cities, geo.defaultCity);
 
   const breadcrumbs = [
     { label: "Главная", href: appendCityParam("/", cityValue ?? "") },

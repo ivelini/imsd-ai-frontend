@@ -1,7 +1,7 @@
 // Статья: .article-section + похожие статьи (фаза 4). Серверный — данные через props.
 // Контент — HTML от «бэка» (как descriptionHtml в товаре).
 import { NewsCard } from "@/shared/ui/NewsCard";
-import type { Article } from "@/shared/api/data";
+import type { Article } from "@/features/articles/types";
 
 export function ArticlePage({
   article,

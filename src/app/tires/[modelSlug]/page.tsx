@@ -1,6 +1,6 @@
 // Страница модели шины: описание + типоразмеры (фаза 2)
 import { notFound } from "next/navigation";
-import { getTireModel } from "@/shared/api/data";
+import { getTireModel, getGeo } from "@/shared/api/data";
 import { resolveCityLabel } from "@/shared/lib/cityUrl";
 import { ModelDescription } from "@/features/catalog/components/ModelDescription";
 import { ModelSizes } from "@/features/catalog/components/ModelSizes";
@@ -11,13 +11,13 @@ interface PageProps {
 }
 
 export default async function ModelPage({ params, searchParams }: PageProps) {
-  const [{ modelSlug }, resolvedSearch] = await Promise.all([params, searchParams]);
+  const [{ modelSlug }, resolvedSearch, geo] = await Promise.all([params, searchParams, getGeo()]);
   const model = getTireModel(modelSlug);
 
   if (!model) notFound();
 
   const cityValue = typeof resolvedSearch.city === "string" ? resolvedSearch.city : undefined;
-  const cityLabel = resolveCityLabel(cityValue);
+  const cityLabel = resolveCityLabel(cityValue, geo.cities, geo.defaultCity);
 
   return (
     <section className="catalog-section container model-page">

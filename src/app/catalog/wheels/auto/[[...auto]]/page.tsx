@@ -8,6 +8,7 @@ import {
   getWheelsAutoModifications,
   fetchWheelsAutoResult,
   getWheelsCarBlock,
+  getGeo,
 } from "@/shared/api/data";
 import { CatalogFilter, type AutoFilterData } from "@/features/catalog/components/CatalogFilter";
 import { AutoResultView } from "@/features/catalog/components/AutoResultView";
@@ -40,11 +41,11 @@ async function CatalogLayout({
 }
 
 export default async function WheelsAutoPage({ params, searchParams }: PageProps) {
-  const [resolved, resolvedSearch] = await Promise.all([params, searchParams]);
+  const [resolved, resolvedSearch, geo] = await Promise.all([params, searchParams, getGeo()]);
   const segments = resolved.auto ?? [];
   const current = parseWheelsParams({ params: [] }, resolvedSearch);
   const cityValue = typeof resolvedSearch.city === "string" ? resolvedSearch.city : undefined;
-  const cityLabel = resolveCityLabel(cityValue);
+  const cityLabel = resolveCityLabel(cityValue, geo.cities, geo.defaultCity);
   const qs = buildQueryString(current, false, cityValue);
 
   // Уровень 0: список марок

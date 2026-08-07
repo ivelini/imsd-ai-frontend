@@ -15,7 +15,6 @@
 
 - Перенос вёрстки: **`.claude/rules/ui-porting.md`**
 - Архитектура frontend: **`.claude/rules/frontend-architecture.md`**
-- План переноса: **`.claude/plans/module-split.md`** (~25 модулей, фазы 0–5)
 
 ## Команды
 
@@ -38,9 +37,18 @@
 ## Данные и состояние
 
 - `src/data/` — моки, имитирующие ответы бэка: `geo.ts` (88 городов), `nav.ts` (телефоны, меню-каталог, соцсети), `servicePages.ts` (`/api/service_pages` + `/api/service_page/<slug>`, 10 страниц), `products.ts` (`/api/service-page/main` — attention_blocks, slider, news, description, seo), `catalog.ts` (типоразмеры, опции фильтра, авто-словарь BMW, пары, SEO), `articles.ts` (9 статей), `cart.ts` (бенефиты корзины), `checkout.ts` (способы доставки/оплаты).
-- Доступ — только через `shared/api/data.ts` (async с setTimeout; при API — замена на fetch + `rewrites()`). Детали контрактов: `.claude/plans/service-pages.md`, память `home-api-main`.
+- Доступ — только через `shared/api/data.ts` (async с setTimeout; при API — замена на fetch + `rewrites()`). Детали контрактов: память `home-api-main`, `phase-4-checkout-auth-articles`.
 - `src/stores/` — Zustand только для UI: `useUIStore` (город, попапы, меню). Корзина и сессия — React Query + localStorage (ключи `cart`, `orders`, `session`).
 - Кастомные дополнения к style.css (макетов нет: пустая корзина, страницы заказа/статуса, ЛК, слайдер главной, фиксы меню, сбросы button-семантизации) — в конце `src/app/style.css` с пометкой даты.
+
+## Решения (ADR)
+
+| № | Решение | Статус | Дата |
+|---|---------|--------|------|
+| 0001 | Баррел `shared/api/data.ts` как точка подключения API | Accepted | 2026-08-07 |
+| 0002 | Конфиг-грамматика URL каталога (`parseParams.ts`) | Accepted | 2026-08-07 |
+
+Файлы — в `documentations/adr/` (правила записи — глобальный `adr.md`).
 
 ## Формат slug
 

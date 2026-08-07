@@ -1,5 +1,5 @@
 // Каталог шин: серверная страница с клиентским фильтром (фаза 2)
-import { getCatalogFilters, getCatalogProducts } from "@/shared/api/data";
+import { getCatalogFilters, getCatalogProducts, getGeo, getSeoContent } from "@/shared/api/data";
 import { parseCatalogParams, buildCatalogUrl } from "@/shared/lib/parseParams";
 import { resolveCityLabel } from "@/shared/lib/cityUrl";
 import { CatalogFilter } from "@/features/catalog/components/CatalogFilter";
@@ -17,11 +17,13 @@ export default async function CatalogPage({ params, searchParams }: PageProps) {
   const filter = parseCatalogParams(resolvedParams, resolvedSearchParams);
   const cityValue = typeof resolvedSearchParams.city === "string" ? resolvedSearchParams.city : undefined;
 
-  const [filters, result] = await Promise.all([
+  const [filters, result, geo, seo] = await Promise.all([
     getCatalogFilters(),
     getCatalogProducts(filter),
+    getGeo(),
+    getSeoContent(),
   ]);
-  const cityLabel = resolveCityLabel(cityValue);
+  const cityLabel = resolveCityLabel(cityValue, geo.cities, geo.defaultCity);
 
   return (
     <section className="catalog-section container">
@@ -43,7 +45,7 @@ export default async function CatalogPage({ params, searchParams }: PageProps) {
                 buildHref={(page) => buildCatalogUrl({ ...filter, page }, cityValue)}
             />
         )}
-      <SeoBlock brand={filter.brand} season={filter.season} />
+      <SeoBlock content={seo} brand={filter.brand} season={filter.season} />
     </section>
   );
 }
