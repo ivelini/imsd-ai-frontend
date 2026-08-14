@@ -19,9 +19,9 @@ export default async function CatalogPage({ params, searchParams }: PageProps) {
 
   const [filters, result, geo, seo] = await Promise.all([
     getCatalogFilters(),
-    getCatalogProducts(filter),
+    getCatalogProducts(filter, cityValue),
     getGeo(),
-    getSeoContent(),
+    getSeoContent(cityValue),
   ]);
   const cityLabel = resolveCityLabel(cityValue, geo.cities, geo.defaultCity);
 

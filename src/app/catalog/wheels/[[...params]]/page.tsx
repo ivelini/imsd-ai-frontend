@@ -18,7 +18,7 @@ export default async function WheelsCatalogPage({ params, searchParams }: PagePr
 
   const [filters, result, geo] = await Promise.all([
     getWheelsFilters(),
-    getWheelsProducts(filter),
+    getWheelsProducts(filter, cityValue),
     getGeo(),
   ]);
   const cityLabel = resolveCityLabel(cityValue, geo.cities, geo.defaultCity);

@@ -78,8 +78,8 @@ export interface FilterState {
   brand?: string;
   width?: number;
   profile?: number;
-  diameter?: number;
-  tireType?: string; // шины
+  diameter?: number | string; // шины/диски: 15 | "13c" (C-размеры)
+  studded?: string; // шины: "studded" | "not_studded" (query-параметр)
   pcd?: string; // диски
   et?: number; // диски
   hubBore?: number; // диски
@@ -131,7 +131,7 @@ export interface FilterOptions {
   widths: FilterOption[];
   profiles: FilterOption[];
   diameters: FilterOption[];
-  tireTypes: FilterOption[]; // шины
+  studded: FilterOption[]; // шины
   pcds: FilterOption[]; // диски
   ets: FilterOption[]; // диски
   hubBores: FilterOption[]; // диски
@@ -140,4 +140,27 @@ export interface FilterOptions {
   delivery: FilterOption[];
   priceMin: number;
   priceMax: number;
+}
+
+// ============================================================================
+// DTO бэкенда: GET /api/reference/filter/tire (Scramble public-api.json)
+// Целевой контракт: brand/country — slug-строки, diameter — r-значения (r15);
+// width/profile — int (приводятся к строке адаптером).
+// ============================================================================
+
+export interface FilterValueDto {
+  label: string | number;
+  value: string | number | boolean;
+}
+
+export interface TireFilterValuesDto {
+  width: FilterValueDto[];
+  profile: FilterValueDto[];
+  diameter: FilterValueDto[];
+  season: FilterValueDto[];
+  studded: FilterValueDto[];
+  brand: FilterValueDto[];
+  country: FilterValueDto[];
+  delivery: FilterValueDto[];
+  price: { min: number; max: number };
 }

@@ -59,7 +59,7 @@ export function MainFilter() {
   const [profile, setProfile] = useState("");
   const [diameter, setDiameter] = useState("");
   const [season, setSeason] = useState("");
-  const [tireType, setTireType] = useState("");
+  const [studded, setStudded] = useState("");
   const [brand, setBrand] = useState("");
   // Диски
   const [pcd, setPcd] = useState("");
@@ -119,9 +119,11 @@ export function MainFilter() {
     const filter: FilterState = {};
     if (width) filter.width = Number(width);
     if (profile) filter.profile = Number(profile);
-    if (diameter) filter.diameter = Number(diameter);
+    // diameter — r-значение ("r15", "r13c"): Number("r15") дал бы NaN
+    const diamMatch = diameter.match(/^r?(\d+)(c?)$/i);
+    if (diamMatch) filter.diameter = diamMatch[2] ? `${diamMatch[1]}c` : Number(diamMatch[1]);
     if (season) filter.season = season as FilterState["season"];
-    if (tireType) filter.tireType = tireType as FilterState["tireType"];
+    if (studded) filter.studded = studded as FilterState["studded"];
     if (brand) filter.brand = brand;
     router.push(buildCatalogUrl(filter, cityValue));
   };
@@ -181,7 +183,7 @@ export function MainFilter() {
             </div>
             <div className="select-row">
               <Select value={season} onChange={setSeason} placeholder="Сезонность" options={tireOptions.seasons} />
-              <Select value={tireType} onChange={setTireType} placeholder="Тип шин" options={tireOptions.tireTypes} />
+              <Select value={studded} onChange={setStudded} placeholder="Шипованность" options={tireOptions.studded} />
               <Select value={brand} onChange={setBrand} placeholder="Производитель" options={tireOptions.brands} />
             </div>
           </div>

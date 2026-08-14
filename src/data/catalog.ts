@@ -32,22 +32,6 @@ export const COUNTRY_LABELS: Record<string, string> = {
 // Справочники фильтра (в value-формате)
 // ============================================================================
 
-export const SEASONS: FilterOption[] = [
-  { label: SEASON_LABELS.summer, value: "summer" },
-  { label: SEASON_LABELS.winter, value: "winter" },
-  { label: SEASON_LABELS["all-season"], value: "all-season" },
-];
-
-export const TIRE_TYPES: FilterOption[] = [
-  { label: TIRE_TYPE_LABELS.passenger, value: "passenger" },
-  { label: TIRE_TYPE_LABELS.suv, value: "suv" },
-  { label: TIRE_TYPE_LABELS.commercial, value: "commercial" },
-];
-
-export const ALL_WIDTHS = Array.from({ length: 21 }, (_, i) => 145 + i * 10); // 145..355
-
-export const ALL_PROFILES = [30, 35, 40, 45, 50, 55, 60, 65, 70, 75, 80];
-
 export const ALL_DIAMETERS = Array.from({ length: 12 }, (_, i) => 13 + i); // 13..24
 
 // ============================================================================
@@ -70,13 +54,6 @@ const BRANDS: BrandDef[] = [
   { id: "bridgestone", name: "Bridgestone", slug: "bridgestone", country: "japan", priceBase: 11000, priceFactor: 1.4 },
   { id: "pirelli", name: "Pirelli", slug: "pirelli", country: "italy", priceBase: 13000, priceFactor: 1.7 },
 ];
-
-export const BRAND_LIST = BRANDS.map(({ id, name, slug, country }) => ({ id, name, slug, country }));
-
-export const COUNTRIES: FilterOption[] = [...new Set(BRANDS.map((b) => b.country))].map((c) => ({
-  label: COUNTRY_LABELS[c] ?? c,
-  value: c,
-}));
 
 // ============================================================================
 // Модели шин по брендам
@@ -385,11 +362,48 @@ function generateProducts(): TireProduct[] {
 
 export const ALL_PRODUCTS = generateProducts();
 
-// Пересчитываем при импорте (цены на лету)
-export function getPriceRange() {
-  if (ALL_PRODUCTS.length === 0) return { min: 0, max: 100000 };
-  const prices = ALL_PRODUCTS.map((p) => p.price);
-  return { min: Math.min(...prices), max: Math.max(...prices) };
+// ============================================================================
+// Товары каталога (мок ответа бэка)
+// ============================================================================
+
+const PER_PAGE = 12;
+
+/**
+ * Мок эндпоинта товаров: фильтрация по параметрам + пагинация.
+ * city — контекст запроса (региональные цены/наличие на реальном бэке);
+ * в моке не влияет на данные — параметр существует для контракта.
+ */
+export function getCatalogProductsMock(
+  filter: FilterState,
+  city?: string,
+): { items: TireProduct[]; total: number; page: number; perPage: number } {
+  let items = [...ALL_PRODUCTS];
+
+  if (filter.season) items = items.filter((p) => p.season === filter.season);
+  if (filter.brand) items = items.filter((p) => p.brandId === filter.brand);
+  if (filter.width) items = items.filter((p) => p.width === filter.width);
+  if (filter.profile) items = items.filter((p) => p.profile === filter.profile);
+  // diameter: number (15) или C-строка ("13c")
+  if (filter.diameter != null) {
+    const diameterNum = typeof filter.diameter === "number" ? filter.diameter : parseInt(filter.diameter, 10);
+    items = items.filter((p) => p.diameter === diameterNum);
+  }
+  if (filter.priceMin != null) items = items.filter((p) => p.price >= filter.priceMin!);
+  if (filter.priceMax != null) items = items.filter((p) => p.price <= filter.priceMax!);
+  if (filter.country) items = items.filter((p) => p.country === filter.country);
+  if (filter.studded) {
+    // В моках у товаров нет признака шипов — фильтр не сужает (как delivery)
+  }
+  if (filter.delivery && filter.delivery.length > 0) {
+    // В моках все товары доступны — фильтр delivery не сужает
+  }
+
+  const total = items.length;
+  const page = filter.page ?? 1;
+  const start = (page - 1) * PER_PAGE;
+  const paged = items.slice(start, start + PER_PAGE);
+
+  return { items: paged, total, page, perPage: PER_PAGE };
 }
 
 // ============================================================================
@@ -397,44 +411,14 @@ export function getPriceRange() {
 // ============================================================================
 
 // Способы получения: label формирует «бэк», value — латинский slug = query
+// Опции фильтра шин приходят с бэка (GET /api/reference/filter/tire);
+// DELIVERY_OPTIONS остаётся для мока дисков (src/data/wheels.ts).
 export const DELIVERY_OPTIONS: FilterOption[] = [
   { label: "Сегодня", value: "today" },
   { label: "Поставка 1-2 дня", value: "delivery-1-2" },
   { label: "Поставка 2-5 дней", value: "delivery-2-5" },
   { label: "Поставка 5-7 дней", value: "delivery-5-7" },
 ];
-
-export function getFilterOptions(): FilterOptions {
-  // Все опции — единый формат FilterOption { label, value }: label формирует «бэк»
-  const seasons: FilterOption[] = [...new Set(ALL_PRODUCTS.map((p) => p.season))].map((s) => ({
-    label: SEASON_LABELS[s] ?? s,
-    value: s,
-  }));
-  const brands: FilterOption[] = BRAND_LIST.map((b) => ({
-    label: `${b.name} (${ALL_PRODUCTS.filter((p) => p.brandId === b.id).length})`,
-    value: b.slug,
-  }));
-  const widths: FilterOption[] = [...new Set(ALL_PRODUCTS.map((p) => Number(p.width)))]
-    .sort((a, b) => a - b)
-    .map((w) => ({ label: String(w), value: String(w) }));
-  const profiles: FilterOption[] = [...new Set(ALL_PRODUCTS.map((p) => p.profile))]
-    .sort((a, b) => a - b)
-    .map((p) => ({ label: String(p), value: String(p) }));
-  const diameters: FilterOption[] = [...new Set(ALL_PRODUCTS.map((p) => p.diameter))]
-    .sort((a, b) => a - b)
-    .map((d) => ({ label: `R${d}`, value: String(d) }));
-  const tireTypes: FilterOption[] = [...new Set(ALL_PRODUCTS.map((p) => p.tireType))].map((t) => ({
-    label: TIRE_TYPE_LABELS[t] ?? t,
-    value: t,
-  }));
-  const countries: FilterOption[] = [...new Set(ALL_PRODUCTS.map((p) => p.country))].map((c) => ({
-    label: COUNTRY_LABELS[c] ?? c,
-    value: c,
-  }));
-  const priceRange = getPriceRange();
-
-  return { seasons, brands, widths, profiles, diameters, tireTypes, pcds: [], ets: [], hubBores: [], wheelTypes: [], countries, delivery: DELIVERY_OPTIONS, priceMin: priceRange.min, priceMax: priceRange.max };
-}
 
 // ============================================================================
 // Авто-словарь (4 марки)
@@ -873,3 +857,12 @@ export const SEO_CONTENT: SeoContent = {
   advantages: "Почему выгодно покупать шины у нас: прямые поставки от производителей, гарантия качества, быстрая доставка по Челябинску и области, профессиональный шиномонтаж.",
   sizes: ALL_DIAMETERS.filter((d) => d >= 13 && d <= 18).map((d) => `R${d}`),
 };
+
+/**
+ * Мок эндпоинта SEO-контента каталога.
+ * city — контекст запроса (тексты/преимущества по городу на реальном бэке);
+ * в моке контент статичен — параметр существует для контракта.
+ */
+export function getSeoContentMock(city?: string): SeoContent {
+  return SEO_CONTENT;
+}

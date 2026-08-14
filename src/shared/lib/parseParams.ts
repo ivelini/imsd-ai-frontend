@@ -6,7 +6,8 @@
 // шины и диски различаются только TIRES_CONFIG / WHEELS_CONFIG.
 import type { FilterState } from "@/features/catalog/types";
 
-const R_DIAMETER = /^r(\d+)$/i; // r15, R16
+// r15, R16, r13c — C-размеры (легкогрузовые) хранятся как строка "13c"
+const R_DIAMETER = /^r(\d+)(c)?$/i;
 
 // ---------------------------------------------------------------------------
 // Правила конфига
@@ -38,12 +39,19 @@ export interface CatalogUrlConfig {
 // Общие сегмент-парсеры
 // ---------------------------------------------------------------------------
 
-/** rN → diameter (общий для шин и дисков) */
+/** rN/rNc → diameter (общий для шин и дисков): r15 → 15, r13c → "13c" */
 const diameterSegment: SegmentParser = (seg, filter) => {
   const m = seg.toLowerCase().match(R_DIAMETER);
   if (!m) return false;
-  filter.diameter = parseInt(m[1], 10);
+  filter.diameter = m[2] ? `${m[1]}c` : parseInt(m[1], 10);
   return true;
+};
+
+/** diameter в query (auto-вкладка, без сегментов): "r15"/"15" → 15, "r13c"/"13c" → "13c" */
+const diameterVal = (raw: string | string[] | undefined): number | string | undefined => {
+  const m = String(raw).match(/^r?(\d+)(c)?$/i);
+  if (!m) return undefined;
+  return m[2] ? `${m[1]}c` : parseInt(m[1], 10);
 };
 
 /** Числа шин: первое → ширина, второе → профиль, остальные игнорируются */
@@ -230,7 +238,7 @@ const wheelSegmentOrder = (f: FilterState) => [
 
 const tireExtraQueryFields = (f: FilterState): [string, string][] => {
   const out: [string, string][] = [];
-  if (f.tireType) out.push(["tire_type", f.tireType]);
+  if (f.studded) out.push(["studded", f.studded]);
   return out;
 };
 
@@ -251,8 +259,8 @@ export const TIRES_CONFIG: CatalogUrlConfig = {
     fallback("brand", "brand", strVal),
     fallback("width", "width", intVal),
     fallback("profile", "profile", intVal),
-    fallback("diameter", "diameter", intVal),
-    always("tire_type", "tireType", strVal),
+    fallback("diameter", "diameter", diameterVal),
+    always("studded", "studded", strVal),
   ],
   segmentOrder: tireSegmentOrder,
   extraQueryFields: tireExtraQueryFields,

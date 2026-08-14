@@ -141,13 +141,56 @@ export function getWheelPriceRange() {
 }
 
 // ============================================================================
+// Товары каталога (мок ответа бэка)
+// ============================================================================
+
+const WHEELS_PER_PAGE = 12;
+
+/**
+ * Мок эндпоинта товаров дисков: фильтрация + пагинация.
+ * city — контекст запроса (региональные цены/наличие на реальном бэке);
+ * в моке не влияет на данные — параметр существует для контракта.
+ */
+export function getWheelsProductsMock(
+  filter: FilterState,
+  city?: string,
+): { items: WheelProduct[]; total: number; page: number; perPage: number } {
+  let items = [...ALL_WHEELS];
+
+  if (filter.brand) items = items.filter((p) => p.brandId === filter.brand);
+  // diameter: number (15) или C-строка ("13c" — в моке дисков нет C-размеров)
+  if (filter.diameter != null) {
+    const diameterNum = typeof filter.diameter === "number" ? filter.diameter : parseInt(filter.diameter, 10);
+    items = items.filter((p) => p.diameter === diameterNum);
+  }
+  if (filter.width) items = items.filter((p) => p.width === filter.width);
+  if (filter.pcd) items = items.filter((p) => p.pcd === filter.pcd);
+  if (filter.et) items = items.filter((p) => p.et === filter.et);
+  if (filter.hubBore) items = items.filter((p) => p.hubBore === filter.hubBore);
+  if (filter.wheelType) items = items.filter((p) => p.wheelType === filter.wheelType);
+  if (filter.priceMin != null) items = items.filter((p) => p.price >= filter.priceMin!);
+  if (filter.priceMax != null) items = items.filter((p) => p.price <= filter.priceMax!);
+  if (filter.country) items = items.filter((p) => p.country === filter.country);
+  if (filter.delivery && filter.delivery.length > 0) {
+    // В моках все товары доступны — фильтр delivery не сужает
+  }
+
+  const total = items.length;
+  const page = filter.page ?? 1;
+  const start = (page - 1) * WHEELS_PER_PAGE;
+  const paged = items.slice(start, start + WHEELS_PER_PAGE);
+
+  return { items: paged, total, page, perPage: WHEELS_PER_PAGE };
+}
+
+// ============================================================================
 // Опции фильтра
 // ============================================================================
 
 export function getWheelsFilterOptions(): FilterOptions {
   const diameters: FilterOption[] = [...new Set(ALL_WHEELS.map((p) => p.diameter))]
     .sort((a, b) => a - b)
-    .map((d) => ({ label: `R${d}`, value: String(d) }));
+    .map((d) => ({ label: `R${d}`, value: `r${d}` })); // value = сегмент URL (r15)
 
   const widths: FilterOption[] = [...new Set(ALL_WHEELS.map((p) => p.width))]
     .sort((a, b) => Number(a) - Number(b))
@@ -175,7 +218,7 @@ export function getWheelsFilterOptions(): FilterOptions {
     widths,
     profiles: [],
     diameters,
-    tireTypes: [],
+    studded: [],
     pcds,
     ets,
     hubBores,

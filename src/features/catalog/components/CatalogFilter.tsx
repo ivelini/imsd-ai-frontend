@@ -165,6 +165,12 @@ export function CatalogFilter({ options, current, initialTab = "params", autoDat
 
   const num = (v: string) => (v && v !== "0" ? parseInt(v, 10) : undefined);
   const str = (v: string) => (v && v !== "0" ? v : undefined);
+  // Диаметр: "r15"/"15" → 15, "r13c"/"13c" → "13c" (C-размеры — строка)
+  const diam = (v: string): number | string | undefined => {
+    const m = (v || "").match(/^r?(\d+)(c?)$/i);
+    if (!m) return undefined;
+    return m[2] ? `${m[1]}c` : parseInt(m[1], 10);
+  };
 
   return (
     <>
@@ -222,7 +228,7 @@ export function CatalogFilter({ options, current, initialTab = "params", autoDat
             <div className="calatog-select-col">
               {isWheels ? (
                 <>
-                  <CatSelect id="catalog-diameterSelect" value={effective.diameter ? String(effective.diameter) : "0"} onChange={(v) => apply({ diameter: num(v) })} placeholder="Диаметр">
+                  <CatSelect id="catalog-diameterSelect" value={effective.diameter != null ? `r${effective.diameter}` : "0"} onChange={(v) => apply({ diameter: diam(v) })} placeholder="Диаметр">
                     {options.diameters.map((d) => <option key={d.value} value={d.value}>{d.label}</option>)}
                   </CatSelect>
                   <CatSelect id="catalog-widthSelect" value={effective.width ? String(effective.width) : "0"} onChange={(v) => apply({ width: num(v) })} placeholder="Ширина">
@@ -252,14 +258,14 @@ export function CatalogFilter({ options, current, initialTab = "params", autoDat
                   <CatSelect id="catalog-profileSelect" value={effective.profile ? String(effective.profile) : "0"} onChange={(v) => apply({ profile: num(v) })} placeholder="Профиль">
                     {options.profiles.map((p) => <option key={p.value} value={p.value}>{p.label}</option>)}
                   </CatSelect>
-                  <CatSelect id="catalog-diameterSelect" value={effective.diameter ? String(effective.diameter) : "0"} onChange={(v) => apply({ diameter: num(v) })} placeholder="Диаметр">
+                  <CatSelect id="catalog-diameterSelect" value={effective.diameter != null ? `r${effective.diameter}` : "0"} onChange={(v) => apply({ diameter: diam(v) })} placeholder="Диаметр">
                     {options.diameters.map((d) => <option key={d.value} value={d.value}>{d.label}</option>)}
                   </CatSelect>
                   <CatSelect id="catalog-seasonalitySelect" value={effective.season ?? "0"} onChange={(v) => apply({ season: str(v) })} placeholder="Сезонность">
                     {options.seasons.map((s) => <option key={s.value} value={s.value}>{s.label}</option>)}
                   </CatSelect>
-                  <CatSelect id="catalog-tireTypeSelect" value={effective.tireType ?? "0"} onChange={(v) => apply({ tireType: str(v) })} placeholder="Тип шин">
-                    {options.tireTypes.map((t) => <option key={t.value} value={t.value}>{t.label}</option>)}
+                  <CatSelect id="catalog-studdedSelect" value={effective.studded ?? "0"} onChange={(v) => apply({ studded: str(v) })} placeholder="Шипованность">
+                    {options.studded.map((t) => <option key={t.value} value={t.value}>{t.label}</option>)}
                   </CatSelect>
                   <CatSelect id="catalog-manufacturerSelect" value={effective.brand ?? "0"} onChange={(v) => apply({ brand: str(v) })} placeholder="Производитель">
                     {options.brands.map((b) => <option key={b.value} value={b.value}>{b.label}</option>)}

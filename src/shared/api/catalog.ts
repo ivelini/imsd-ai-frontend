@@ -1,11 +1,10 @@
 // Catalog: стартовая страница /catalog, каталог шин и дисков, авто-каскад
 import type { PaginatedResult } from "./types";
-import { delay } from "./base";
+import { apiBase, delay } from "./base";
 import { CATALOG_START } from "@/data/catalogStart";
 import type { CatalogStartData } from "@/features/catalog/types";
 import {
-  ALL_PRODUCTS,
-  getFilterOptions,
+  getCatalogProductsMock,
   getTireModel,
   AUTO_BRANDS,
   AUTO_YEARS,
@@ -19,10 +18,15 @@ import type {
   AutoResultProduct,
   CarBlockData,
 } from "@/data/catalog";
-import type { FilterOptions, FilterState, TireProduct } from "@/features/catalog/types";
+import type {
+  FilterOptions,
+  FilterState,
+  TireFilterValuesDto,
+  TireProduct,
+} from "@/features/catalog/types";
 import {
-  ALL_WHEELS,
   getWheelsFilterOptions,
+  getWheelsProductsMock,
   getWheelsAutoResult,
   getWheelsCarBlock,
   generateWheelMods,
@@ -42,36 +46,49 @@ export async function getCatalogStart(): Promise<CatalogStartData> {
   return delay(30, CATALOG_START);
 }
 
-const PER_PAGE = 12;
+/**
+ * Адаптер DTO GET /api/reference/filter/tire → FilterOptions.
+ * Целевой контракт: brand/country — slug, diameter — r-значения (исправляется
+ * на бэке). width/profile — int → строка (совпадает с сегментом URL без потерь).
+ */
+export function toFilterOptions(data: TireFilterValuesDto): FilterOptions {
+  // value в нижний регистр: бэк отдаёт "r13C" — в URL сегменты строчные (r13c)
+  const opts = (items: TireFilterValuesDto["width"]): FilterOptions["seasons"] =>
+    items.map((o) => ({ label: String(o.label), value: String(o.value).toLowerCase() }));
+
+  return {
+    seasons: opts(data.season),
+    brands: opts(data.brand),
+    widths: opts(data.width),
+    profiles: opts(data.profile),
+    diameters: opts(data.diameter),
+    studded: opts(data.studded),
+    pcds: [], // диски — отдельный мок (эндпоинта нет)
+    ets: [],
+    hubBores: [],
+    wheelTypes: [],
+    countries: opts(data.country),
+    delivery: opts(data.delivery),
+    priceMin: data.price.min,
+    priceMax: data.price.max,
+  };
+}
 
 export async function getCatalogFilters(): Promise<FilterOptions> {
-  return delay(50, getFilterOptions());
+  const res = await fetch(`${apiBase()}/reference/filter/tire`);
+  if (!res.ok) {
+    throw new Error(`getCatalogFilters: HTTP ${res.status}`);
+  }
+  const body = (await res.json()) as { data: TireFilterValuesDto };
+  return toFilterOptions(body.data);
 }
 
 export async function getCatalogProducts(
   filter: FilterState,
+  city?: string,
 ): Promise<PaginatedResult<TireProduct>> {
-  let items = [...ALL_PRODUCTS];
-
-  if (filter.season) items = items.filter((p) => p.season === filter.season);
-  if (filter.brand) items = items.filter((p) => p.brandId === filter.brand);
-  if (filter.width) items = items.filter((p) => p.width === filter.width);
-  if (filter.profile) items = items.filter((p) => p.profile === filter.profile);
-  if (filter.diameter) items = items.filter((p) => p.diameter === filter.diameter);
-  if (filter.priceMin != null) items = items.filter((p) => p.price >= filter.priceMin!);
-  if (filter.priceMax != null) items = items.filter((p) => p.price <= filter.priceMax!);
-  if (filter.country) items = items.filter((p) => p.country === filter.country);
-  if (filter.tireType) items = items.filter((p) => p.tireType === filter.tireType);
-  if (filter.delivery && filter.delivery.length > 0) {
-    // В моках все товары доступны — фильтр delivery не сужает
-  }
-
-  const total = items.length;
-  const page = filter.page ?? 1;
-  const start = (page - 1) * PER_PAGE;
-  const paged = items.slice(start, start + PER_PAGE);
-
-  return delay(50, { items: paged, total, page, perPage: PER_PAGE });
+  // city — контекст запроса; при подключении API уходит в query fetch-запроса
+  return delay(50, getCatalogProductsMock(filter, city));
 }
 
 export async function getAutoBrands(): Promise<AutoBrandData[]> {
@@ -118,29 +135,10 @@ export async function getWheelsFilters(): Promise<FilterOptions> {
 
 export async function getWheelsProducts(
   filter: FilterState,
+  city?: string,
 ): Promise<PaginatedResult<WheelProduct>> {
-  let items = [...ALL_WHEELS];
-
-  if (filter.brand) items = items.filter((p) => p.brandId === filter.brand);
-  if (filter.diameter) items = items.filter((p) => p.diameter === filter.diameter);
-  if (filter.width) items = items.filter((p) => p.width === filter.width);
-  if (filter.pcd) items = items.filter((p) => p.pcd === filter.pcd);
-  if (filter.et) items = items.filter((p) => p.et === filter.et);
-  if (filter.hubBore) items = items.filter((p) => p.hubBore === filter.hubBore);
-  if (filter.wheelType) items = items.filter((p) => p.wheelType === filter.wheelType);
-  if (filter.priceMin != null) items = items.filter((p) => p.price >= filter.priceMin!);
-  if (filter.priceMax != null) items = items.filter((p) => p.price <= filter.priceMax!);
-  if (filter.country) items = items.filter((p) => p.country === filter.country);
-  if (filter.delivery && filter.delivery.length > 0) {
-    // В моках все товары доступны — фильтр delivery не сужает
-  }
-
-  const total = items.length;
-  const page = filter.page ?? 1;
-  const start = (page - 1) * PER_PAGE;
-  const paged = items.slice(start, start + PER_PAGE);
-
-  return delay(50, { items: paged, total, page, perPage: PER_PAGE });
+  // city — контекст запроса; при подключении API уходит в query fetch-запроса
+  return delay(50, getWheelsProductsMock(filter, city));
 }
 
 export async function getWheelsAutoBrands(): Promise<WheelAutoBrand[]> {

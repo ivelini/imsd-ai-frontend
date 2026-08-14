@@ -48,3 +48,28 @@ export function mergeSearchParams(
   }
   return next.toString();
 }
+
+/** Действие синхронизации города между URL и стором (CityHydrator) */
+export type CitySyncAction =
+  | { type: "none" }
+  | { type: "setStore"; value: string }
+  | { type: "setUrl"; value: string };
+
+/**
+ * Что делать при расхождении URL и стора:
+ * - URL пуст, стор пуст → ничего;
+ * - URL пуст, стор есть → дописать город в URL (заход без ?city= с сохранённым выбором);
+ * - URL есть и отличается от стора → стор подчиняется URL (URL — источник истины);
+ * - совпадают → ничего (защита от бесконечного цикла replace).
+ */
+export function citySyncAction(
+  urlCity: string | null,
+  storeCity: string | null,
+): CitySyncAction {
+  if (urlCity) {
+    if (urlCity !== storeCity) return { type: "setStore", value: urlCity };
+    return { type: "none" };
+  }
+  if (storeCity) return { type: "setUrl", value: storeCity };
+  return { type: "none" };
+}
