@@ -5202,3 +5202,45 @@ input[type="checkbox"] {
 .filter-content-item.auto {
   display: block;
 }
+/* Пагинация типоразмеров модели (12.08.2026): диаметр — вкладки с ?diameter,
+   внутри секции — «Показать ещё» по 24. Мок-селекторы .model-sizes-nav a
+   не работают на <button> — дублируем + активная вкладка + кнопка. */
+.model-sizes-nav-link {
+  display: inline-block;
+  padding: 6px 14px;
+  border-radius: 5px;
+  border: 1px solid var(--color-border-soft, #e0e0e0);
+  background: none;
+  cursor: pointer;
+  color: var(--color-text-dark);
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+}
+.model-sizes-nav-link:hover {
+  border-color: var(--color-red);
+  color: var(--color-red);
+}
+.model-sizes-nav-link_active,
+.model-sizes-nav-link_active:hover {
+  border-color: var(--color-red);
+  background: var(--color-red);
+  color: #fff;
+}
+.model-sizes-more {
+  display: block;
+  margin: 30px auto 0;
+  padding: 10px 32px;
+  border-radius: 5px;
+  border: 1px solid var(--color-red);
+  background: none;
+  cursor: pointer;
+  color: var(--color-red);
+  font: inherit;
+  font-size: 15px;
+  font-weight: 600;
+}
+.model-sizes-more:hover {
+  background: var(--color-red);
+  color: #fff;
+}

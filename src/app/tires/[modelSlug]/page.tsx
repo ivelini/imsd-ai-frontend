@@ -31,7 +31,14 @@ export default async function ModelPage({ params, searchParams }: PageProps) {
         params={model.params}
         description={model.description}
       />
-      <ModelSizes sizesByDiameter={model.sizesByDiameter} cityLabel={cityLabel} cityValue={cityValue} />
+      <ModelSizes
+        sizesByDiameter={model.sizesByDiameter}
+        initialDiameter={
+          typeof resolvedSearch.diameter === "string" ? resolvedSearch.diameter : undefined
+        }
+        cityLabel={cityLabel}
+        cityValue={cityValue}
+      />
     </section>
   );
 }
