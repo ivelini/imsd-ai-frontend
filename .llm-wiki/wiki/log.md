@@ -9,3 +9,6 @@
 - Created: api-contract.md
 - Created: ui-porting-rules.md
 - Created: git-workflow.md
+
+## [2026-08-19] ingest | Практика ADR в проекте
+- Updated: project-architecture.md (See Also)

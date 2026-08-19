@@ -42,3 +42,4 @@
 - [frontend-architecture-rules](frontend-architecture-rules.md)
 - [api-contract](api-contract.md)
 - [ui-porting-rules](ui-porting-rules.md)
+- [adr-practice](adr-practice.md) — правила записи решений
