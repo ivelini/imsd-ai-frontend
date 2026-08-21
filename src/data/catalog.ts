@@ -363,50 +363,6 @@ function generateProducts(): TireProduct[] {
 export const ALL_PRODUCTS = generateProducts();
 
 // ============================================================================
-// Товары каталога (мок ответа бэка)
-// ============================================================================
-
-const PER_PAGE = 12;
-
-/**
- * Мок эндпоинта товаров: фильтрация по параметрам + пагинация.
- * city — контекст запроса (региональные цены/наличие на реальном бэке);
- * в моке не влияет на данные — параметр существует для контракта.
- */
-export function getCatalogProductsMock(
-  filter: FilterState,
-  city?: string,
-): { items: TireProduct[]; total: number; page: number; perPage: number } {
-  let items = [...ALL_PRODUCTS];
-
-  if (filter.season) items = items.filter((p) => p.season === filter.season);
-  if (filter.brand) items = items.filter((p) => p.brandId === filter.brand);
-  if (filter.width) items = items.filter((p) => p.width === filter.width);
-  if (filter.profile) items = items.filter((p) => p.profile === filter.profile);
-  // diameter: number (15) или C-строка ("13c")
-  if (filter.diameter != null) {
-    const diameterNum = typeof filter.diameter === "number" ? filter.diameter : parseInt(filter.diameter, 10);
-    items = items.filter((p) => p.diameter === diameterNum);
-  }
-  if (filter.priceMin != null) items = items.filter((p) => p.price >= filter.priceMin!);
-  if (filter.priceMax != null) items = items.filter((p) => p.price <= filter.priceMax!);
-  if (filter.country) items = items.filter((p) => p.country === filter.country);
-  if (filter.studded) {
-    // В моках у товаров нет признака шипов — фильтр не сужает (как delivery)
-  }
-  if (filter.delivery && filter.delivery.length > 0) {
-    // В моках все товары доступны — фильтр delivery не сужает
-  }
-
-  const total = items.length;
-  const page = filter.page ?? 1;
-  const start = (page - 1) * PER_PAGE;
-  const paged = items.slice(start, start + PER_PAGE);
-
-  return { items: paged, total, page, perPage: PER_PAGE };
-}
-
-// ============================================================================
 // Опции фильтра (вычисляются из товаров)
 // ============================================================================
 
@@ -711,8 +667,8 @@ export function getAutoResult(brand: string, model: string, year: number, mod: s
     const product = findMatchingProduct(w, p, d);
     if (!product) return null;
     if (filter) {
-      if (filter.priceMin != null && product.price < filter.priceMin) return null;
-      if (filter.priceMax != null && product.price > filter.priceMax) return null;
+      if (filter.priceMin != null && (product.price ?? 0) < filter.priceMin) return null;
+      if (filter.priceMax != null && (product.price ?? 0) > filter.priceMax) return null;
       if (filter.country && product.country !== filter.country) return null;
     }
     return product;
@@ -849,13 +805,6 @@ function findMatchingProduct(width: number, profile: number, diameter: number): 
 export const SEO_CONTENT: SeoContent = {
   title: "Шины в Челябинске",
   subtitle: "Шины Viatti",
-  features: [
-    "Особенности шин Viatti",
-    "Летняя резина Viatti — надёжное сцепление на сухом и мокром асфальте, низкий уровень шума, длительный срок службы.",
-    "Зимняя резина Viatti — отличное сцепление на снегу и льду, износостойкий компаунд, устойчивость к низким температурам.",
-  ],
-  advantages: "Почему выгодно покупать шины у нас: прямые поставки от производителей, гарантия качества, быстрая доставка по Челябинску и области, профессиональный шиномонтаж.",
-  sizes: ALL_DIAMETERS.filter((d) => d >= 13 && d <= 18).map((d) => `R${d}`),
 };
 
 /**

@@ -12,3 +12,8 @@
 
 ## [2026-08-19] ingest | Практика ADR в проекте
 - Updated: project-architecture.md (See Also)
+
+## [2026-08-21] ingest | Каталог шин: живой API (листинг, гео, SEO-мета)
+- Created: catalog-live-api.md
+- Updated: city-request-context.md (резолв города переехал на бэк)
+- Updated: project-architecture.md (карта: каталог живой, моки удалены)

@@ -136,7 +136,7 @@ for (const brand of BRANDS) {
 
 export function getWheelPriceRange() {
   if (ALL_WHEELS.length === 0) return { min: 0, max: 100000 };
-  const prices = ALL_WHEELS.map((p) => p.price);
+  const prices = ALL_WHEELS.map((p) => p.price ?? 0);
   return { min: Math.min(...prices), max: Math.max(...prices) };
 }
 
@@ -168,8 +168,8 @@ export function getWheelsProductsMock(
   if (filter.et) items = items.filter((p) => p.et === filter.et);
   if (filter.hubBore) items = items.filter((p) => p.hubBore === filter.hubBore);
   if (filter.wheelType) items = items.filter((p) => p.wheelType === filter.wheelType);
-  if (filter.priceMin != null) items = items.filter((p) => p.price >= filter.priceMin!);
-  if (filter.priceMax != null) items = items.filter((p) => p.price <= filter.priceMax!);
+  if (filter.priceMin != null) items = items.filter((p) => (p.price ?? 0) >= filter.priceMin!);
+  if (filter.priceMax != null) items = items.filter((p) => (p.price ?? 0) <= filter.priceMax!);
   if (filter.country) items = items.filter((p) => p.country === filter.country);
   if (filter.delivery && filter.delivery.length > 0) {
     // В моках все товары доступны — фильтр delivery не сужает
@@ -414,8 +414,8 @@ export function getWheelsAutoResult(
     const product = findWheel(w, d, pcd, et, hb);
     if (!product) return null;
     if (filter) {
-      if (filter.priceMin != null && product.price < filter.priceMin) return null;
-      if (filter.priceMax != null && product.price > filter.priceMax) return null;
+      if (filter.priceMin != null && (product.price ?? 0) < filter.priceMin) return null;
+      if (filter.priceMax != null && (product.price ?? 0) > filter.priceMax) return null;
       if (filter.country && product.country !== filter.country) return null;
     }
     return product;

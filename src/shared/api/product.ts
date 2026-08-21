@@ -29,7 +29,7 @@ export async function getProduct(
 
   const quantityOptions = [1, 2, 3, 4].map((q) => ({
     value: q,
-    label: `${(product.price * q).toLocaleString("ru-RU")} ₽ - ${q} шт.`,
+    label: `${((product.price ?? 0) * q).toLocaleString("ru-RU")} ₽ - ${q} шт.`,
   }));
 
   return delay(50, {

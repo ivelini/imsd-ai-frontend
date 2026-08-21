@@ -20,7 +20,7 @@ export function AddToCartBlock({ product }: { product: ProductDetailData }) {
     setPopupOpen,
     setConfirmOpen,
   } = useCartItemActions(
-    { id: product.id, name: product.title, price: product.price, image: product.image },
+    { id: product.id, name: product.title, price: product.price ?? 0, image: product.image },
     quantity,
   );
 

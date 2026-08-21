@@ -21,7 +21,7 @@ export interface ProductBase {
   modelName: string;
   width: number | string; // ширина (мм для шин, J-width для дисков)
   diameter: number;
-  price: number;
+  price?: number; // null с бэка → карточка скрывает блок цен
   oldPrice?: number;
   code: string;
   country: string; // value: "russia", "france"...
@@ -50,6 +50,10 @@ export interface TireProduct extends ProductBase {
   category: "tires";
   slug: string; // = sizeSlug (обратная совместимость)
   season: string; // value: "summer" | "winter" | "all-season"
+  seasonLabel?: string; // русское название сезона (label от бэка)
+  isStudded?: boolean; // шипованность (живой листинг)
+  deliveryMin?: number | null; // срок доставки города, дни
+  deliveryMax?: number | null;
   profile: number;
   loadIndex: string;
   speedRating: string;
@@ -116,13 +120,10 @@ export interface CatalogStartData {
   wheelBrands: BrandLink[];
 }
 
-/** SEO-контент под каталогом (готовые строки от «бэка») */
+/** SEO-контент под каталогом (готовые строки от бэка; бренд подставляет бэк) */
 export interface SeoContent {
   title: string;
   subtitle: string;
-  features: string[];
-  advantages: string;
-  sizes: string[];
 }
 
 export interface FilterOptions {
@@ -163,4 +164,55 @@ export interface TireFilterValuesDto {
   country: FilterValueDto[];
   delivery: FilterValueDto[];
   price: { min: number; max: number };
+}
+
+// ============================================================================
+// DTO бэкенда: GET /api/catalog/tires (Scramble public-api.json, 21.08.2026)
+// ============================================================================
+
+/** Элемент листинга шин. slug — sizeSlug (brand-name-width-profile-diameter). */
+export interface TireListItemDto {
+  id: number;
+  name: string;
+  slug: string;
+  brand: { id: number; name: string; slug: string };
+  model: { id: number; name: string; slug: string } | null;
+  width: number | null;
+  profile: number | null;
+  diameter: string | null; // "17" | "13c"
+  season: { label: string; value: string } | null;
+  is_studded: boolean;
+  euro_label: { rollingResistance: string; wetGrip: string; noiseEmission: string } | null;
+  price: number | null;
+  delivery_min: number | null;
+  delivery_max: number | null;
+  images: { id: number; url: string }[];
+}
+
+/** SEO-мета листинга: title готовый (предложный падеж города), description из бренда/конфига. */
+export interface TireListSeo {
+  title: string;
+  description: string | null;
+}
+
+export interface TireListMetaDto {
+  current_page: number;
+  last_page: number;
+  per_page: number;
+  total: number;
+  seo: TireListSeo | null;
+}
+
+export interface TireListDto {
+  data: TireListItemDto[];
+  meta: TireListMetaDto;
+}
+
+/** Результат листинга для страницы: товары + пагинация + seo-мета. */
+export interface TireListResult {
+  items: TireProduct[];
+  total: number;
+  page: number;
+  perPage: number;
+  seo: TireListSeo | null;
 }

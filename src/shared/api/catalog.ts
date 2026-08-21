@@ -4,7 +4,6 @@ import { apiBase, delay } from "./base";
 import { CATALOG_START } from "@/data/catalogStart";
 import type { CatalogStartData } from "@/features/catalog/types";
 import {
-  getCatalogProductsMock,
   getTireModel,
   AUTO_BRANDS,
   AUTO_YEARS,
@@ -22,6 +21,9 @@ import type {
   FilterOptions,
   FilterState,
   TireFilterValuesDto,
+  TireListItemDto,
+  TireListDto,
+  TireListResult,
   TireProduct,
 } from "@/features/catalog/types";
 import {
@@ -83,12 +85,96 @@ export async function getCatalogFilters(): Promise<FilterOptions> {
   return toFilterOptions(body.data);
 }
 
+// --- Живой листинг GET /api/catalog/tires (контракт public-api.json, 21.08.2026) ---
+
+/** Заглушка карточки без изображения (как в моке). */
+const PRODUCT_PLACEHOLDER = "/assets/img/wheel-product.png";
+/** Элементов на странице каталога (допустимо 10–100, бэк по умолчанию 48). */
+const CATALOG_PER_PAGE = 12;
+
+/** Фильтр каталога → query листинга. Город — слагом city= (резолвит бэк). */
+export function toTireListQuery(filter: FilterState, city?: string): string {
+  const params = new URLSearchParams();
+  if (filter.width !== undefined) params.append("width[]", String(filter.width));
+  if (filter.profile !== undefined) params.append("profile[]", String(filter.profile));
+  if (filter.diameter !== undefined) params.append("diameter[]", String(filter.diameter));
+  if (filter.season) params.append("season", filter.season);
+  if (filter.studded) params.append("studded", filter.studded);
+  if (filter.brand) params.append("brand", filter.brand);
+  if (filter.country) params.append("country", filter.country);
+  filter.delivery?.forEach((d) => params.append("delivery[]", d));
+  if (filter.priceMin !== undefined) params.append("price_min", String(filter.priceMin));
+  if (filter.priceMax !== undefined) params.append("price_max", String(filter.priceMax));
+  if (filter.page !== undefined) params.append("page", String(filter.page));
+  if (city) params.append("city", city);
+  // URLSearchParams кодирует [] в %5B%5D — бэк ждёт каноничный вид width[]= (PHP parse_str)
+  return params.toString().replace(/%5B/g, "[").replace(/%5D/g, "]");
+}
+
+/** Диаметр DTO → число: "17" → 17, "13c" → 13 (C-размер), null → 0. */
+function parseDiameter(diameter: string | null): number {
+  const match = /^(\d+)(c)?$/.exec(diameter ?? "");
+  return match ? Number(match[1]) : 0;
+}
+
+/** DTO листинга → TireProduct (поля, которых нет на бэке, — пустые дефолты). */
+export function toTireProduct(dto: TireListItemDto): TireProduct {
+  const sizeTitle = [dto.width, dto.profile].filter(Boolean).join("/");
+  return {
+    id: String(dto.id),
+    category: "tires",
+    slug: dto.slug,
+    season: dto.season?.value ?? "all-season",
+    seasonLabel: dto.season?.label,
+    isStudded: dto.is_studded,
+    deliveryMin: dto.delivery_min,
+    deliveryMax: dto.delivery_max,
+    brandId: String(dto.brand.id),
+    brandName: dto.brand.name,
+    modelSlug: dto.model?.slug ?? "",
+    modelName: dto.model?.name ?? dto.name,
+    width: dto.width ?? 0,
+    profile: dto.profile ?? 0,
+    diameter: parseDiameter(dto.diameter),
+    price: dto.price ?? undefined,
+    code: "",
+    country: "",
+    countryLabel: "",
+    year: "",
+    quantity: 0,
+    image: dto.images[0]?.url ?? PRODUCT_PLACEHOLDER,
+    title: dto.name,
+    sizeSlug: dto.slug,
+    sizeTitle: `${sizeTitle} R${dto.diameter ?? ""}`,
+    // бэк шлёт noiseEmission строкой — в карточке число dB
+    euLabel: dto.euro_label
+      ? { ...dto.euro_label, noiseEmission: Number(dto.euro_label.noiseEmission) }
+      : undefined,
+    parameters: [],
+    loadIndex: "",
+    speedRating: "",
+    tireType: "",
+  };
+}
+
 export async function getCatalogProducts(
   filter: FilterState,
   city?: string,
-): Promise<PaginatedResult<TireProduct>> {
-  // city — контекст запроса; при подключении API уходит в query fetch-запроса
-  return delay(50, getCatalogProductsMock(filter, city));
+): Promise<TireListResult> {
+  const query = toTireListQuery(filter, city);
+  const url = `${apiBase()}/catalog/tires?${query ? `${query}&` : ""}per_page=${CATALOG_PER_PAGE}`;
+  const res = await fetch(url);
+  if (!res.ok) {
+    throw new Error(`getCatalogProducts: HTTP ${res.status}`);
+  }
+  const body = (await res.json()) as TireListDto;
+  return {
+    items: body.data.map(toTireProduct),
+    total: body.meta.total,
+    page: body.meta.current_page,
+    perPage: body.meta.per_page,
+    seo: body.meta.seo ?? null,
+  };
 }
 
 export async function getAutoBrands(): Promise<AutoBrandData[]> {

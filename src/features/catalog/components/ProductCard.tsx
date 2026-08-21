@@ -45,8 +45,11 @@ export function ProductCard({ product, showLink = true, pair = false, cityLabel,
             )}
           </h2>
           <div className="catalog-product-prices">
-            <p className="catalog-product-new-price">{formatPrice(product.price)}</p>
-            {product.oldPrice && product.oldPrice > product.price && (
+            {/* price nullable с бэка (нет цены города) — блок цен скрывается */}
+            {typeof product.price === "number" && (
+              <p className="catalog-product-new-price">{formatPrice(product.price)}</p>
+            )}
+            {product.oldPrice && typeof product.price === "number" && product.oldPrice > product.price && (
               <p className="catalog-product-old-price">{formatPrice(product.oldPrice)}</p>
             )}
           </div>

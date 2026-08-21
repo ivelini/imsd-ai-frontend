@@ -19,7 +19,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   if (!product) return { title: "Товар не найден" };
   return {
     title: product.title,
-    description: `Купить ${product.title} в Челябинске. Цена ${product.price.toLocaleString("ru-RU")} ₽.`,
+    description: `Купить ${product.title} в Челябинске. Цена ${(product.price ?? 0).toLocaleString("ru-RU")} ₽.`,
   };
 }
 

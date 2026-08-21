@@ -1,15 +1,28 @@
-// Каталог шин: серверная страница с клиентским фильтром (фаза 2)
-import { getCatalogFilters, getCatalogProducts, getGeo, getSeoContent } from "@/shared/api/data";
+// Каталог шин: серверная страница с клиентским фильтром (фаза 2, API 21.08.2026)
+import type { Metadata } from "next";
+import { getCatalogFilters, getCatalogProducts, getGeo } from "@/shared/api/data";
 import { parseCatalogParams, buildCatalogUrl } from "@/shared/lib/parseParams";
 import { resolveCityLabel } from "@/shared/lib/cityUrl";
 import { CatalogFilter } from "@/features/catalog/components/CatalogFilter";
 import { ProductCard } from "@/features/catalog/components/ProductCard";
 import { Pagination } from "@/features/catalog/components/Pagination";
-import { SeoBlock } from "@/features/catalog/components/SeoBlock";
 
 interface PageProps {
   params: Promise<{ params?: string[] }>;
   searchParams: Promise<Record<string, string | string[] | undefined>>;
+}
+
+/** SEO-мета листинга: title/description от бэка (город — предложный падеж, при brand — «Шины Michelin в Челябинске»). */
+export async function generateMetadata({ params, searchParams }: PageProps): Promise<Metadata> {
+  const [resolvedParams, resolvedSearchParams] = await Promise.all([params, searchParams]);
+  const filter = parseCatalogParams(resolvedParams, resolvedSearchParams);
+  const cityValue = typeof resolvedSearchParams.city === "string" ? resolvedSearchParams.city : undefined;
+  const result = await getCatalogProducts(filter, cityValue);
+
+  return {
+    title: result.seo?.title ?? "Каталог шин",
+    description: result.seo?.description ?? undefined,
+  };
 }
 
 export default async function CatalogPage({ params, searchParams }: PageProps) {
@@ -17,17 +30,17 @@ export default async function CatalogPage({ params, searchParams }: PageProps) {
   const filter = parseCatalogParams(resolvedParams, resolvedSearchParams);
   const cityValue = typeof resolvedSearchParams.city === "string" ? resolvedSearchParams.city : undefined;
 
-  const [filters, result, geo, seo] = await Promise.all([
+  // Город в query идёт слагом city= — бэк резолвит сам, поэтому один параллельный RTT
+  const [filters, result, geo] = await Promise.all([
     getCatalogFilters(),
     getCatalogProducts(filter, cityValue),
     getGeo(),
-    getSeoContent(cityValue),
   ]);
   const cityLabel = resolveCityLabel(cityValue, geo.cities, geo.defaultCity);
 
   return (
     <section className="catalog-section container">
-      <h2>Шины на авто в Челябинске</h2>
+      <h2>{result.seo?.title ?? "Шины и диски"}</h2>
       <div className="main-content-catalog">
         <CatalogFilter options={filters} current={filter} trackUrl />
         <div className="catalog-with-products">
@@ -45,7 +58,6 @@ export default async function CatalogPage({ params, searchParams }: PageProps) {
                 buildHref={(page) => buildCatalogUrl({ ...filter, page }, cityValue)}
             />
         )}
-      <SeoBlock content={seo} brand={filter.brand} season={filter.season} />
     </section>
   );
 }

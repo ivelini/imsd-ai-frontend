@@ -1,11 +1,11 @@
 # Архитектура проекта (карта)
 
-> Sources: CLAUDE.md, 2026-08-19
-> Raw: [CLAUDE.md](../../raw/project/2026-08-19-claude-md.md)
+> Sources: CLAUDE.md, 2026-08-19; catalog-tires-live-api, 2026-08-21
+> Raw: [CLAUDE.md](../../raw/project/2026-08-19-claude-md.md); [catalog-tires-live-api](../../raw/project/2026-08-21-catalog-tires-live-api.md)
 
 ## Overview
 
-Проект — интернет-магазин шин и дисков aalyans.ru: Next.js 16 приложение (`src/`), переносимое 1-в-1 из статичного HTML-мокапа (`.template/`). Данные — моки `src/data/`, имитирующие ответы Laravel-бэка (`backend/`, соседний проект); подключение API — поэтапное через rewrites.
+Проект — интернет-магазин шин и дисков aalyans.ru: Next.js 16 приложение (`src/`), переносимое 1-в-1 из статичного HTML-мокапа (`.template/`). Данные — моки `src/data/`, имитирующие ответы Laravel-бэка (`backend/`, соседний проект); подключение API — поэтапное через rewrites. С 21.08.2026 каталог шин полностью живой (листинг, гео, SEO-мета).
 
 ## Слои
 
@@ -21,9 +21,9 @@
 
 ## Данные и состояние
 
-- Моки в `src/data/` (geo 88 городов, nav, servicePages 10 стр., products, catalog, articles 9, cart, checkout); доступ только через `shared/api/data.ts`.
-- Источник истины по маршрутам API — `../backend/documentations/scramble/public-api.json` (Scramble-экспорт), не моки.
-- Бэк подключён частично: rewrites `/api/*` → бэк, живые опции фильтра `GET /api/reference/filter/tire`; остальное — моки. Кэш — на бэке.
+- Моки в `src/data/` (nav, servicePages 10 стр., products, catalog, articles 9, cart, checkout); доступ только через `shared/api/data.ts`.
+- Источник истины по маршрутам API — `../backend/documentations/scramble/public-api.json` (Scramble-экспорт, генерится в docker `scramble:export-docs`), не моки.
+- **Живое (21.08.2026):** каталог шин целиком — листинг `GET /api/catalog/tires` (адаптеры `toTireListQuery`/`toTireProduct`, город слагом `city=` — резолвит бэк), гео `GET /api/reference/city` (`toGeoData`; мок `data/geo.ts` удалён), опции фильтра `GET /api/reference/filter/tire`. SEO-мета страницы — `meta.seo {title, description}` → generateMetadata/h2. Остальное — моки (модель шины, auto-каскад, диски; SeoBlock {title, subtitle} для auto-страницы). Кэш — на бэке (`tire-list:v5`).
 - Zustand — только UI (город, попапы, меню); корзина/сессия — React Query + localStorage (`cart`, `orders`, `session`).
 - Кастомный CSS (страницы без макетов) — в конце `src/app/style.css` с датой.
 
@@ -35,10 +35,11 @@
 
 ## Решения
 
-Зафиксированные ADR 0001–0004 — отдельные статьи: [api-barrel-data-ts](api-barrel-data-ts.md), [catalog-url-grammar](catalog-url-grammar.md), [model-sizes-pagination](model-sizes-pagination.md), [city-request-context](city-request-context.md).
+Зафиксированные ADR 0001–0004 — отдельные статьи: [api-barrel-data-ts](api-barrel-data-ts.md), [catalog-url-grammar](catalog-url-grammar.md), [model-sizes-pagination](model-sizes-pagination.md), [city-request-context](city-request-context.md). Состояние подключения каталога — [catalog-live-api](catalog-live-api.md).
 
 ## See Also
 
+- [catalog-live-api](catalog-live-api.md) — живой листинг каталога: контракт, адаптеры, city-слаг
 - [frontend-architecture-rules](frontend-architecture-rules.md)
 - [api-contract](api-contract.md)
 - [ui-porting-rules](ui-porting-rules.md)

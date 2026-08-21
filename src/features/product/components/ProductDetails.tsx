@@ -32,7 +32,7 @@ export function ProductDetails({ product }: { product: ProductDetailData }) {
         <div className="price-payment-shipping">
           <div className="price-info">
             <span className="current-price">
-              {product.price.toLocaleString("ru-RU")} ₽
+              {product.price?.toLocaleString("ru-RU") ?? ""} ₽
             </span>
             {product.oldPrice && (
               <span className="old-price">
