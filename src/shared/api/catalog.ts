@@ -50,19 +50,26 @@ export async function getCatalogStart(): Promise<CatalogStartData> {
 
 /**
  * Адаптер DTO GET /api/reference/filter/tire → FilterOptions.
- * Целевой контракт: brand/country — slug, diameter — r-значения (исправляется
- * на бэке). width/profile — int → строка (совпадает с сегментом URL без потерь).
+ * Целевой контракт: brand/country — slug, diameter/width/profile — префиксные
+ * размеры ("r15", "w185", "p60") — 1:1 с сегментами URL.
  */
 export function toFilterOptions(data: TireFilterValuesDto): FilterOptions {
   // value в нижний регистр: бэк отдаёт "r13C" — в URL сегменты строчные (r13c)
   const opts = (items: TireFilterValuesDto["width"]): FilterOptions["seasons"] =>
     items.map((o) => ({ label: String(o.label), value: String(o.value).toLowerCase() }));
 
+  // Размеры с префиксом; голое число (переходный период бэка) — префикс добавляется
+  const sizeOpts = (items: TireFilterValuesDto["width"], prefix: string): FilterOptions["widths"] =>
+    items.map((o) => {
+      const value = String(o.value).toLowerCase();
+      return { label: String(o.label), value: value.startsWith(prefix) ? value : `${prefix}${value}` };
+    });
+
   return {
     seasons: opts(data.season),
     brands: opts(data.brand),
-    widths: opts(data.width),
-    profiles: opts(data.profile),
+    widths: sizeOpts(data.width, "w"),
+    profiles: sizeOpts(data.profile, "p"),
     diameters: opts(data.diameter),
     studded: opts(data.studded),
     pcds: [], // диски — отдельный мок (эндпоинта нет)

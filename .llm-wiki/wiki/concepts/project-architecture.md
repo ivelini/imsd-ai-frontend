@@ -14,7 +14,7 @@
 
 ## Ключевые роуты
 
-- Каталог шин `/catalog/tires/[[...params]]` — сегменты `season/brand/width/profile/rN` (C-размеры `r13c`) + query (`price_min`, `price_max`, `delivery[]`, `studded`, `page`).
+- Каталог шин `/catalog/tires/[[...params]]` — сегменты `season/brand/wN/pN/rN` (префиксные размеры: `w185`, `p60`, C-размеры `r13c`; невалидный сегмент → 404) + query (`price_min`, `price_max`, `delivery[]`, `studded`, `page`).
 - Автоподбор `/catalog/tires/auto/[[...auto]]` — каскад марка→модель→год→модификация.
 - Товар `/tires/[modelSlug]`, типоразмер `/tires/[modelSlug]/[sizeSlug]` (`185-60-r15-84h`).
 - Сервисные: `/cart`, `/checkout`, `/order/[id]` (localStorage-мок), `/order-status`, `/auth/*`, `/articles/*`, `/service-page/[slug]` (контент из API-мока).

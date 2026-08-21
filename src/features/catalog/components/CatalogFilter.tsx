@@ -171,6 +171,15 @@ export function CatalogFilter({ options, current, initialTab = "params", autoDat
     if (!m) return undefined;
     return m[2] ? `${m[1]}c` : parseInt(m[1], 10);
   };
+  // Ширина/профиль: префиксные value опций ("w185"/"p60") — 1:1 с сегментами URL
+  const wnum = (v: string): number | undefined => {
+    const m = (v || "").match(/^w(\d+)$/i);
+    return m ? parseInt(m[1], 10) : undefined;
+  };
+  const pnum = (v: string): number | undefined => {
+    const m = (v || "").match(/^p(\d+)$/i);
+    return m ? parseInt(m[1], 10) : undefined;
+  };
 
   return (
     <>
@@ -252,10 +261,10 @@ export function CatalogFilter({ options, current, initialTab = "params", autoDat
                 </>
               ) : (
                 <>
-                  <CatSelect id="catalog-widthSelect" value={effective.width ? String(effective.width) : "0"} onChange={(v) => apply({ width: num(v) })} placeholder="Ширина">
+                  <CatSelect id="catalog-widthSelect" value={effective.width != null ? `w${effective.width}` : "0"} onChange={(v) => apply({ width: wnum(v) })} placeholder="Ширина">
                     {options.widths.map((w) => <option key={w.value} value={w.value}>{w.label}</option>)}
                   </CatSelect>
-                  <CatSelect id="catalog-profileSelect" value={effective.profile ? String(effective.profile) : "0"} onChange={(v) => apply({ profile: num(v) })} placeholder="Профиль">
+                  <CatSelect id="catalog-profileSelect" value={effective.profile != null ? `p${effective.profile}` : "0"} onChange={(v) => apply({ profile: pnum(v) })} placeholder="Профиль">
                     {options.profiles.map((p) => <option key={p.value} value={p.value}>{p.label}</option>)}
                   </CatSelect>
                   <CatSelect id="catalog-diameterSelect" value={effective.diameter != null ? `r${effective.diameter}` : "0"} onChange={(v) => apply({ diameter: diam(v) })} placeholder="Диаметр">

@@ -1,6 +1,6 @@
 // Адаптер DTO GET /api/reference/filter/tire → FilterOptions
-// Актуальный контракт бэка: brand/country — slug, diameter — r-значения (r15, r13C),
-// studded — строки ("studded"/"not_studded")
+// Контракт бэка: brand/country — slug, размеры — префиксные значения (w185, p60, r15, r13C),
+// studded — строки ("studded"/"not_studded"); голые числа — переходный период (префикс добавляется)
 import { describe, expect, it } from "vitest";
 import { toFilterOptions } from "@/shared/api/catalog";
 import type { TireFilterValuesDto } from "@/features/catalog/types";
@@ -21,10 +21,15 @@ const baseDto: TireFilterValuesDto = {
 };
 
 describe("toFilterOptions", () => {
-  it("test_int_values_become_strings", () => {
+  it("test_int_values_get_size_prefix", () => {
     const opts = toFilterOptions(baseDto);
-    expect(opts.widths).toEqual([{ label: "185", value: "185" }]);
-    expect(opts.profiles).toEqual([{ label: "60", value: "60" }]);
+    expect(opts.widths).toEqual([{ label: "185", value: "w185" }]);
+    expect(opts.profiles).toEqual([{ label: "60", value: "p60" }]);
+  });
+
+  it("test_prefixed_values_passthrough", () => {
+    const opts = toFilterOptions({ ...baseDto, width: [{ label: 185, value: "w185" }] });
+    expect(opts.widths).toEqual([{ label: "185", value: "w185" }]);
   });
 
   it("test_slug_values_passthrough", () => {

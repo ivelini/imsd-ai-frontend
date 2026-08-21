@@ -1,7 +1,8 @@
 // Парсер URL-сегментов каталога в FilterState (фаза 2, обобщён 07.08.2026)
 // [[...params]] → { season?, brand?, width?, profile?, diameter? }
-// value сегментов = value опций фильтра 1:1 (summer, viatti, 185, 60, r15) —
+// value сегментов = value опций фильтра 1:1 (summer, viatti, w185, p60, r15) —
 // никаких маппингов (контракт: .claude/rules/api-contract.md)
+// Каноничный порядок шин: season/brand/w/p/r; нераспознанный сегмент → 404.
 // Грамматика каталога — конфиг (порядок сегментов, query-поля):
 // шины и диски различаются только TIRES_CONFIG / WHEELS_CONFIG.
 import type { FilterState } from "@/features/catalog/types";
@@ -54,13 +55,32 @@ const diameterVal = (raw: string | string[] | undefined): number | string | unde
   return m[2] ? `${m[1]}c` : parseInt(m[1], 10);
 };
 
-/** Числа шин: первое → ширина, второе → профиль, остальные игнорируются */
-const tireNumberSegment: SegmentParser = (seg, filter) => {
-  const num = parseInt(seg, 10);
-  if (isNaN(num)) return false;
-  if (filter.width == null) filter.width = num;
-  else if (filter.profile == null) filter.profile = num;
+/** w185 → 185 (ширина, префиксный сегмент — 1:1 с value опций справочника) */
+const widthSegment: SegmentParser = (seg, filter) => {
+  const m = seg.toLowerCase().match(/^w(\d+)$/);
+  if (!m) return false;
+  filter.width = parseInt(m[1], 10);
   return true;
+};
+
+/** p60 → 60 (профиль, префиксный сегмент — 1:1 с value опций справочника) */
+const profileSegment: SegmentParser = (seg, filter) => {
+  const m = seg.toLowerCase().match(/^p(\d+)$/);
+  if (!m) return false;
+  filter.profile = parseInt(m[1], 10);
+  return true;
+};
+
+/** width в query (auto-вкладка): "w185" → 185 */
+const widthVal = (raw: string | string[] | undefined): number | undefined => {
+  const m = String(raw).match(/^w(\d+)$/i);
+  return m ? parseInt(m[1], 10) : undefined;
+};
+
+/** profile в query (auto-вкладка): "p60" → 60 */
+const profileVal = (raw: string | string[] | undefined): number | undefined => {
+  const m = String(raw).match(/^p(\d+)$/i);
+  return m ? parseInt(m[1], 10) : undefined;
 };
 
 /** Число дисков: первое → ширина (J-width, например 6.5) */
@@ -72,21 +92,30 @@ const wheelNumberSegment: SegmentParser = (seg, filter) => {
 };
 
 /**
- * Сезон/бренд шин — семантика 1-в-1 с прежним кодом:
- * сезон — только ПЕРВЫЙ нечисловой сегмент (если это сезон);
- * бренд — первый не-сезонный; остальные нечисловые игнорируются
- * (например /tires/viatti/summer/... — season из URL не берётся).
+ * Сезон/бренд шин — строгая позиция в начале URL (каноничный порядок
+ * season/brand/w/p/r): сезон — только первый сегмент и без бренда;
+ * бренд — первая строка без размерных префиксов и чисел. Всё остальное
+ * (второй бренд, сезон после бренда/размеров, голые числа) не распознано —
+ * на странице это 404 (InvalidCatalogUrlError).
  */
 const tireBrandSeasonSegment: SegmentParser = (seg, filter) => {
   const lower = seg.toLowerCase();
   const seasons = new Set(["summer", "winter", "all-season"]);
   const isSeason = seasons.has(lower);
-  if (filter.brand == null && !isSeason) {
-    filter.brand = lower;
-  } else if (filter.season == null && filter.brand == null && isSeason) {
-    filter.season = lower;
+  const sizeSet = filter.width != null || filter.profile != null || filter.diameter != null;
+  if (isSeason) {
+    if (filter.season == null && filter.brand == null && !sizeSet) {
+      filter.season = lower;
+      return true;
+    }
+    return false; // сезон вне каноничной позиции
   }
-  return true; // потреблён (даже если проигнорирован)
+  if (/^\d/.test(lower) || /^[wpr]\d/.test(lower)) return false; // размеры/числа — не бренд
+  if (filter.brand == null && !sizeSet) {
+    filter.brand = lower;
+    return true;
+  }
+  return false; // второй бренд или строка после размеров
 };
 
 /** Бренд дисков — первый нечисловой сегмент */
@@ -162,8 +191,8 @@ function writeCommonQuery(filter: FilterState, query: URLSearchParams): void {
 function writeTireParams(filter: FilterState, query: URLSearchParams): void {
   if (filter.season) query.set("season", filter.season);
   if (filter.brand) query.set("brand", filter.brand);
-  if (filter.width) query.set("width", String(filter.width));
-  if (filter.profile) query.set("profile", String(filter.profile));
+  if (filter.width) query.set("width", `w${filter.width}`);
+  if (filter.profile) query.set("profile", `p${filter.profile}`);
   if (filter.diameter) query.set("diameter", String(filter.diameter));
 }
 
@@ -187,6 +216,14 @@ function buildQueryPortion(
 // Обобщённые функции
 // ---------------------------------------------------------------------------
 
+/** Невалидный сегмент URL каталога — страница отдаёт 404 */
+export class InvalidCatalogUrlError extends Error {
+  constructor(segment: string) {
+    super(`Невалидный сегмент URL каталога: "${segment}"`);
+    this.name = "InvalidCatalogUrlError";
+  }
+}
+
 export function parseUrl(
   config: CatalogUrlConfig,
   params: { params?: string[] },
@@ -194,11 +231,17 @@ export function parseUrl(
 ): FilterState {
   const filter: FilterState = {};
 
-  // Сегменты: пробуем парсеры по порядку, первый «съевший» побеждает
+  // Сегменты: пробуем парсеры по порядку, первый «съевший» побеждает;
+  // нераспознанный сегмент — невалидный URL (404 на странице)
   for (const seg of params.params ?? []) {
+    let eaten = false;
     for (const parser of config.segmentParsers) {
-      if (parser(seg, filter)) break;
+      if (parser(seg, filter)) {
+        eaten = true;
+        break;
+      }
     }
+    if (!eaten) throw new InvalidCatalogUrlError(seg);
   }
 
   // Query: свои параметры + общие
@@ -225,8 +268,8 @@ export function buildUrl(
 const tireSegmentOrder = (f: FilterState) => [
   f.season ?? null,
   f.brand ?? null,
-  f.width != null ? String(f.width) : null,
-  f.profile != null ? String(f.profile) : null,
+  f.width != null ? `w${f.width}` : null,
+  f.profile != null ? `p${f.profile}` : null,
   f.diameter != null ? `r${f.diameter}` : null,
 ];
 
@@ -253,12 +296,12 @@ const wheelExtraQueryFields = (f: FilterState): [string, string][] => {
 
 export const TIRES_CONFIG: CatalogUrlConfig = {
   pathPrefix: "/catalog/tires",
-  segmentParsers: [diameterSegment, tireNumberSegment, tireBrandSeasonSegment],
+  segmentParsers: [diameterSegment, widthSegment, profileSegment, tireBrandSeasonSegment],
   queryParsers: [
     fallback("season", "season", strVal),
     fallback("brand", "brand", strVal),
-    fallback("width", "width", intVal),
-    fallback("profile", "profile", intVal),
+    fallback("width", "width", widthVal),
+    fallback("profile", "profile", profileVal),
     fallback("diameter", "diameter", diameterVal),
     always("studded", "studded", strVal),
   ],

@@ -17,3 +17,8 @@
 - Created: catalog-live-api.md
 - Updated: city-request-context.md (резолв города переехал на бэк)
 - Updated: project-architecture.md (карта: каталог живой, моки удалены)
+
+## [2026-08-21] ingest | Конфиг-грамматика URL каталога (ADR 0002)
+- Updated: catalog-url-grammar.md (префиксные размеры w/p, 404 на мусор)
+- Updated: catalog-live-api.md (адаптер фильтров: префиксная нормализация)
+- Updated: project-architecture.md (карта: сегменты season/brand/wN/pN/rN)

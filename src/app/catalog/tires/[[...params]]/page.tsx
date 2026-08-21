@@ -1,8 +1,14 @@
 // Каталог шин: серверная страница с клиентским фильтром (фаза 2, API 21.08.2026)
 import type { Metadata } from "next";
+import { notFound } from "next/navigation";
 import { getCatalogFilters, getCatalogProducts, getGeo } from "@/shared/api/data";
-import { parseCatalogParams, buildCatalogUrl } from "@/shared/lib/parseParams";
+import {
+  buildCatalogUrl,
+  InvalidCatalogUrlError,
+  parseCatalogParams,
+} from "@/shared/lib/parseParams";
 import { resolveCityLabel } from "@/shared/lib/cityUrl";
+import type { FilterState } from "@/features/catalog/types";
 import { CatalogFilter } from "@/features/catalog/components/CatalogFilter";
 import { ProductCard } from "@/features/catalog/components/ProductCard";
 import { Pagination } from "@/features/catalog/components/Pagination";
@@ -12,10 +18,23 @@ interface PageProps {
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 }
 
+/** Парсинг URL каталога; невалидные сегменты (мусор в пути) → 404 */
+function parseCatalogParamsOr404(
+  params: { params?: string[] },
+  searchParams: Record<string, string | string[] | undefined>,
+): FilterState {
+  try {
+    return parseCatalogParams(params, searchParams);
+  } catch (e) {
+    if (e instanceof InvalidCatalogUrlError) notFound();
+    throw e;
+  }
+}
+
 /** SEO-мета листинга: title/description от бэка (город — предложный падеж, при brand — «Шины Michelin в Челябинске»). */
 export async function generateMetadata({ params, searchParams }: PageProps): Promise<Metadata> {
   const [resolvedParams, resolvedSearchParams] = await Promise.all([params, searchParams]);
-  const filter = parseCatalogParams(resolvedParams, resolvedSearchParams);
+  const filter = parseCatalogParamsOr404(resolvedParams, resolvedSearchParams);
   const cityValue = typeof resolvedSearchParams.city === "string" ? resolvedSearchParams.city : undefined;
   const result = await getCatalogProducts(filter, cityValue);
 
@@ -27,7 +46,7 @@ export async function generateMetadata({ params, searchParams }: PageProps): Pro
 
 export default async function CatalogPage({ params, searchParams }: PageProps) {
   const [resolvedParams, resolvedSearchParams] = await Promise.all([params, searchParams]);
-  const filter = parseCatalogParams(resolvedParams, resolvedSearchParams);
+  const filter = parseCatalogParamsOr404(resolvedParams, resolvedSearchParams);
   const cityValue = typeof resolvedSearchParams.city === "string" ? resolvedSearchParams.city : undefined;
 
   // Город в query идёт слагом city= — бэк резолвит сам, поэтому один параллельный RTT
