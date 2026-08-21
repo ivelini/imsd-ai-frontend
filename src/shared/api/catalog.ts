@@ -24,8 +24,10 @@ import type {
   TireListItemDto,
   TireListDto,
   TireListResult,
+  TireOriginItem,
   TireProduct,
 } from "@/features/catalog/types";
+import type { ProductParam } from "@/shared/types/product";
 import {
   getWheelsFilterOptions,
   getWheelsProductsMock,
@@ -104,7 +106,7 @@ export function toTireListQuery(filter: FilterState, city?: string): string {
   const params = new URLSearchParams();
   if (filter.width !== undefined) params.append("width[]", String(filter.width));
   if (filter.profile !== undefined) params.append("profile[]", String(filter.profile));
-  if (filter.diameter !== undefined) params.append("diameter[]", String(filter.diameter));
+  if (filter.diameter !== undefined) params.append("diameter[]", String(filter.diameter).toUpperCase());
   if (filter.season) params.append("season", filter.season);
   if (filter.studded) params.append("studded", filter.studded);
   if (filter.brand) params.append("brand", filter.brand);
@@ -124,12 +126,24 @@ function parseDiameter(diameter: string | null): number {
   return match ? Number(match[1]) : 0;
 }
 
+/** origin-бейдж бэка → параметр карточки (description строкой → {title, text} для ParamBadge). */
+function toOriginParam(name: string, item: TireOriginItem | null | undefined): ProductParam | null {
+  if (!item) return null;
+  return {
+    name,
+    value: item.badge,
+    badge: true,
+    description: item.description ? { title: item.badge, text: item.description } : undefined,
+  };
+}
+
 /** DTO листинга → TireProduct (поля, которых нет на бэке, — пустые дефолты). */
 export function toTireProduct(dto: TireListItemDto): TireProduct {
   const sizeTitle = [dto.width, dto.profile].filter(Boolean).join("/");
   return {
     id: String(dto.id),
     category: "tires",
+    ean: dto.ean,
     slug: dto.slug,
     season: dto.season?.value ?? "all-season",
     seasonLabel: dto.season?.label,
@@ -157,7 +171,12 @@ export function toTireProduct(dto: TireListItemDto): TireProduct {
     euLabel: dto.euro_label
       ? { ...dto.euro_label, noiseEmission: Number(dto.euro_label.noiseEmission) }
       : undefined,
-    parameters: [],
+    // origin (vendor/country/year с badge+description) → параметры карточки
+    parameters: [
+      toOriginParam("Производитель:", dto.origin?.vendor),
+      toOriginParam("Страна производства:", dto.origin?.manufacture_country),
+      toOriginParam("Год производства:", dto.origin?.manufacture_year),
+    ].filter((p): p is ProductParam => Boolean(p)),
     loadIndex: "",
     speedRating: "",
     tireType: "",

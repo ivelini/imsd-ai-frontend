@@ -13,6 +13,7 @@ export interface FilterOption {
 
 export interface ProductBase {
   id: string;
+  ean: string;
   category: "tires" | "wheels";
   season?: string; // только у шин; у дисков нет
   brandId: string;
@@ -170,13 +171,28 @@ export interface TireFilterValuesDto {
 // DTO бэкенда: GET /api/catalog/tires (Scramble public-api.json, 21.08.2026)
 // ============================================================================
 
+/** origin-бейдж: badge — текст бейджа, description — текст попапа (строка от бэка). */
+export interface TireOriginItem {
+  badge: string;
+  description: string | null;
+}
+
+/** Происхождение шины: производитель, страна производства, год выпуска. */
+export interface TireOrigin {
+  vendor: TireOriginItem | null;
+  manufacture_country: TireOriginItem | null;
+  manufacture_year: TireOriginItem | null;
+}
+
 /** Элемент листинга шин. slug — sizeSlug (brand-name-width-profile-diameter). */
 export interface TireListItemDto {
   id: number;
+  ean: string;
   name: string;
   slug: string;
   brand: { id: number; name: string; slug: string };
   model: { id: number; name: string; slug: string } | null;
+  origin: TireOrigin | null;
   width: number | null;
   profile: number | null;
   diameter: string | null; // "17" | "13c"

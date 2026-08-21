@@ -14,6 +14,11 @@ const baseDto: TireListItemDto = {
   width: 215,
   profile: 55,
   diameter: "17",
+  origin: {
+    vendor: { badge: "Yokohama", description: "Японский производитель шин." },
+    manufacture_country: { badge: "Япония", description: "Завод в Японии." },
+    manufacture_year: { badge: "2025", description: null },
+  },
   season: { label: "Летняя", value: "summer" },
   is_studded: false,
   euro_label: { rollingResistance: "C", wetGrip: "B", noiseEmission: "72" },
@@ -32,9 +37,9 @@ describe("toTireListQuery", () => {
     expect(toTireListQuery({}, undefined)).toBe("");
   });
 
-  it("test_query_c_diameter_passed_as_url_value", () => {
+  it("test_query_c_diameter_passed_uppercase", () => {
     const q = toTireListQuery({ diameter: "13c" }, undefined);
-    expect(q).toContain("diameter[]=13c");
+    expect(q).toContain("diameter[]=13C");
     expect(q).not.toContain("r13c");
   });
 
@@ -107,5 +112,44 @@ describe("toTireProduct", () => {
 
     const without = toTireProduct({ ...baseDto, euro_label: null });
     expect(without.euLabel).toBeUndefined();
+  });
+
+  it("test_product_maps_origin_to_parameters", () => {
+    const p = toTireProduct(baseDto);
+    expect(p.parameters).toEqual([
+      {
+        name: "Производитель:",
+        value: "Yokohama",
+        badge: true,
+        description: { title: "Yokohama", text: "Японский производитель шин." },
+      },
+      {
+        name: "Страна производства:",
+        value: "Япония",
+        badge: true,
+        description: { title: "Япония", text: "Завод в Японии." },
+      },
+      {
+        name: "Год производства:",
+        value: "2025",
+        badge: true,
+        description: undefined,
+      },
+    ]);
+  });
+
+  it("test_product_null_origin_empty_parameters", () => {
+    const p = toTireProduct({ ...baseDto, origin: null });
+    expect(p.parameters).toEqual([]);
+  });
+
+  it("test_product_partial_origin_skips_nulls", () => {
+    const p = toTireProduct({
+      ...baseDto,
+      origin: { vendor: { badge: "Yokohama", description: null }, manufacture_country: null, manufacture_year: null },
+    });
+    expect(p.parameters).toHaveLength(1);
+    expect(p.parameters[0].value).toBe("Yokohama");
+    expect(p.parameters[0].description).toBeUndefined();
   });
 });

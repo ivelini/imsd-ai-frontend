@@ -291,6 +291,7 @@ function generateProducts(): TireProduct[] {
 
             products.push({
               id,
+              ean: 'AAA',
               slug: sizeSlug,
               category: "tires" as const,
               brandId: brand.id,

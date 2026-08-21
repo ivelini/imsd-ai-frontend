@@ -43,7 +43,8 @@ export function ParamBadge({ label, description }: ParamBadgeProps) {
                 </svg>
               </button>
               <div className="badge-popup-title">{description.title}</div>
-              <div className="badge-popup-text">{description.text}</div>
+              {/* rich-текст от бэка (как service-page/articles): HTML — часть страницы */}
+              <div className="badge-popup-text" dangerouslySetInnerHTML={{ __html: description.text }} />
             </div>
           </div>,
           document.body

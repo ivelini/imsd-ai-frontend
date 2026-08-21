@@ -1339,8 +1339,11 @@ input[type="checkbox"] {
   background: var(--color-white);
   border-radius: 8px;
   padding: 30px 36px;
-  max-width: 460px;
-  width: 90vw;
+  /* 22.08.2026: большой rich-текст — попап до 80% ширины экрана, скролл внутри */
+  width: max-content;
+  max-width: 80vw;
+  max-height: 80vh;
+  overflow-y: auto;
   box-shadow: 0 4px 24px rgba(0,0,0,0.15);
 }
 .badge-popup-close {
