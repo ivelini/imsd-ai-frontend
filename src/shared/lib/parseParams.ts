@@ -268,14 +268,14 @@ export function buildUrl(
 const tireSegmentOrder = (f: FilterState) => [
   f.season ?? null,
   f.brand ?? null,
-  f.width != null ? `w${f.width}` : null,
-  f.profile != null ? `p${f.profile}` : null,
-  f.diameter != null ? `r${f.diameter}` : null,
+  f.width ? `w${f.width}` : null,
+  f.profile ? `p${f.profile}` : null,
+  f.diameter ? `r${f.diameter}` : null,
 ];
 
 const wheelSegmentOrder = (f: FilterState) => [
-  f.diameter != null ? `r${f.diameter}` : null,
-  f.width != null ? String(f.width) : null,
+  f.diameter ? `r${f.diameter}` : null,
+  f.width ? String(f.width) : null,
   f.brand ?? null,
 ];
 

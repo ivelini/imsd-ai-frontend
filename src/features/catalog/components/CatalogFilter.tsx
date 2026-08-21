@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import type { FilterOptions, FilterState } from "@/features/catalog/types";
 import { buildCatalogUrl, buildWheelsUrl, buildQueryString } from "@/shared/lib/parseParams";
+import { formatSelectValue, parseSelectValue } from "@/shared/lib/filterSelect";
 import { useAutoBrands } from "@/features/catalog/api/useAutoBrands";
 import { useFilterStore } from "@/stores/useFilterStore";
 import { useCity } from "@/shared/layout/api/useCity";
@@ -78,7 +79,6 @@ export function CatalogFilter({ options, current, initialTab = "params", autoDat
   const { data: autoBrands } = useAutoBrands(category);
   const isWheels = category === "wheels";
   const autoBase = isWheels ? "/catalog/wheels/auto" : "/catalog/tires/auto";
-  const catalogBase = isWheels ? "/catalog/wheels" : "/catalog/tires";
   const buildUrl = isWheels ? buildWheelsUrl : buildCatalogUrl;
   // Память фильтров: раздельная для шин и дисков (параметризовано категорией)
   const cat: "tires" | "wheels" = isWheels ? "wheels" : "tires";
@@ -163,23 +163,7 @@ export function CatalogFilter({ options, current, initialTab = "params", autoDat
     }
   };
 
-  const num = (v: string) => (v && v !== "0" ? parseInt(v, 10) : undefined);
-  const str = (v: string) => (v && v !== "0" ? v : undefined);
-  // Диаметр: "r15"/"15" → 15, "r13c"/"13c" → "13c" (C-размеры — строка)
-  const diam = (v: string): number | string | undefined => {
-    const m = (v || "").match(/^r?(\d+)(c?)$/i);
-    if (!m) return undefined;
-    return m[2] ? `${m[1]}c` : parseInt(m[1], 10);
-  };
-  // Ширина/профиль: префиксные value опций ("w185"/"p60") — 1:1 с сегментами URL
-  const wnum = (v: string): number | undefined => {
-    const m = (v || "").match(/^w(\d+)$/i);
-    return m ? parseInt(m[1], 10) : undefined;
-  };
-  const pnum = (v: string): number | undefined => {
-    const m = (v || "").match(/^p(\d+)$/i);
-    return m ? parseInt(m[1], 10) : undefined;
-  };
+  // Кодировки select ⇄ FilterState — в shared/lib/filterSelect.ts (покрыты unit-тестами)
 
   return (
     <>
@@ -237,46 +221,46 @@ export function CatalogFilter({ options, current, initialTab = "params", autoDat
             <div className="calatog-select-col">
               {isWheels ? (
                 <>
-                  <CatSelect id="catalog-diameterSelect" value={effective.diameter != null ? `r${effective.diameter}` : "0"} onChange={(v) => apply({ diameter: diam(v) })} placeholder="Диаметр">
+                  <CatSelect id="catalog-diameterSelect" value={formatSelectValue("diameter", effective.diameter)} onChange={(v) => apply({ diameter: parseSelectValue("diameter", v) })} placeholder="Диаметр">
                     {options.diameters.map((d) => <option key={d.value} value={d.value}>{d.label}</option>)}
                   </CatSelect>
-                  <CatSelect id="catalog-widthSelect" value={effective.width ? String(effective.width) : "0"} onChange={(v) => apply({ width: num(v) })} placeholder="Ширина">
+                  <CatSelect id="catalog-widthSelect" value={formatSelectValue("int", effective.width)} onChange={(v) => apply({ width: parseSelectValue("int", v) })} placeholder="Ширина">
                     {options.widths.map((w) => <option key={w.value} value={w.value}>{w.label}</option>)}
                   </CatSelect>
-                  <CatSelect id="catalog-pcdSelect" value={effective.pcd ?? "0"} onChange={(v) => apply({ pcd: str(v) })} placeholder="PCD (крепеж)">
+                  <CatSelect id="catalog-pcdSelect" value={formatSelectValue("str", effective.pcd)} onChange={(v) => apply({ pcd: parseSelectValue("str", v) })} placeholder="PCD (крепеж)">
                     {options.pcds.map((p) => <option key={p.value} value={p.value}>{p.label}</option>)}
                   </CatSelect>
-                  <CatSelect id="catalog-etSelect" value={effective.et ? String(effective.et) : "0"} onChange={(v) => apply({ et: num(v) })} placeholder="ET (вылет)">
+                  <CatSelect id="catalog-etSelect" value={formatSelectValue("int", effective.et)} onChange={(v) => apply({ et: parseSelectValue("int", v) })} placeholder="ET (вылет)">
                     {options.ets.map((e) => <option key={e.value} value={e.value}>{e.label}</option>)}
                   </CatSelect>
                   <CatSelect id="catalog-hubBoreSelect" value={effective.hubBore ? String(effective.hubBore) : "0"} onChange={(v) => apply({ hubBore: parseFloat(v) || undefined })} placeholder="D (Ступица)">
                     {options.hubBores.map((h) => <option key={h.value} value={h.value}>{h.label}</option>)}
                   </CatSelect>
-                  <CatSelect id="catalog-wheelTypeSelect" value={effective.wheelType ?? "0"} onChange={(v) => apply({ wheelType: str(v) })} placeholder="Тип дисков">
+                  <CatSelect id="catalog-wheelTypeSelect" value={formatSelectValue("str", effective.wheelType)} onChange={(v) => apply({ wheelType: parseSelectValue("str", v) })} placeholder="Тип дисков">
                     {options.wheelTypes.map((t) => <option key={t.value} value={t.value}>{t.label}</option>)}
                   </CatSelect>
-                  <CatSelect id="catalog-manufacturerSelect" value={effective.brand ?? "0"} onChange={(v) => apply({ brand: str(v) })} placeholder="Производитель">
+                  <CatSelect id="catalog-manufacturerSelect" value={formatSelectValue("str", effective.brand)} onChange={(v) => apply({ brand: parseSelectValue("str", v) })} placeholder="Производитель">
                     {options.brands.map((b) => <option key={b.value} value={b.value}>{b.label}</option>)}
                   </CatSelect>
                 </>
               ) : (
                 <>
-                  <CatSelect id="catalog-widthSelect" value={effective.width != null ? `w${effective.width}` : "0"} onChange={(v) => apply({ width: wnum(v) })} placeholder="Ширина">
+                  <CatSelect id="catalog-widthSelect" value={formatSelectValue("width", effective.width)} onChange={(v) => apply({ width: parseSelectValue("width", v) })} placeholder="Ширина">
                     {options.widths.map((w) => <option key={w.value} value={w.value}>{w.label}</option>)}
                   </CatSelect>
-                  <CatSelect id="catalog-profileSelect" value={effective.profile != null ? `p${effective.profile}` : "0"} onChange={(v) => apply({ profile: pnum(v) })} placeholder="Профиль">
+                  <CatSelect id="catalog-profileSelect" value={formatSelectValue("profile", effective.profile)} onChange={(v) => apply({ profile: parseSelectValue("profile", v) })} placeholder="Профиль">
                     {options.profiles.map((p) => <option key={p.value} value={p.value}>{p.label}</option>)}
                   </CatSelect>
-                  <CatSelect id="catalog-diameterSelect" value={effective.diameter != null ? `r${effective.diameter}` : "0"} onChange={(v) => apply({ diameter: diam(v) })} placeholder="Диаметр">
+                  <CatSelect id="catalog-diameterSelect" value={formatSelectValue("diameter", effective.diameter)} onChange={(v) => apply({ diameter: parseSelectValue("diameter", v) })} placeholder="Диаметр">
                     {options.diameters.map((d) => <option key={d.value} value={d.value}>{d.label}</option>)}
                   </CatSelect>
-                  <CatSelect id="catalog-seasonalitySelect" value={effective.season ?? "0"} onChange={(v) => apply({ season: str(v) })} placeholder="Сезонность">
+                  <CatSelect id="catalog-seasonalitySelect" value={formatSelectValue("str", effective.season)} onChange={(v) => apply({ season: parseSelectValue("str", v) })} placeholder="Сезонность">
                     {options.seasons.map((s) => <option key={s.value} value={s.value}>{s.label}</option>)}
                   </CatSelect>
-                  <CatSelect id="catalog-studdedSelect" value={effective.studded ?? "0"} onChange={(v) => apply({ studded: str(v) })} placeholder="Шипованность">
+                  <CatSelect id="catalog-studdedSelect" value={formatSelectValue("str", effective.studded)} onChange={(v) => apply({ studded: parseSelectValue("str", v) })} placeholder="Шипованность">
                     {options.studded.map((t) => <option key={t.value} value={t.value}>{t.label}</option>)}
                   </CatSelect>
-                  <CatSelect id="catalog-manufacturerSelect" value={effective.brand ?? "0"} onChange={(v) => apply({ brand: str(v) })} placeholder="Производитель">
+                  <CatSelect id="catalog-manufacturerSelect" value={formatSelectValue("str", effective.brand)} onChange={(v) => apply({ brand: parseSelectValue("str", v) })} placeholder="Производитель">
                     {options.brands.map((b) => <option key={b.value} value={b.value}>{b.label}</option>)}
                   </CatSelect>
                 </>
@@ -406,7 +390,7 @@ export function CatalogFilter({ options, current, initialTab = "params", autoDat
           {/* Страна бренда */}
           <div className="country-selet-2">
             <h3 className="delivery-title-cat country-title-cat">Страна бренда</h3>
-            <CatSelect id="catalog-countrySelect" value={effective.country ?? "0"} onChange={(v) => apply({ country: str(v) })} placeholder="Производитель">
+            <CatSelect id="catalog-countrySelect" value={formatSelectValue("str", effective.country)} onChange={(v) => apply({ country: parseSelectValue("str", v) })} placeholder="Производитель">
               {options.countries.map((c) => <option key={c.value} value={c.value}>{c.label}</option>)}
             </CatSelect>
           </div>

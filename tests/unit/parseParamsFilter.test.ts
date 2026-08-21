@@ -122,4 +122,11 @@ describe("префиксные размеры w/p", () => {
     expect(filter.width).toBe(185);
     expect(filter.profile).toBe(60);
   });
+
+  it("test_build_url_skips_zero_sizes", () => {
+    const url = buildCatalogUrl({ diameter: 0, width: 0, profile: 0 });
+    expect(url).not.toContain("r0");
+    expect(url).not.toContain("w0");
+    expect(url).not.toContain("p0");
+  });
 });
