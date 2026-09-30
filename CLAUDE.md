@@ -32,7 +32,7 @@
 - Сервисные: `/cart`, `/checkout`, `/order/[id]` (клиентская — заказ в localStorage-моке), `/order-status`, `/auth/login|register`, `/articles`, `/articles/[id]`.
 - Сервисные страницы: `/service-page/[slug]` — контент по `GET /api/service_page/<slug>`; ссылки шапки/футера — из `GET /api/service_pages` (мок `servicePages.ts`).
 - ЛК: `/account` (приветствие + выход из мок-сессии), `/account/*` (profile, orders, garage, favorites, addresses — заглушки, макетов нет).
-- Шиномонтаж (booking): React-роутов пока нет — есть макет-эталон `.template/booking/` (11 страниц: время → услуги → данные → код → успех, состояния «код устарел»/«время занято», «Мои записи» в `my/`). Каркас — проектный, в футере один добавленный пункт «Мои записи».
+- Шиномонтаж (booking): `/booking` (время) → `/booking/services` → `/booking/details` → `/booking/code` → `/booking/success` — поток на живом API. Состояния «код устарел» и «время занято» — состояния шага 4, не роуты; прямой заход на шаги 2–4 без времени уводит на `/booking`. Вход — пункт «Шиномонтаж» в шапке. Макет-эталон — `.template/booking/` (11 страниц, «Мои записи» в `my/` — раздел не портирован: публичного API нет).
 - `lang="ru"` в layout (в мокапе `lang="en"` — артефакт, не воспроизводить).
 
 ## Данные и состояние
@@ -40,10 +40,10 @@
 - `src/data/` — моки, имитирующие ответы бэка: `geo.ts` (88 городов), `nav.ts` (телефоны, меню-каталог, соцсети), `servicePages.ts` (`/api/service_pages` + `/api/service_page/<slug>`, 10 страниц), `products.ts` (`/api/service-page/main` — attention_blocks, slider, news, description, seo), `catalog.ts` (типоразмеры, опции фильтра, авто-словарь BMW, пары, SEO), `articles.ts` (9 статей), `cart.ts` (бенефиты корзины), `checkout.ts` (способы доставки/оплаты).
 - Доступ — только через `shared/api/data.ts` (async с setTimeout; при API — замена на fetch + `rewrites()`). Детали контрактов: память `home-api-main`, `phase-4-checkout-auth-articles`.
 - **Единственный источник истины по маршрутам API** — `../backend/documentations/scramble/public-api.json` (Scramble-экспорт бэка). При подключении API контракты фронта сверять с ним, не с моками `src/data/`.
-- **Бэк подключён частично:** rewrites `/api/*` → бэк (`next.config.ts`, `BACKEND_URL`, дефолт `http://imsd-backend-nginx`), `apiBase()` в `shared/api/base.ts` (браузер → `/api`, сервер → прямой URL). Опции фильтра шин — живой `GET /api/reference/filter/tire` (адаптер `toFilterOptions` в `shared/api/catalog.ts`); остальные данные — на моках. Кэширование — на бэке, фронт не кэширует. Долги бэка по контракту (brand/country → slug, diameter → `r15`, пустые delivery/tireType) — память `api-connection-state`.
+- **Бэк подключён частично:** rewrites `/api/*` → бэк (`next.config.ts`, `BACKEND_URL`, дефолт `http://imsd-backend-nginx`), `apiBase()` в `shared/api/base.ts` (браузер → `/api`, сервер → прямой URL). Опции фильтра шин — живой `GET /api/reference/filter/tire` (адаптер `toFilterOptions` в `shared/api/catalog.ts`); каталог и запись на шиномонтаж (`shared/api/booking.ts`) — живые; остальные данные — на моках. Кэширование — на бэке, фронт не кэширует. Долги бэка по контракту (brand/country → slug, diameter → `r15`, пустые delivery/tireType) — память `api-connection-state`.
 - `src/stores/` — Zustand только для UI: `useUIStore` (город, попапы, меню). Корзина и сессия — React Query + localStorage (ключи `cart`, `orders`, `session`).
 - Кастомные дополнения к style.css (макетов нет: пустая корзина, страницы заказа/статуса, ЛК, слайдер главной, фиксы меню, сбросы button-семантизации) — в конце `src/app/style.css` с пометкой даты.
-- Стили домена booking (классы `.booking-*`, `.step*`, `.calendar*`, `.time-chip`, `.code-*`, `.service-checkbox`, `.param-chip`, `.status-badge`, `.alert`) — в конце `.template/assets/css/style.css` с пометкой 12.09.2026; в `src/app/style.css` переносятся вместе с React-портом домена.
+- Стили домена booking (классы `.booking-*`, `.step*`, `.calendar*`, `.time-chip`, `.code-*`, `.service-checkbox`, `.param-chip`, `.status-badge`, `.alert`) — в конце `src/app/style.css` с пометкой 30.09.2026. Стили раздела «Мои записи» (`my/*`: `.booking-card*`, `.booking-list-empty`) остаются в `.template/assets/css/style.css` до порта раздела.
 
 ## Решения (ADR)
 
@@ -53,6 +53,7 @@
 | 0002 | Конфиг-грамматика URL каталога (`parseParams.ts`) | Accepted | 2026-08-07 (обн. 21.08) |
 | 0003 | Пагинация типоразмеров модели: диаметр в URL + «Показать ещё» | Accepted | 2026-08-12 |
 | 0004 | Город как контекст запроса: city в URL, резолв бэком | Accepted | 2026-08-14 (обн. 21.08) |
+| 0005 | Черновик записи на шиномонтаж — в sessionStorage, в URL только шаг | Accepted | 2026-09-30 |
 
 Файлы — в `documentations/adr/` (правила записи — глобальный `adr.md`).
 

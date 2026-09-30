@@ -5,8 +5,8 @@
 // нужно запросить у бэка, если иконки нужны и там).
 import type { SliderProduct, SliderTire } from "@/features/home/types";
 import { SeasonIcons } from "@/shared/ui/SeasonIcons";
+import { formatPrice } from "@/shared/lib/money";
 
-const formatPrice = (n: number) => n.toLocaleString("ru-RU") + " ₽";
 
 export function SectionProduct({
   product,

@@ -26,6 +26,13 @@ export const queryKeys = {
   auth: {
     session: ["auth", "session"] as const,
   },
+  booking: {
+    reference: ["booking", "reference"] as const,
+    days: (dateFrom: string, dateTo: string) => ["booking", "days", dateFrom, dateTo] as const,
+    daySlots: (date: string) => ["booking", "day-slots", date] as const,
+    catalog: (radius: number | null, carType: string | null) =>
+      ["booking", "catalog", radius, carType] as const,
+  },
   account: {
     // placeholder для будущих хуков ЛК
   },

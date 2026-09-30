@@ -4,8 +4,8 @@
 import { useUpdateCartItem } from "@/features/cart/api/useUpdateCartItem";
 import { useRemoveFromCart } from "@/features/cart/api/useRemoveFromCart";
 import type { CartItem } from "@/features/cart/types";
+import { formatPrice } from "@/shared/lib/money";
 
-const formatPrice = (n: number) => n.toLocaleString("ru-RU") + " ₽";
 
 export function CartItemRow({ item }: { item: CartItem }) {
   const { mutate: changeQuantity } = useUpdateCartItem();

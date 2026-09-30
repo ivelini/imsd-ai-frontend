@@ -6,11 +6,8 @@ import { ParamBadge } from "@/shared/ui/ParamBadge";
 import { SeasonIcons } from "@/shared/ui/SeasonIcons";
 import { BuyButton } from "./BuyButton";
 import { EuLabel } from "@/shared/ui/EuLabel";
+import { formatPrice } from "@/shared/lib/money";
 import { CardCityBadge } from "./CardCityBadge";
-
-function formatPrice(n: number): string {
-  return n.toLocaleString("ru-RU") + " ₽";
-}
 
 interface ProductCardProps {
   product: ProductBase;

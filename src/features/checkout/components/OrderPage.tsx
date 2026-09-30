@@ -5,8 +5,8 @@
 import Link from "next/link";
 import { useOrder } from "@/features/checkout/api/useOrder";
 import type { Order } from "@/features/checkout/types";
+import { formatPrice } from "@/shared/lib/money";
 
-const formatPrice = (n: number) => n.toLocaleString("ru-RU") + " ₽";
 
 function OrderItems({ order }: { order: Order }) {
   return (

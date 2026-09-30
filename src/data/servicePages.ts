@@ -26,6 +26,8 @@ export const SERVICE_PAGES: ServicePageBlock[] = [
   {
     type: "header",
     items: [
+      // Точка входа в запись на шиномонтаж; в макете пункт добавлен в шапку всех страниц
+      { link: "/booking", link_name: "Шиномонтаж" },
       { link: "/service-page/otzyvy", link_name: "Отзывы о нас" },
       { link: "/service-page/novosti-i-akcii", link_name: "Новости и акции" },
       { link: "/articles", link_name: "Статьи" },

@@ -4,9 +4,9 @@
 // Пустое состояние — нет в мокапе, сделано по образцу (см. style.css .cart-empty).
 import Link from "next/link";
 import { useCart } from "@/features/cart/api/useCart";
+import { formatPrice } from "@/shared/lib/money";
 import { CartItemRow } from "./CartItemRow";
 
-const formatPrice = (n: number) => n.toLocaleString("ru-RU") + " ₽";
 
 interface CartPageProps {
   /** Пункты .cart_total_list — готовые строки от «бэка» (getCartTotalInfo) */

@@ -1,16 +1,16 @@
 # Архитектура проекта (карта)
 
-> Sources: CLAUDE.md, 2026-08-19; catalog-tires-live-api, 2026-08-21; Перенос мокапа шиномонтажа, 2026-09-12
-> Raw: [CLAUDE.md](../../raw/project/2026-08-19-claude-md.md); [catalog-tires-live-api](../../raw/project/2026-08-21-catalog-tires-live-api.md); [booking-domain-port](../../raw/project/2026-09-12-booking-domain-port.md)
+> Sources: CLAUDE.md, 2026-08-19; catalog-tires-live-api, 2026-08-21; Перенос мокапа шиномонтажа, 2026-09-12; React-порт записи на живой API, 2026-09-30
+> Raw: [CLAUDE.md](../../raw/project/2026-08-19-claude-md.md); [catalog-tires-live-api](../../raw/project/2026-08-21-catalog-tires-live-api.md); [booking-domain-port](../../raw/project/2026-09-12-booking-domain-port.md); [booking-react-port](../../raw/project/2026-09-30-booking-react-port.md)
 
 ## Overview
 
-Проект — интернет-магазин шин и дисков aalyans.ru: Next.js 16 приложение (`src/`), переносимое 1-в-1 из статичного HTML-мокапа (`.template/`). Данные — моки `src/data/`, имитирующие ответы Laravel-бэка (`backend/`, соседний проект); подключение API — поэтапное через rewrites. С 21.08.2026 каталог шин полностью живой (листинг, гео, SEO-мета). С 12.09.2026 в мокапе есть домен онлайн-записи на шиномонтаж (`booking`) — пока только как эталон вёрстки.
+Проект — интернет-магазин шин и дисков aalyans.ru: Next.js 16 приложение (`src/`), переносимое 1-в-1 из статичного HTML-мокапа (`.template/`). Данные — моки `src/data/`, имитирующие ответы Laravel-бэка (`backend/`, соседний проект); подключение API — поэтапное через rewrites. С 21.08.2026 каталог шин полностью живой (листинг, гео, SEO-мета). С 30.09.2026 запись на шиномонтаж (`booking`) работает как React-поток на живом API (пять роутов `/booking/*`), раздел «Мои записи» остаётся макетом.
 
 ## Слои
 
 - **`src/app/`** — роутинг и композиция страниц; **`src/features/`** — домены (каталог, корзина, товар, автоподбор); **`src/shared/`** — ядро (api-баррел, UI, lib, layout); **`src/data/`** — моки; **`src/stores/`** — Zustand (только UI).
-- **`.template/`** — эталон вёрстки: 27 страниц, BEM-классы, без JS. `style.css` — база 4701 строка плюс доменные блоки в конце с пометкой даты (booking — +1206 строк, 12.09.2026).
+- **`.template/`** — эталон вёрстки: 27 страниц, BEM-классы, без JS. `style.css` — база 4701 строка плюс доменные блоки в конце с пометкой даты (booking — +1206 строк, 12.09.2026; стили самого потока записи с 30.09.2026 живут в `src/app/style.css`, в макете остались только стили «Моих записей»).
 
 ## Ключевые роуты
 
@@ -18,12 +18,13 @@
 - Автоподбор `/catalog/tires/auto/[[...auto]]` — каскад марка→модель→год→модификация.
 - Товар `/tires/[modelSlug]`, типоразмер `/tires/[modelSlug]/[sizeSlug]` (`185-60-r15-84h`).
 - Сервисные: `/cart`, `/checkout`, `/order/[id]` (localStorage-мок), `/order-status`, `/auth/*`, `/articles/*`, `/service-page/[slug]` (контент из API-мока).
-- Шиномонтаж (booking): React-роутов пока нет — есть макет `.template/booking/` (поток время → услуги → данные → код → успех, состояния отказа, «Мои записи» в `my/`). Детали — [booking-domain](booking-domain.md).
+- Шиномонтаж (booking): `/booking` → `/booking/services` → `/booking/details` → `/booking/code` → `/booking/success` — поток на живом API; состояния отказа — состояния шага 4. Вход — пункт «Шиномонтаж» в шапке. «Мои записи» (`my/*`) — макет без API. Детали — [booking-domain](booking-domain.md).
 
 ## Данные и состояние
 
 - Моки в `src/data/` (nav, servicePages 10 стр., products, catalog, articles 9, cart, checkout); доступ только через `shared/api/data.ts`.
 - Источник истины по маршрутам API — `../backend/documentations/scramble/public-api.json` (Scramble-экспорт, генерится в docker `scramble:export-docs`), не моки.
+- **Живое (30.09.2026):** запись на шиномонтаж — слоты `GET /api/booking/slots`, каталог услуг `GET /api/booking/catalog`, код `POST /api/booking/code`, подтверждение `POST /api/booking/confirm`, справочник `GET /api/reference/booking` (адрес, телефон, сроки); слой — `shared/api/booking.ts`, ошибки различаются машинными кодами `booking.*`.
 - **Живое (21.08.2026):** каталог шин целиком — листинг `GET /api/catalog/tires` (адаптеры `toTireListQuery`/`toTireProduct`, город слагом `city=` — резолвит бэк), гео `GET /api/reference/city` (`toGeoData`; мок `data/geo.ts` удалён), опции фильтра `GET /api/reference/filter/tire`. SEO-мета страницы — `meta.seo {title, description}` → generateMetadata/h2. Остальное — моки (модель шины, auto-каскад, диски; SeoBlock {title, subtitle} для auto-страницы). Кэш — на бэке (`tire-list:v5`).
 - Zustand — только UI (город, попапы, меню); корзина/сессия — React Query + localStorage (`cart`, `orders`, `session`).
 - Кастомный CSS (страницы без макетов) — в конце `src/app/style.css` с датой.

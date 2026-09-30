@@ -4,8 +4,8 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useOrderByNumber } from "@/features/checkout/api/useOrderByNumber";
+import { formatPrice } from "@/shared/lib/money";
 
-const formatPrice = (n: number) => n.toLocaleString("ru-RU") + " ₽";
 
 export function OrderStatusPage() {
   const [number, setNumber] = useState("");

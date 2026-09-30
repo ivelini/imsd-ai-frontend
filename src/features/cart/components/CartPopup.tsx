@@ -4,8 +4,8 @@
 import { useUpdateCartItem } from "@/features/cart/api/useUpdateCartItem";
 import { useEsc } from "@/shared/lib/useEsc";
 import type { CartItem } from "@/features/cart/types";
+import { formatPrice } from "@/shared/lib/money";
 
-const formatPrice = (n: number) => n.toLocaleString("ru-RU") + " ₽";
 
 interface CartPopupProps {
   item: CartItem;

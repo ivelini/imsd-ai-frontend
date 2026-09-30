@@ -27,3 +27,9 @@
 - Created: booking-domain.md
 - Updated: project-architecture.md (карта: 27 страниц, домен booking, стили доменов в style.css, verify 5×27)
 - Updated: ui-porting-rules.md (стили непортированного домена остаются в .template до React-порта)
+
+## [2026-09-30] ingest | React-порт записи на шиномонтаж на живом API
+- Updated: booking-domain.md (поток на пяти роутах, контракт API, отказы по машинному коду, ADR 0005)
+- Updated: project-architecture.md (карта: роуты /booking/*, живой API записи, стили домена в src)
+- Updated: ui-porting-rules.md (пример переезда стилей вместе с портом домена)
+- Updated: adr-practice.md (индекс 0001–0005)

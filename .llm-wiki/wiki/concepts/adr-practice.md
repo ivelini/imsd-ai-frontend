@@ -22,7 +22,7 @@
 
 ## Состояние базы
 
-4 принятых ADR (0001–0004): баррел data.ts, конфиг-грамматика URL, пагинация типоразмеров, город как контекст. Индекс — в `documentations/adr/README.md` и в [project-architecture](project-architecture.md).
+5 принятых ADR (0001–0005): баррел data.ts, конфиг-грамматика URL, пагинация типоразмеров, город как контекст, черновик записи в sessionStorage. Индекс — в `documentations/adr/README.md` и в [project-architecture](project-architecture.md).
 
 ## See Also
 

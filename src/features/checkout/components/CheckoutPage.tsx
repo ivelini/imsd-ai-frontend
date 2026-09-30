@@ -8,8 +8,8 @@ import { useCart } from "@/features/cart/api/useCart";
 import { useCity } from "@/shared/layout/api/useCity";
 import { useCreateOrder } from "@/features/checkout/api/useCreateOrder";
 import type { CheckoutOptions } from "@/features/checkout/types";
+import { formatPrice } from "@/shared/lib/money";
 
-const formatPrice = (n: number) => n.toLocaleString("ru-RU") + " ₽";
 
 interface CheckoutPageProps {
   options: CheckoutOptions;
