@@ -7,7 +7,7 @@
 Интернет-магазин шин и дисков (aalyans.ru), два слоя:
 
 1. **`src/` — Next.js 16 приложение** (App Router, TypeScript, Turbopack, `@/*`-алиас, Zustand 5). UI переносится из мокапа. Код: `src/app/` (роутинг), `src/features/` (домены), `src/shared/` (ядро), `src/data/` (моки), `src/stores/` (Zustand).
-2. **`.template/` — статичный HTML-мокап дизайна** (эталон вёрстки). 16 страниц, стили в `assets/css/style.css` (4611 строк), BEM-подобные классы, без JavaScript. Страницы не ссылаются друг на друга.
+2. **`.template/` — статичный HTML-мокап дизайна** (эталон вёрстки). 27 страниц, стили в `assets/css/style.css` (база 4701 строка + блоки доменов ниже), BEM-подобные классы, без JavaScript. Страницы витрины друг на друга не ссылаются; страницы домена `booking/` связаны сквозным потоком (степпер, CTA, крошки).
 
 Соседние проекты: `admin/` (React SPA), `backend/` (Laravel, владеет бизнес-логикой; API позже).
 
@@ -21,7 +21,7 @@
 - `npm run dev` / `npm run build` / `npm run lint` — Next.js; `npm test` — Vitest (unit, `tests/unit/`)
 - **Dev-сервер — через Docker** (`make up`, порт 30034). Образ кастомный (`docker/frontend/Dockerfile`, `USER node` uid 1000 = хост-пользователь), поэтому `.next`/`node_modules` принадлежат uid 1000 и локальный `npm run build` работает. Не запускать build/`npm run dev` одновременно с dev-контейнером — общий `.next` (кэш turbopack повреждается).
 - Мокап: открыть `.html` в `.template/` или `python3 -m http.server 8765`
-- Верификация мокапа: `node .claude/verify/verify.mjs` (скриншоты 5 разрешений × 16 страниц) и `node .claude/verify/check-all.mjs` (переполнения/битые картинки)
+- Верификация мокапа: `node .claude/verify/verify.mjs` (скриншоты 5 разрешений × 27 страниц) и `node .claude/verify/check-all.mjs` (переполнения/битые картинки/битые ссылки). Требуют `playwright` — в `devDependencies` проекта его нет (запускались через временную установку в `/tmp` + симлинк в `node_modules`).
 
 ## Схема роутов
 
@@ -32,6 +32,7 @@
 - Сервисные: `/cart`, `/checkout`, `/order/[id]` (клиентская — заказ в localStorage-моке), `/order-status`, `/auth/login|register`, `/articles`, `/articles/[id]`.
 - Сервисные страницы: `/service-page/[slug]` — контент по `GET /api/service_page/<slug>`; ссылки шапки/футера — из `GET /api/service_pages` (мок `servicePages.ts`).
 - ЛК: `/account` (приветствие + выход из мок-сессии), `/account/*` (profile, orders, garage, favorites, addresses — заглушки, макетов нет).
+- Шиномонтаж (booking): React-роутов пока нет — есть макет-эталон `.template/booking/` (11 страниц: время → услуги → данные → код → успех, состояния «код устарел»/«время занято», «Мои записи» в `my/`). Каркас — проектный, в футере один добавленный пункт «Мои записи».
 - `lang="ru"` в layout (в мокапе `lang="en"` — артефакт, не воспроизводить).
 
 ## Данные и состояние
@@ -42,6 +43,7 @@
 - **Бэк подключён частично:** rewrites `/api/*` → бэк (`next.config.ts`, `BACKEND_URL`, дефолт `http://imsd-backend-nginx`), `apiBase()` в `shared/api/base.ts` (браузер → `/api`, сервер → прямой URL). Опции фильтра шин — живой `GET /api/reference/filter/tire` (адаптер `toFilterOptions` в `shared/api/catalog.ts`); остальные данные — на моках. Кэширование — на бэке, фронт не кэширует. Долги бэка по контракту (brand/country → slug, diameter → `r15`, пустые delivery/tireType) — память `api-connection-state`.
 - `src/stores/` — Zustand только для UI: `useUIStore` (город, попапы, меню). Корзина и сессия — React Query + localStorage (ключи `cart`, `orders`, `session`).
 - Кастомные дополнения к style.css (макетов нет: пустая корзина, страницы заказа/статуса, ЛК, слайдер главной, фиксы меню, сбросы button-семантизации) — в конце `src/app/style.css` с пометкой даты.
+- Стили домена booking (классы `.booking-*`, `.step*`, `.calendar*`, `.time-chip`, `.code-*`, `.service-checkbox`, `.param-chip`, `.status-badge`, `.alert`) — в конце `.template/assets/css/style.css` с пометкой 12.09.2026; в `src/app/style.css` переносятся вместе с React-портом домена.
 
 ## Решения (ADR)
 

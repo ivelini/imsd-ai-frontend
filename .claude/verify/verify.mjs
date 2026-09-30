@@ -33,6 +33,17 @@ const PAGES = [
   ['popup-cart', '/.template/popups/cart.html'],
   ['popup-catalog-menu', '/.template/popups/catalog-menu.html'],
   ['popup-geo', '/.template/popups/geo.html'],
+  ['booking-time', '/.template/booking/index.html'],
+  ['booking-services', '/.template/booking/services.html'],
+  ['booking-details', '/.template/booking/details.html'],
+  ['booking-code', '/.template/booking/code.html'],
+  ['booking-success', '/.template/booking/success.html'],
+  ['booking-code-expired', '/.template/booking/code-expired.html'],
+  ['booking-unavailable', '/.template/booking/unavailable.html'],
+  ['booking-my-login', '/.template/booking/my/index.html'],
+  ['booking-my-code', '/.template/booking/my/code.html'],
+  ['booking-my-list', '/.template/booking/my/list.html'],
+  ['booking-my-cancelled', '/.template/booking/my/cancelled.html'],
 ];
 
 const browser = await chromium.launch();
@@ -43,7 +54,12 @@ for (const [pageName, pagePath] of PAGES) {
     const page = await browser.newPage({ viewport: { width: vp.width, height: vp.height } });
     const url = `http://localhost:8765${pagePath}`;
     try {
-      await page.goto(url, { waitUntil: 'networkidle', timeout: 30000 });
+      const response = await page.goto(url, { waitUntil: 'networkidle', timeout: 30000 });
+      if (response && !response.ok()) {
+        issues.push({ page: pageName, vp: vp.name, status: response.status() });
+        await page.close();
+        continue;
+      }
       const report = await page.evaluate(() => {
         const doc = document.documentElement;
         return {

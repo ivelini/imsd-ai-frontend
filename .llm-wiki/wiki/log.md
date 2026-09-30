@@ -22,3 +22,8 @@
 - Updated: catalog-url-grammar.md (префиксные размеры w/p, 404 на мусор)
 - Updated: catalog-live-api.md (адаптер фильтров: префиксная нормализация)
 - Updated: project-architecture.md (карта: сегменты season/brand/wN/pN/rN)
+
+## [2026-09-12] ingest | Перенос мокапа шиномонтажа (booking) в .template
+- Created: booking-domain.md
+- Updated: project-architecture.md (карта: 27 страниц, домен booking, стили доменов в style.css, verify 5×27)
+- Updated: ui-porting-rules.md (стили непортированного домена остаются в .template до React-порта)
