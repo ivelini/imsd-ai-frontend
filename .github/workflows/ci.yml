@@ -1,0 +1,40 @@
+name: Проверки
+
+# Запускается только выкладкой (workflow_call) — проверки идут первым шагом её прогона.
+# Сам по себе файл не срабатывает: ни пуш в любой ветке, ни pull request его не запускают.
+on:
+  workflow_call:
+
+permissions:
+  contents: read
+
+jobs:
+  checks:
+    name: Линтер, типы, тесты
+    runs-on: ubuntu-latest
+
+    # Умолчание — 360 минут; зависший прогон не должен держать проверки так долго
+    timeout-minutes: 20
+
+    steps:
+      - name: Забрать код
+        uses: actions/checkout@v7
+
+      - name: Настроить Node
+        uses: actions/setup-node@v7
+        with:
+          # Как на сервере (панельный nvm: 24.21) и в сборке выкладки
+          node-version: '24'
+          cache: npm
+
+      - name: Установить зависимости
+        run: npm ci --no-audit --no-fund
+
+      - name: Линтер (ESLint)
+        run: npm run lint
+
+      - name: Типы (TypeScript)
+        run: npx tsc --noEmit
+
+      - name: Тесты (Vitest)
+        run: npm test

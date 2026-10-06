@@ -1,7 +1,7 @@
 // Гео-окно: выбор города (03.08.2026)
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useGeo } from "@/shared/layout/api/useGeo";
 import { useUIStore } from "@/stores/useUIStore";
@@ -20,12 +20,13 @@ export function GeoPopup() {
   const defaultRegionId = geo?.cities.find((c) => c.value === cityValue)?.regionId ?? geo?.regions[0]?.id;
   const [selectedRegionId, setSelectedRegionId] = useState<string | undefined>(undefined);
 
-  // При открытии попапа — сброс на регион текущего города
-  useEffect(() => {
-    if (geoOpen && defaultRegionId) {
-      setSelectedRegionId(undefined);
-    }
-  }, [geoOpen, defaultRegionId]);
+  // При открытии попапа — сброс на регион текущего города. Правка состояния
+  // во время рендера по смене признака (эффект с setState даёт каскадный рендер)
+  const [prevGeoOpen, setPrevGeoOpen] = useState(geoOpen);
+  if (geoOpen !== prevGeoOpen) {
+    setPrevGeoOpen(geoOpen);
+    if (geoOpen && defaultRegionId) setSelectedRegionId(undefined);
+  }
 
   if (!geoOpen) return null;
 

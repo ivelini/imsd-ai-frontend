@@ -7,6 +7,7 @@ import type { TireListItemDto } from "@/features/catalog/types";
 
 const baseDto: TireListItemDto = {
   id: 188,
+  ean: "4601234567890",
   name: "Bluearth E70B",
   slug: "yokohama-bluearth-e70b-215-55-17",
   brand: { id: 3, name: "Yokohama", slug: "yokohama" },

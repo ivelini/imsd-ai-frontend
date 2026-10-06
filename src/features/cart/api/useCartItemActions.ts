@@ -2,22 +2,24 @@
 // добавление/удаление. Используется BuyButton (каталог) и AddToCartBlock (товар).
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useSyncExternalStore } from "react";
 import { useAddToCart } from "@/features/cart/api/useAddToCart";
 import { useRemoveFromCart } from "@/features/cart/api/useRemoveFromCart";
 import { useCart } from "@/features/cart/api/useCart";
 import type { CartAddPayload } from "@/shared/api/data";
 
+// Пустая подписка: «готово» — не событие внешнего мира, а факт клиента
+const emptySubscribe = () => () => {};
+
 export function useCartItemActions(item: CartAddPayload, quantity: number) {
-  const [ready, setReady] = useState(false);
   const [popupOpen, setPopupOpen] = useState(false);
   const [confirmOpen, setConfirmOpen] = useState(false);
   const { mutate: add, isPending } = useAddToCart();
   const { mutate: remove } = useRemoveFromCart();
   const { data: items } = useCart();
 
-  // После mount — рендер по данным корзины (post-hydration update)
-  useEffect(() => setReady(true), []);
+  // false при SSR и гидратации, true — на клиенте: данные корзины рендерятся после гидратации
+  const ready = useSyncExternalStore(emptySubscribe, () => true, () => false);
 
   const cartItem = items?.find((i) => i.id === item.id);
   const isInCart = ready && !!cartItem;

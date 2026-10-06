@@ -1,0 +1,205 @@
+name: Выкладка на прод
+
+on:
+  push:
+    branches: [master]
+  workflow_dispatch:
+
+# Две выкладки одновременно не запускаются: релизы не должны пересекаться
+concurrency:
+  group: deploy-prod
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  checks:
+    name: Тесты и проверки
+    uses: ./.github/workflows/ci.yml
+
+  deploy:
+    name: Развернуть релиз
+    needs: checks
+    runs-on: ubuntu-latest
+
+    # Умолчание — 360 минут: повисший SSH держал бы очередь выкладок часами.
+    # 20 минут — с запасом на сборку Next, установку зависимостей на сервере и проверку
+    timeout-minutes: 20
+
+    # ─── НАСТРОЙКИ ВЫКЛАДКИ: правьте здесь ───────────────────────────────────
+    env:
+      PROD_HOST: 91.142.94.133              # адрес прод-сервера: домен или IP
+      PROD_USER: aalyans74_ru               # пользователь SSH — владелец каталога выкладки
+      PROD_SSH_PORT: '45222'                # порт SSH
+      BASE_PATH: /var/www/aalyans74_ru/data/www    # каталог выкладки
+      DIR_NAME: aalyans74.ru                # каталог сайта — его обслуживает ISPmanager
+      RELEASES: releases_front_aalyans74    # каталог релизов внутри BASE_PATH
+      APP_NAME: aalyans74.ru                # имя приложения в pm2 (заводит панель)
+      PM2_HOME: /var/www/aalyans74_ru/data/.pm2    # домашний каталог pm2 пользователя
+      PM2_BIN: /usr/lib/ispnodejs/bin/pm2   # панельный pm2 — им перезапускается приложение
+      NODE_BIN_DIR: /usr/lib/ispnodejs/bin  # панельные node и npm (для установки зависимостей)
+      SOCKET_PATH: /var/www/aalyans74_ru/data/nodejs/0.sock   # сокет, на который смотрит nginx
+      # Адрес бэка запекается в rewrites() сборки (сборка идёт на раннере, без .env).
+      # Тот же адрес — в build/.env.frontend.prod на сервере: менять оба места сразу (operations.md)
+      BACKEND_URL: https://api.aalyans74.ru
+      KEEP_RELEASES: '3'                    # сколько релизов хранить (старые удаляются)
+
+    # ─────────────────────────────────────────────────────────────────────────
+
+    steps:
+      - name: Забрать код
+        uses: actions/checkout@v7
+
+      - name: Настроить Node
+        uses: actions/setup-node@v7
+        with:
+          # Как на сервере: панельный nvm — 24.21
+          node-version: '24'
+          cache: npm
+
+      - name: Установить зависимости
+        run: npm ci --no-audit --no-fund
+
+      # Сборка идёт на раннере, а не на сервере: сборка Next съедает память VDS,
+      # а в релиз приезжает готовый .next. Обращение к серверу — только после сборки,
+      # чтобы сломанный фронтенд не трогал каталог релиза.
+      - name: Собрать приложение
+        run: npm run build
+
+      # Общие настройки SSH для всех шагов ниже: без BatchMode ssh ждёт ввода пароля,
+      # без ConnectTimeout — висит на молчащем хосте до таймаута всей задачи
+      - name: Настроить SSH
+        # Секрет — только этому шагу: в env всей задачи его видели бы и шаги сборки
+        # (npm запускает install-скрипты сторонних пакетов)
+        env:
+          PROD_SSH_KEY: ${{ secrets.PROD_SSH_KEY }}
+        run: |
+          mkdir -p ~/.ssh
+          echo "$PROD_SSH_KEY" > ~/.ssh/prod_deploy
+          chmod 600 ~/.ssh/prod_deploy
+
+          # Действует на все вызовы ssh ниже: не спрашивать пароль и не ждать молчащий хост
+          {
+            echo 'Host *'
+            echo '  BatchMode yes'
+            echo '  ConnectTimeout 15'
+          } > ~/.ssh/config
+          chmod 600 ~/.ssh/config
+
+          # Ошибка keyscan (хост не отвечает, не тот порт) останавливает выкладку — это и есть сигнал
+          PORT="${PROD_SSH_PORT:-22}"
+          ssh-keyscan -p "$PORT" -H "$PROD_HOST" >> ~/.ssh/known_hosts
+
+          # Пути — абсолютные: тильда в переменной не раскрывается
+          {
+            echo "SSH_KEY=$HOME/.ssh/prod_deploy"
+            echo "SSH_PORT=$PORT"
+          } >> "$GITHUB_ENV"
+
+      - name: Создать каталог релиза
+        run: |
+          RELEASE="$(date -u +%Y%m%d%H%M%S)"
+          echo "RELEASE=$RELEASE" >> "$GITHUB_ENV"
+          ssh -i "$SSH_KEY" -p "$SSH_PORT" "$PROD_USER@$PROD_HOST" "
+            set -e
+            mkdir -p '$BASE_PATH/$RELEASES/$RELEASE'
+          "
+
+      # node_modules не переносится: на сервере его ставит npm из того же lock-файла.
+      # .next/cache и .next/dev — машинный кэш сборки, в релизе не нужны
+      - name: Скопировать код
+        run: |
+          rsync -rlptz --no-owner --no-group --delete \
+            -e "ssh -i $SSH_KEY -p $SSH_PORT" \
+            --exclude='/.git/' \
+            --exclude='/.github/' \
+            --exclude='/.claude/' \
+            --exclude='/.llm-wiki/' \
+            --exclude='/.codegraph/' \
+            --exclude='/.mcp.json' \
+            --exclude='/.idea/' \
+            --exclude='/.template/' \
+            --exclude='/documentations/' \
+            --exclude='/tests/' \
+            --exclude='/node_modules/' \
+            --exclude='/.next/cache/' \
+            --exclude='/.next/dev/' \
+            --exclude='/.env*' \
+            ./ "$PROD_USER@$PROD_HOST:$BASE_PATH/$RELEASES/$RELEASE/"
+
+      # .env живёт вне релиза — копией из build/: правка файла действует со следующей выкладки
+      - name: Положить .env и поставить зависимости
+        run: |
+          ssh -i "$SSH_KEY" -p "$SSH_PORT" "$PROD_USER@$PROD_HOST" "
+            set -e
+            cd '$BASE_PATH/$RELEASES/$RELEASE'
+
+            [ -f '$BASE_PATH/build/.env.frontend.prod' ] || { echo 'Нет $BASE_PATH/build/.env.frontend.prod — положите .env прода туда'; exit 1; }
+            cp '$BASE_PATH/build/.env.frontend.prod' .env
+
+            # Панельные node и npm: /usr/lib/ispnodejs/bin (в SSH-сессии PATH без них)
+            export PATH='$NODE_BIN_DIR':\$PATH
+            npm ci --omit=dev --no-audit --no-fund
+          "
+
+      # Подмена ссылки каталога сайта — одной операцией: mv по симлинку атомарен, окна «сайт без кода» нет.
+      # Первый раз заглушку панели убирают вручную (operations.md, «Подготовка сервера»)
+      - name: Переключить каталог сайта на новый релиз
+        run: |
+          ssh -i "$SSH_KEY" -p "$SSH_PORT" "$PROD_USER@$PROD_HOST" "
+            set -e
+            cd '$BASE_PATH'
+            [ ! -e '$DIR_NAME' ] || [ -L '$DIR_NAME' ] || { echo 'Каталог сайта $DIR_NAME — не ссылка: разовая подготовка сервера не выполнена (operations.md, «Подготовка сервера»)'; exit 1; }
+
+            ln -sfn '$RELEASES/$RELEASE' '$DIR_NAME.new'
+            mv -T '$DIR_NAME.new' '$DIR_NAME'
+
+            [ \"\$(readlink -f '$DIR_NAME')\" = '$BASE_PATH/$RELEASES/$RELEASE' ] || { echo 'Ссылка каталога сайта ведёт не на новый релиз'; exit 1; }
+          "
+
+      # Приложение поднимает панель (pm2), каталог сайта — ссылка на релиз:
+      # pm2 перезапускает процесс по сохранённому cwd и читает код нового релиза.
+      # --update-env не нужен: SOCKET и прочее окружение панели сохранены в самом приложении
+      - name: Перезапустить приложение
+        run: |
+          ssh -i "$SSH_KEY" -p "$SSH_PORT" "$PROD_USER@$PROD_HOST" "
+            set -e
+            # pm2 — это node-скрипт: без панельного node в PATH SSH-сессия его не запускает
+            export PATH='$NODE_BIN_DIR':\$PATH
+            export PM2_HOME='$PM2_HOME'
+            '$PM2_BIN' describe '$APP_NAME' > /dev/null || { echo 'pm2 не знает приложение $APP_NAME — сайт в панели не переведён на Node.js?'; exit 1; }
+            '$PM2_BIN' restart '$APP_NAME'
+          "
+
+      # Проверки после перезапуска: приложение отвечает через сокет (это оно, а не заглушка панели),
+      # и сайт открывается по домену — через nginx, TLS и прокси на сокет
+      - name: Проверить, что приложение живо
+        run: |
+          ssh -i "$SSH_KEY" -p "$SSH_PORT" "$PROD_USER@$PROD_HOST" "
+            set -e
+            sleep 2
+
+            BODY=\"\$(curl -fsS --unix-socket '$SOCKET_PATH' -H 'Host: $DIR_NAME' http://localhost/)\"
+            case \"\$BODY\" in
+              *'/_next/static/'*) echo 'Приложение отвечает через сокет' ;;
+              *) echo 'Ответ без признаков сборки Next — смотрите логи pm2'; exit 1 ;;
+            esac
+
+            curl -fsS -o /dev/null -w 'Сайт https://$DIR_NAME/ — %{http_code}\n' 'https://$DIR_NAME/'
+          "
+
+      # Список старых релизов считает сервер, удаляем по явным именам: ни одной подстановки
+      # в самой команде удаления — ошибка в ней стоила бы всего каталога релизов.
+      # Текущий релиз исключается отдельно, имена фильтруются по виду «дата-время».
+      - name: Убрать старые релизы
+        run: |
+          KEEP_AFTER=$((KEEP_RELEASES + 1))
+          OLD="$(ssh -i "$SSH_KEY" -p "$SSH_PORT" "$PROD_USER@$PROD_HOST" \
+            "ls -1dt '$BASE_PATH/$RELEASES'/*/ | tail -n +$KEEP_AFTER | xargs -r -n1 basename" \
+            | grep -v -x "$RELEASE" | grep -E '^[0-9]{14}$' | tr '\n' ' ')"
+
+          [ -n "$OLD" ] || { echo "Старых релизов нет — удалять нечего"; exit 0; }
+
+          echo "Удаляю релизы: $OLD"
+          ssh -i "$SSH_KEY" -p "$SSH_PORT" "$PROD_USER@$PROD_HOST" "cd '$BASE_PATH/$RELEASES' && rm -rf $OLD"

@@ -1,7 +1,7 @@
 "use client";
 // p-badge с попапом описания (фаза 3, 04.08.2026)
 // Переиспользуемый компонент — страница товара, каталог
-import { useState, useEffect } from "react";
+import { useState, useSyncExternalStore } from "react";
 import { createPortal } from "react-dom";
 
 export interface ParamBadgeProps {
@@ -9,11 +9,13 @@ export interface ParamBadgeProps {
   description: { title: string; text: string };
 }
 
+// Пустая подписка: «смонтировано» — не событие внешнего мира, а факт клиента
+const emptySubscribe = () => () => {};
+
 export function ParamBadge({ label, description }: ParamBadgeProps) {
   const [open, setOpen] = useState(false);
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => setMounted(true), []);
+  // false при SSR и гидратации, true — на клиенте: портал рендерится только в браузере
+  const mounted = useSyncExternalStore(emptySubscribe, () => true, () => false);
 
   return (
     <>

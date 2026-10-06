@@ -83,9 +83,11 @@ for (const brand of BRANDS) {
 
         const modelName = `${brand.name} ${sizeTitle}`;
         const price = Math.round(brand.priceBase * brand.priceFactor * (1 + (diameter - 13) * 0.25) * (1 + width * 0.05));
+        const code = `W${String(_nextId).padStart(5, "0")}`;
 
         ALL_WHEELS.push({
           id: `wheel-${_nextId}`,
+          ean: code,
           slug: sizeSlug,
           category: "wheels" as const,
           brandId: brand.id,
@@ -100,7 +102,7 @@ for (const brand of BRANDS) {
           wheelType,
           price,
           oldPrice: Math.round(price * 1.15),
-          code: `W${String(_nextId).padStart(5, "0")}`,
+          code,
           country: brand.country,
           countryLabel: COUNTRY_LABELS[brand.country] ?? brand.country,
           year: "2026",
@@ -110,7 +112,7 @@ for (const brand of BRANDS) {
           sizeSlug,
           sizeTitle,
           parameters: [
-            { name: "Код товара:", value: `W${String(_nextId).padStart(5, "0")}` },
+            { name: "Код товара:", value: code },
             {
               name: "Производитель:",
               value: brand.name,

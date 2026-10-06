@@ -21,6 +21,7 @@
 - `npm run dev` / `npm run build` / `npm run lint` — Next.js; `npm test` — Vitest (unit, `tests/unit/`)
 - **Dev-сервер — через Docker** (`make up`, порт 30034). Образ кастомный (`docker/frontend/Dockerfile`, `USER node` uid 1000 = хост-пользователь), поэтому `.next`/`node_modules` принадлежат uid 1000 и локальный `npm run build` работает. Не запускать build/`npm run dev` одновременно с dev-контейнером — общий `.next` (кэш turbopack повреждается).
 - Мокап: открыть `.html` в `.template/` или `python3 -m http.server 8765`
+- Выкладка: пуш в `master` → `.github/workflows/deploy.yml` (проверки → сборка на раннере → релиз на сервере → `pm2 restart aalyans74.ru`). Настройки, откат и диагностика — `documentations/operations.md`. Прод-приложение запускается `npm start` = `node server.mjs` (кастомный сервер Next: панель отдаёт адрес unix-сокета в `SOCKET` — `next start` сокет не умеет).
 - Верификация мокапа: `node .claude/verify/verify.mjs` (скриншоты 5 разрешений × 27 страниц) и `node .claude/verify/check-all.mjs` (переполнения/битые картинки/битые ссылки). Требуют `playwright` — в `devDependencies` проекта его нет (запускались через временную установку в `/tmp` + симлинк в `node_modules`).
 
 ## Схема роутов
@@ -54,6 +55,7 @@
 | 0003 | Пагинация типоразмеров модели: диаметр в URL + «Показать ещё» | Accepted | 2026-08-12 |
 | 0004 | Город как контекст запроса: city в URL, резолв бэком | Accepted | 2026-08-14 (обн. 21.08) |
 | 0005 | Черновик записи на шиномонтаж — в sessionStorage, в URL только шаг | Accepted | 2026-09-30 |
+| 0006 | Приложение поднимает свой сервер Next и слушает unix-сокет панели | Accepted | 2026-10-06 |
 
 Файлы — в `documentations/adr/` (правила записи — глобальный `adr.md`).
 
