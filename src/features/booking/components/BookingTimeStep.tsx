@@ -11,6 +11,7 @@ import { useBookingDays } from "@/features/booking/api/useBookingDays";
 import { useBookingDraft } from "@/features/booking/api/useBookingDraft";
 import { useBookingReference } from "@/features/booking/api/useBookingReference";
 import { today, monthRange, formatDayLong } from "@/features/booking/lib/dates";
+import { defaultBookingDate } from "@/features/booking/lib/calendar";
 import { isComplete, setTime } from "@/features/booking/lib/draft";
 import { plural } from "@/features/booking/lib/plural";
 
@@ -21,7 +22,10 @@ export function BookingTimeStep() {
 
   const range = monthRange(month);
   const { data: days = {} } = useBookingDays(range.from, range.to);
-  const { data: slots = [] } = useBookingDaySlots(draft?.date ?? null);
+  // Шаг открывается с готовой датой: выбранная в черновике, иначе по умолчанию
+  // (сегодня, а если на сегодня записи уже нет — первый свободный день месяца)
+  const date = draft?.date ?? defaultBookingDate(days, today());
+  const { data: slots = [] } = useBookingDaySlots(date);
   const { data: reference } = useBookingReference();
 
   if (draft === null) return null;
@@ -43,8 +47,8 @@ export function BookingTimeStep() {
             <BookingCalendar
               month={month}
               days={days}
-              selected={draft.date}
-              onSelect={(date) => save(setTime(draft, date, null))}
+              selected={date}
+              onSelect={(picked) => save(setTime(draft, picked, null))}
               onMonthChange={setMonth}
               canGoBack={month > today().slice(0, 7)}
             />
@@ -52,57 +56,51 @@ export function BookingTimeStep() {
 
           <div className="booking-blk">
             <h3 className="booking-blk-title">Время</h3>
-            {draft.date === null ? (
-              <p className="booking-blk-hint">Выберите дату в календаре</p>
-            ) : (
-              <>
-                <p className="booking-blk-hint">
-                  {formatDayLong(draft.date)}
-                  {openSlots.length > 0 &&
-                    ` — часы работы мастерской ${openSlots[0].hour}:00–${
-                      openSlots[openSlots.length - 1].hour + 1
-                    }:00`}
-                </p>
-                <div className="time-grid">
-                  {slots.map((slot) =>
-                    slot.is_closed ? (
-                      <span key={slot.hour} className="time-chip time-chip--busy">
-                        {slot.hour}:00
-                      </span>
-                    ) : (
-                      <button
-                        key={slot.hour}
-                        className={
-                          slot.hour === draft.hour
-                            ? "time-chip time-chip--selected"
-                            : "time-chip"
-                        }
-                        type="button"
-                        onClick={() => save(setTime(draft, draft.date!, slot.hour))}
-                      >
-                        {slot.hour}:00
-                      </button>
-                    ),
-                  )}
-                </div>
-                {draft.hour !== null && reference && (
-                  <p className="time-note">
-                    Запись на {draft.hour}:00 означает, что приехать нужно к {draft.hour}:00.
-                    {busySlots.length > 0 &&
-                      ` Слоты ${busySlots.map((s) => `${s.hour}:00`).join(", ")} недоступны (перерыв и закрытый слот).`}{" "}
-                    Записаться можно не позднее чем за {reference.min_lead_time_h}{" "}
-                    {plural(reference.min_lead_time_h, ["час", "часа", "часов"])} до начала и в
-                    пределах {reference.horizon_days}{" "}
-                    {plural(reference.horizon_days, ["дня", "дней", "дней"])}.
-                  </p>
-                )}
-              </>
+            <p className="booking-blk-hint">
+              {formatDayLong(date)}
+              {openSlots.length > 0 &&
+                ` — часы работы мастерской ${openSlots[0].hour}:00–${
+                  openSlots[openSlots.length - 1].hour + 1
+                }:00`}
+            </p>
+            <div className="time-grid">
+              {slots.map((slot) =>
+                slot.is_closed ? (
+                  <span key={slot.hour} className="time-chip time-chip--busy">
+                    {slot.hour}:00
+                  </span>
+                ) : (
+                  <button
+                    key={slot.hour}
+                    className={
+                      slot.hour === draft.hour
+                        ? "time-chip time-chip--selected"
+                        : "time-chip"
+                    }
+                    type="button"
+                    onClick={() => save(setTime(draft, date, slot.hour))}
+                  >
+                    {slot.hour}:00
+                  </button>
+                ),
+              )}
+            </div>
+            {draft.hour !== null && reference && (
+              <p className="time-note">
+                Запись на {draft.hour}:00 означает, что приехать нужно к {draft.hour}:00.
+                {busySlots.length > 0 &&
+                  ` Слоты ${busySlots.map((s) => `${s.hour}:00`).join(", ")} недоступны (перерыв и закрытый слот).`}{" "}
+                Записаться можно не позднее чем за {reference.min_lead_time_h}{" "}
+                {plural(reference.min_lead_time_h, ["час", "часа", "часов"])} до начала и в
+                пределах {reference.horizon_days}{" "}
+                {plural(reference.horizon_days, ["дня", "дней", "дней"])}.
+              </p>
             )}
           </div>
         </div>
 
         <BookingSummary
-          date={draft.date}
+          date={date}
           hour={draft.hour}
           footer={
             <>

@@ -41,6 +41,21 @@ export function buildCalendar({ month, today, days }: BuildCalendarInput): Calen
 }
 
 /**
+ * День, который шаг «Время» показывает сразу при заходе: сегодня, если записаться
+ * на него ещё можно, иначе — первый по календарю свободный день карты. Карта пуста
+ * (грузится или в месяце нет слотов) — сегодня: шаг не должен остаться без даты.
+ */
+export function defaultBookingDate(days: Record<string, boolean>, today: string): string {
+  if (days[today] === true) return today;
+
+  const firstFree = Object.keys(days)
+    .filter((date) => days[date] === true)
+    .sort()[0];
+
+  return firstFree ?? today;
+}
+
+/**
  * Прошлое отсекается по календарю, а не по карте бэка: тот отдаёт `true` и по
  * прошедшим дням, и кликабельным такой день делать нельзя.
  */

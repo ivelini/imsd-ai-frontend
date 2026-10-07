@@ -1,8 +1,12 @@
 // Сетка календаря записи на шиномонтаж: прошлое, выходные, неделя с понедельника
-// (тест-лист плана booking-react-port, тесты 1–3)
+// (тест-листы планов booking-react-port — тесты 1–3, booking-default-day — тесты 1–4)
 import { describe, expect, it } from "vitest";
 
-import { buildCalendar, type CalendarCell } from "@/features/booking/lib/calendar";
+import {
+  buildCalendar,
+  defaultBookingDate,
+  type CalendarCell,
+} from "@/features/booking/lib/calendar";
 
 function cellAt(cells: CalendarCell[], day: number): CalendarCell {
   const cell = cells.find((c) => c.day === day);
@@ -41,5 +45,36 @@ describe("buildCalendar (сетка месяца)", () => {
     expect(cells[0].day).toBeNull();
     expect(cells.length % 7).toBe(0);
     expect([35, 42]).toContain(cells.length);
+  });
+});
+
+describe("defaultBookingDate (день по умолчанию на шаге «Время»)", () => {
+  it("test_default_date_is_today_when_available", () => {
+    expect(defaultBookingDate({ "2026-10-06": true, "2026-10-07": false }, "2026-10-06")).toBe(
+      "2026-10-06",
+    );
+  });
+
+  it("test_default_date_first_free_when_today_unavailable", () => {
+    const days = {
+      "2026-10-06": false,
+      "2026-10-07": false,
+      "2026-10-08": true,
+      "2026-10-09": true,
+    };
+
+    expect(defaultBookingDate(days, "2026-10-06")).toBe("2026-10-08");
+  });
+
+  it("test_default_date_ignores_map_order", () => {
+    // ключи карты приходят от бэка в порядке диапазона, но полагаться на это нельзя
+    expect(defaultBookingDate({ "2026-10-09": true, "2026-10-07": true }, "2026-10-06")).toBe(
+      "2026-10-07",
+    );
+  });
+
+  it("test_default_date_falls_back_to_today_on_empty_map", () => {
+    // карта ещё грузится или месяц пуст — шаг не должен остаться без даты
+    expect(defaultBookingDate({}, "2026-10-06")).toBe("2026-10-06");
   });
 });
