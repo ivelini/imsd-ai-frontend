@@ -126,6 +126,10 @@ jobs:
             --exclude='/.next/cache/' \
             --exclude='/.next/dev/' \
             --exclude='/.env*' \
+            --exclude='/AGENTS.md' \
+            --exclude='/CLAUDE.md' \
+            --exclude='/.gitignore' \
+            --exclude='/Makefile' \
             ./ "$PROD_USER@$PROD_HOST:$BASE_PATH/$RELEASES/$RELEASE/"
 
       # .env живёт вне релиза — копией из build/: правка файла действует со следующей выкладки
