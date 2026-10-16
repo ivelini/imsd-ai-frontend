@@ -36,3 +36,7 @@
 
 ## [2026-10-15] ingest | Плашка «Самовывоз» в карточке каталога из origin.delivery_days_after_order
 - Updated: catalog-live-api.md (контракт листинга + origin, маппинг pickup → ProductBase, BadgeValue)
+
+## [2026-10-16] ingest | Фоллбэк ошибок бэка: самостоятельная страница ошибки
+- Created: backend-error-fallback.md
+- Updated: project-architecture.md (карта: фоллбэк ошибок бэка, See Also)

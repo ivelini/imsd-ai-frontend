@@ -6252,3 +6252,48 @@ input[type="checkbox"] {
   font-size: 12px;
   color: #999;
 }
+
+/* ===== Страница ошибки (global-error; макета нет — свой блок) — 15.10.2026 ===== */
+.error-page {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  padding: 40px 20px;
+  text-align: center;
+}
+.error-page-inner {
+  max-width: 560px;
+}
+.error-page-logo {
+  height: 34px;
+}
+.error-page-title {
+  margin-top: 24px;
+  font-size: 28px;
+  color: var(--color-text-dark);
+}
+.error-page-text {
+  margin-top: 12px;
+  font-size: 16px;
+  color: var(--color-text);
+}
+.error-page-actions {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 24px;
+  margin-top: 28px;
+}
+.error-page-button {
+  padding: 12px 28px;
+  font-size: 15px;
+}
+.error-page-link {
+  font-size: 15px;
+  color: var(--color-text-dark);
+  text-decoration: underline;
+}
+.error-page-link:hover {
+  text-decoration: none;
+}

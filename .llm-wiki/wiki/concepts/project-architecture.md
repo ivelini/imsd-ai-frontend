@@ -1,7 +1,7 @@
 # Архитектура проекта (карта)
 
-> Sources: CLAUDE.md, 2026-08-19; catalog-tires-live-api, 2026-08-21; Перенос мокапа шиномонтажа, 2026-09-12; React-порт записи на живой API, 2026-09-30
-> Raw: [CLAUDE.md](../../raw/project/2026-08-19-claude-md.md); [catalog-tires-live-api](../../raw/project/2026-08-21-catalog-tires-live-api.md); [booking-domain-port](../../raw/project/2026-09-12-booking-domain-port.md); [booking-react-port](../../raw/project/2026-09-30-booking-react-port.md)
+> Sources: CLAUDE.md, 2026-08-19; catalog-tires-live-api, 2026-08-21; Перенос мокапа шиномонтажа, 2026-09-12; React-порт записи на живой API, 2026-09-30; Фоллбэк ошибок бэка (global-error), 2026-10-16
+> Raw: [CLAUDE.md](../../raw/project/2026-08-19-claude-md.md); [catalog-tires-live-api](../../raw/project/2026-08-21-catalog-tires-live-api.md); [booking-domain-port](../../raw/project/2026-09-12-booking-domain-port.md); [booking-react-port](../../raw/project/2026-09-30-booking-react-port.md); [global-error-page](../../raw/project/2026-10-16-global-error-page.md)
 
 ## Overview
 
@@ -27,6 +27,7 @@
 - **Живое (30.09.2026):** запись на шиномонтаж — слоты `GET /api/booking/slots`, каталог услуг `GET /api/booking/catalog`, код `POST /api/booking/code`, подтверждение `POST /api/booking/confirm`, справочник `GET /api/reference/booking` (адрес, телефон, сроки); слой — `shared/api/booking.ts`, ошибки различаются машинными кодами `booking.*`.
 - **Живое (21.08.2026):** каталог шин целиком — листинг `GET /api/catalog/tires` (адаптеры `toTireListQuery`/`toTireProduct`, город слагом `city=` — резолвит бэк), гео `GET /api/reference/city` (`toGeoData`; мок `data/geo.ts` удалён), опции фильтра `GET /api/reference/filter/tire`. SEO-мета страницы — `meta.seo {title, description}` → generateMetadata/h2. Остальное — моки (модель шины, auto-каскад, диски; SeoBlock {title, subtitle} для auto-страницы). Кэш — на бэке (`tire-list:v5`).
 - Zustand — только UI (город, попапы, меню); корзина/сессия — React Query + localStorage (`cart`, `orders`, `session`).
+- **Фоллбэк ошибок бэка (16.10.2026):** любое необработанное исключение (5xx, недоступность) → HTTP 500 и единственная верхняя граница `src/app/global-error.tsx` — самостоятельная страница ошибки без шапки/подвала и без обращений к API, кнопки «Обновить» и «На главную»; детали — [backend-error-fallback](backend-error-fallback.md).
 - Кастомный CSS (страницы без макетов) — в конце `src/app/style.css` с датой.
 
 ## Разработка
@@ -42,6 +43,7 @@
 ## See Also
 
 - [catalog-live-api](catalog-live-api.md) — живой листинг каталога: контракт, адаптеры, city-слаг
+- [backend-error-fallback](backend-error-fallback.md) — страница ошибки при недоступном бэке
 - [booking-domain](booking-domain.md) — макет записи на шиномонтаж: поток, правила продукта, решения порта
 - [frontend-architecture-rules](frontend-architecture-rules.md)
 - [api-contract](api-contract.md)
