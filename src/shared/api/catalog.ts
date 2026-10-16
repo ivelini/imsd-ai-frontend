@@ -3,7 +3,6 @@ import { apiBase, delay } from "./base";
 import { CATALOG_START } from "@/data/catalogStart";
 import type { CatalogStartData } from "@/features/catalog/types";
 import {
-  getTireModel,
   AUTO_BRANDS,
   AUTO_YEARS,
   generateModifications,
@@ -24,6 +23,10 @@ import type {
   TireListItemDto,
   TireListDto,
   TireListResult,
+  TireListSeo,
+  TireModelData,
+  TireModelDto,
+  TireModelResponseDto,
   TireProduct,
   WheelFilterValuesDto,
   WheelListItemDto,
@@ -44,7 +47,7 @@ import type { WheelProduct } from "@/features/catalog/types";
 export type { CatalogStartData };
 export type { AutoBrandData, AutoModData, AutoResultProduct, CarBlockData, FilterOptions, TireProduct };
 export type { WheelAutoBrand, WheelAutoResultItem, WheelCarBlockData, WheelProduct };
-export { getTireModel, getAutoResult, getCarBlock };
+export { getAutoResult, getCarBlock };
 export { getWheelsCarBlock };
 
 export async function getCatalogStart(): Promise<CatalogStartData> {
@@ -138,6 +141,17 @@ function toOriginParam(name: string, item: OriginItemDto | null | undefined): Pr
   };
 }
 
+/**
+ * Короткий слаг модели для URL: у полного слага листинга («бренд-модель») срезается
+ * префикс бренда (страницы модели/типоразмера адресуются схемой бэка: бренд + модель).
+ * Нет префикса — полный остаётся как есть (не гадаем).
+ */
+function toShortModelSlug(fullSlug: string | null | undefined, brandSlug: string): string {
+  if (!fullSlug) return "";
+  const prefix = `${brandSlug}-`;
+  return fullSlug.startsWith(prefix) ? fullSlug.slice(prefix.length) : fullSlug;
+}
+
 /** DTO листинга → TireProduct (поля, которых нет на бэке, — пустые дефолты). */
 export function toTireProduct(dto: TireListItemDto): TireProduct {
   const sizeTitle = [dto.width, dto.profile].filter(Boolean).join("/");
@@ -153,7 +167,9 @@ export function toTireProduct(dto: TireListItemDto): TireProduct {
     deliveryMax: dto.delivery_max,
     brandId: String(dto.brand.id),
     brandName: dto.brand.name,
-    modelSlug: dto.model?.slug ?? "",
+    brandSlug: dto.brand.slug,
+    // ссылки карточек строятся коротким слагом: у полного «бренд-модель» префикс срезается
+    modelSlug: toShortModelSlug(dto.model?.slug, dto.brand.slug),
     modelName: dto.model?.name ?? dto.name,
     width: dto.width ?? 0,
     profile: dto.profile ?? 0,
@@ -247,6 +263,79 @@ export async function fetchAutoResult(
   return delay(50, getAutoResult(brand, model, year, mod, filter));
 }
 
+// --- Модель шины: GET /api/catalog/tire-models/{brand}/{model} + размеры листингом ---
+
+/** Размеров тянем за один заход: вкладка диаметра целиком (листинг допускает до 100). */
+const MODEL_SIZES_PER_PAGE = 100;
+
+/**
+ * Адаптер DTO модели → TireModelData: диаметры бэка («17») — r-ключами вкладок
+ * (?diameter=r17); параметры и описание — как отдал бэк (пустое страница скрывает).
+ */
+export function toTireModel(dto: TireModelDto): TireModelData {
+  return {
+    slug: dto.slug,
+    name: dto.name,
+    brandName: dto.brand.name,
+    brandSlug: dto.brand.slug,
+    image: dto.image_url ?? PRODUCT_PLACEHOLDER,
+    params: dto.params,
+    description: dto.description,
+    diameters: dto.diameters.map((d) => ({
+      value: `r${String(d.value).replace(/^r/i, "")}`,
+      count: d.count,
+    })),
+  };
+}
+
+/** Модель шины: 404 бэка → null (страница отдаёт notFound). */
+export async function getTireModel(
+  brandSlug: string,
+  modelSlug: string,
+  city?: string,
+): Promise<{ model: TireModelData; seo: TireListSeo | null } | null> {
+  const query = city ? `?city=${encodeURIComponent(city)}` : "";
+  const res = await fetch(`${apiBase()}/catalog/tire-models/${brandSlug}/${modelSlug}${query}`);
+  if (res.status === 404) return null;
+  if (!res.ok) {
+    throw new Error(`getTireModel: HTTP ${res.status}`);
+  }
+  const body = (await res.json()) as TireModelResponseDto;
+  return { model: toTireModel(body.data), seo: body.meta.seo ?? null };
+}
+
+/** Query размеров модели: короткий слаг + бренд + диаметр числом (r18 → 18) + город. */
+export function toModelSizesQuery(
+  modelSlug: string,
+  brandSlug: string,
+  diameter?: string,
+  city?: string,
+): string {
+  const params = new URLSearchParams();
+  if (modelSlug) params.append("model", modelSlug);
+  if (brandSlug) params.append("brand", brandSlug);
+  if (diameter) params.append("diameter[]", diameter.replace(/^r/i, "").toUpperCase());
+  if (city) params.append("city", city);
+  // URLSearchParams кодирует [] в %5B%5D — бэк ждёт каноничный вид diameter[]= (PHP parse_str)
+  return params.toString().replace(/%5B/g, "[").replace(/%5D/g, "]");
+}
+
+/** Типоразмеры модели одной вкладки диаметра: живой листинг с фильтрами модели. */
+export async function getTireModelSizes(
+  brandSlug: string,
+  modelSlug: string,
+  diameter?: string,
+  city?: string,
+): Promise<TireProduct[]> {
+  const query = toModelSizesQuery(modelSlug, brandSlug, diameter, city);
+  const res = await fetch(`${apiBase()}/catalog/tires?${query}&per_page=${MODEL_SIZES_PER_PAGE}`);
+  if (!res.ok) {
+    throw new Error(`getTireModelSizes: HTTP ${res.status}`);
+  }
+  const body = (await res.json()) as TireListDto;
+  return body.data.map(toTireProduct);
+}
+
 // --- Диски (живые: GET /api/catalog/wheels, GET /api/reference/filter/wheel) ---
 
 /**
@@ -329,7 +418,9 @@ export function toWheelProduct(dto: WheelListItemDto): WheelProduct {
     slug: dto.slug,
     brandId: String(dto.brand.id),
     brandName: dto.brand.name,
-    modelSlug: dto.model?.slug ?? "",
+    brandSlug: dto.brand.slug,
+    // как у шин: короткий слаг модели (ссылок у дисков нет, но поле — общее)
+    modelSlug: toShortModelSlug(dto.model?.slug, dto.brand.slug),
     modelName: dto.model?.name ?? dto.name,
     width,
     diameter,

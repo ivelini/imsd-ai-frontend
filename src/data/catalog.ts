@@ -75,7 +75,7 @@ interface ModelDef {
 const MODELS: Record<string, ModelDef[]> = {
   viatti: [
     {
-      slug: "viatti-strada-2",
+      slug: "strada-2",
       name: "V-130 Strada Asimmetrico",
       season: "summer",
       tireType: "passenger",
@@ -86,7 +86,7 @@ const MODELS: Record<string, ModelDef[]> = {
       speedRating: "H",
     },
     {
-      slug: "viatti-bosco",
+      slug: "bosco",
       name: "V-125 Bosco",
       season: "winter",
       tireType: "passenger",
@@ -97,7 +97,7 @@ const MODELS: Record<string, ModelDef[]> = {
       speedRating: "T",
     },
     {
-      slug: "viatti-nordico",
+      slug: "nordico",
       name: "V-134 Nordico",
       season: "all-season",
       tireType: "suv",
@@ -110,7 +110,7 @@ const MODELS: Record<string, ModelDef[]> = {
   ],
   michelin: [
     {
-      slug: "michelin-primacy-4",
+      slug: "primacy-4",
       name: "Primacy 4+",
       season: "summer",
       tireType: "passenger",
@@ -121,7 +121,7 @@ const MODELS: Record<string, ModelDef[]> = {
       speedRating: "W",
     },
     {
-      slug: "michelin-pilot-sport-5",
+      slug: "pilot-sport-5",
       name: "Pilot Sport 5",
       season: "summer",
       tireType: "passenger",
@@ -132,7 +132,7 @@ const MODELS: Record<string, ModelDef[]> = {
       speedRating: "Y",
     },
     {
-      slug: "michelin-alpin-7",
+      slug: "alpin-7",
       name: "Alpin 7",
       season: "winter",
       tireType: "passenger",
@@ -143,7 +143,7 @@ const MODELS: Record<string, ModelDef[]> = {
       speedRating: "H",
     },
     {
-      slug: "michelin-crossclimate-2",
+      slug: "crossclimate-2",
       name: "CrossClimate 2",
       season: "all-season",
       tireType: "suv",
@@ -156,7 +156,7 @@ const MODELS: Record<string, ModelDef[]> = {
   ],
   "nokian-tyres": [
     {
-      slug: "nokian-hakka-10",
+      slug: "hakka-10",
       name: "Hakkapeliitta 10",
       season: "winter",
       tireType: "passenger",
@@ -167,7 +167,7 @@ const MODELS: Record<string, ModelDef[]> = {
       speedRating: "T",
     },
     {
-      slug: "nokian-hakka-blue-3",
+      slug: "hakka-blue-3",
       name: "Hakka Blue 3",
       season: "summer",
       tireType: "passenger",
@@ -180,7 +180,7 @@ const MODELS: Record<string, ModelDef[]> = {
   ],
   bridgestone: [
     {
-      slug: "bridgestone-turanza-t005",
+      slug: "turanza-t005",
       name: "Turanza T005",
       season: "summer",
       tireType: "passenger",
@@ -191,7 +191,7 @@ const MODELS: Record<string, ModelDef[]> = {
       speedRating: "W",
     },
     {
-      slug: "bridgestone-blizzak-lm005",
+      slug: "blizzak-lm005",
       name: "Blizzak LM005",
       season: "winter",
       tireType: "passenger",
@@ -202,7 +202,7 @@ const MODELS: Record<string, ModelDef[]> = {
       speedRating: "H",
     },
     {
-      slug: "bridgestone-weather-control",
+      slug: "weather-control",
       name: "Weather Control A005",
       season: "all-season",
       tireType: "suv",
@@ -215,7 +215,7 @@ const MODELS: Record<string, ModelDef[]> = {
   ],
   pirelli: [
     {
-      slug: "pirelli-p-zero",
+      slug: "p-zero",
       name: "P Zero",
       season: "summer",
       tireType: "passenger",
@@ -226,7 +226,7 @@ const MODELS: Record<string, ModelDef[]> = {
       speedRating: "Y",
     },
     {
-      slug: "pirelli-scorpion-verde",
+      slug: "scorpion-verde",
       name: "Scorpion Verde",
       season: "all-season",
       tireType: "suv",
@@ -237,7 +237,7 @@ const MODELS: Record<string, ModelDef[]> = {
       speedRating: "V",
     },
     {
-      slug: "pirelli-ice-zero-2",
+      slug: "ice-zero-2",
       name: "Ice Zero 2",
       season: "winter",
       tireType: "passenger",
@@ -319,6 +319,7 @@ function generateProducts(): TireProduct[] {
               category: "tires" as const,
               brandId: brand.id,
               brandName: brand.name,
+              brandSlug: brand.slug,
               modelSlug: model.slug,
               modelName: model.name,
               width,
@@ -598,66 +599,6 @@ export function generateModifications(brand: string, model: string, year: number
       { width: 245, profile: 40, diameter: 19 },
     ] },
   ];
-}
-
-// ============================================================================
-// Модель шины (для /tires/[modelSlug])
-// ============================================================================
-
-export interface TireModelData {
-  slug: string;
-  name: string;
-  brandName: string;
-  description: string;
-  image: string;
-  params: { name: string; value: string }[];
-  sizesByDiameter: Record<string, TireProduct[]>;
-}
-
-export function getTireModel(slug: string): TireModelData | null {
-  // Ищем модель в MODELS
-  let modelDef: ModelDef | null = null;
-  let brandDef: BrandDef | null = null;
-  for (const brand of BRANDS) {
-    const models = MODELS[brand.id];
-    if (models) {
-      const found = models.find((m) => m.slug === slug);
-      if (found) {
-        modelDef = found;
-        brandDef = brand;
-        break;
-      }
-    }
-  }
-  if (!modelDef || !brandDef) return null;
-
-  const products = ALL_PRODUCTS.filter((p) => p.modelSlug === slug);
-  const sizesByDiameter: Record<string, TireProduct[]> = {};
-  for (const p of products) {
-    const key = `r${p.diameter}`;
-    if (!sizesByDiameter[key]) sizesByDiameter[key] = [];
-    sizesByDiameter[key].push(p);
-  }
-
-  return {
-    slug,
-    name: modelDef.name,
-    brandName: brandDef.name,
-    description:
-      "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ante metus dictum at tempor commodo. Neque viverra justo nec ultrices dui. Risus ultricies tristique nulla aliquet enim.",
-    image: "/assets/img/large.png",
-    params: [
-      { name: "Сезонность", value: SEASON_LABELS[modelDef.season] ?? modelDef.season },
-      { name: "Назначение", value: TIRE_TYPE_LABELS[modelDef.tireType] ?? modelDef.tireType },
-      { name: "Тип протектора", value: modelDef.season === "winter" ? "направленный" : "асимметричный" },
-      { name: "Страна бренда", value: COUNTRY_LABELS[brandDef.country] ?? brandDef.country },
-      { name: "Страна производства", value: COUNTRY_LABELS[brandDef.country] ?? brandDef.country },
-      { name: "Год выпуска", value: "2025-2026" },
-      { name: "Шипы", value: modelDef.season === "winter" && brandDef.id === "nokian-tyres" ? "Да" : "Нет" },
-      { name: "Run flat", value: brandDef.id === "michelin" || brandDef.id === "pirelli" ? "Да" : "Нет" },
-    ],
-    sizesByDiameter,
-  };
 }
 
 // ============================================================================

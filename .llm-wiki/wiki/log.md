@@ -56,3 +56,11 @@
 ## [2026-10-16] ingest | Каталог дисков на живом API
 - Updated: catalog-live-api.md (заголовок «Каталог (шины и диски)»: листинг/фильтр дисков, адаптеры toWheel*, нормализация decimal и значений фасетов, карточки без ссылок)
 - Updated: project-architecture.md (карта: каталог дисков живой; мок — авто-подбор)
+
+## [2026-10-16] ingest | Страница модели шин на живом API
+- Updated: catalog-live-api.md (контракт tire-models, маршруты бренд/модель, короткий слаг, размеры листингом, переходный 404 мок-крошки)
+- Updated: project-architecture.md (карта: роуты модели/товара, модель живая)
+
+## [2026-10-16] ingest | Фото товаров из API: раздача и размер колонки
+- Updated: catalog-live-api.md (storage:link, колонка 172px, пожелание превью)
+- Updated: project-architecture.md (карта: фото товаров)

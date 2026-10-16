@@ -6353,3 +6353,18 @@ input[type="checkbox"] {
     font-size: 24px;
   }
 }
+
+/* ===== Карточка каталога: фото товара из API — колонка по макету — 16.10.2026 ===== */
+/* Макет рисовал картинки «своим» размером (ассеты 172 px, на десктопе ширины в CSS
+   нет); живые фото бэка 600×600 раздували карточку — фиксируем колонку как в макете.
+   Мобильные правила (.catalog-product-image, img: max-width: 30%) остаются сверху. */
+.catalog-product-image {
+  flex-shrink: 0;
+  width: 172px;
+}
+.catalog-product-image img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+

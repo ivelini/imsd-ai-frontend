@@ -18,7 +18,10 @@ interface ProductCardProps {
 }
 
 export function ProductCard({ product, showLink = true, pair = false, cityLabel, cityValue }: ProductCardProps) {
-  const href = appendCityParam(`/${product.category}/${product.modelSlug}/${product.sizeSlug}`, cityValue ?? "");
+  const href = appendCityParam(
+    `/${product.category}/${product.brandSlug}/${product.modelSlug}/${product.sizeSlug}`,
+    cityValue ?? "",
+  );
 
   return (
     <div className={`catalog-product${pair ? " product-pair" : ""}`}>

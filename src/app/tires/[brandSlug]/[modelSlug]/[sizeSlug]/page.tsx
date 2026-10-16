@@ -1,4 +1,4 @@
-// Страница товара (фаза 3, 04.08.2026)
+// Страница товара (фаза 3, 04.08.2026; маршрут — схема бэка: бренд/модель/размер, 16.10.2026)
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { getProduct, getGeo } from "@/shared/api/data";
@@ -9,7 +9,7 @@ import { ProductDetails } from "@/features/product/components/ProductDetails";
 import { ProductTabs } from "@/features/product/components/ProductTabs";
 
 interface PageProps {
-  params: Promise<{ modelSlug: string; sizeSlug: string }>;
+  params: Promise<{ brandSlug: string; modelSlug: string; sizeSlug: string }>;
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 }
 
@@ -24,7 +24,11 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 }
 
 export default async function ProductPage({ params, searchParams }: PageProps) {
-  const [{ modelSlug, sizeSlug }, resolvedSearch, geo] = await Promise.all([params, searchParams, getGeo()]);
+  const [{ brandSlug, modelSlug, sizeSlug }, resolvedSearch, geo] = await Promise.all([
+    params,
+    searchParams,
+    getGeo(),
+  ]);
   const product = await getProduct(modelSlug, sizeSlug);
 
   if (!product) notFound();
@@ -35,7 +39,10 @@ export default async function ProductPage({ params, searchParams }: PageProps) {
   const breadcrumbs = [
     { label: "Главная", href: appendCityParam("/", cityValue ?? "") },
     { label: "Каталог шин", href: appendCityParam("/catalog/tires", cityValue ?? "") },
-    { label: product.brandName, href: appendCityParam(`/tires/${product.modelSlug}`, cityValue ?? "") },
+    {
+      label: product.brandName,
+      href: appendCityParam(`/tires/${brandSlug}/${modelSlug}`, cityValue ?? ""),
+    },
     { label: product.sizeTitle },
   ];
 

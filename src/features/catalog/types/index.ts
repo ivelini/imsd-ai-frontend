@@ -18,6 +18,9 @@ export interface ProductBase {
   season?: string; // только у шин; у дисков нет
   brandId: string;
   brandName: string;
+  /** Слаг бренда (листинг) — сегмент URL страницы модели/типоразмера. */
+  brandSlug: string;
+  /** Короткий слаг модели (без префикса бренда) — сегмент URL страницы модели. */
   modelSlug: string;
   modelName: string;
   width: number | string; // ширина (мм для шин, J-width для дисков)
@@ -288,6 +291,40 @@ export interface WheelListResult {
   page: number;
   perPage: number;
   seo: TireListSeo | null;
+}
+
+// ============================================================================
+// DTO бэкенда: GET /api/catalog/tire-models/{brand}/{model}
+// (Scramble public-api.json, 16.10.2026: {brand} — слаг бренда,
+// {model} — короткий слаг модели; диаметры — числами без префикса)
+// ============================================================================
+
+export interface TireModelDto {
+  slug: string;
+  name: string;
+  brand: { id: number; name: string; slug: string };
+  image_url: string | null;
+  params: { name: string; value: string }[];
+  description: string | null;
+  diameters: { value: string; count: number }[];
+}
+
+export interface TireModelResponseDto {
+  data: TireModelDto;
+  meta: { seo: TireListSeo | null };
+}
+
+/** Модель для страницы: диаметры — r-ключами вкладок (?diameter=r17). */
+export interface TireModelData {
+  slug: string;
+  name: string;
+  brandName: string;
+  brandSlug: string;
+  image: string;
+  params: { name: string; value: string }[];
+  description: string | null;
+  /** Вкладки диаметров: value — r-ключ (r17), count — размеров у бэка. */
+  diameters: { value: string; count: number }[];
 }
 
 /** Фасеты фильтра дисков: label — готовый от бэка, value — значение фасета. */

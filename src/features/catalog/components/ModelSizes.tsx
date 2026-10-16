@@ -1,7 +1,8 @@
-// Типоразмеры модели по диаметрам .model-sizes (фаза 2; 12.08.2026 — диаметр в URL + «Показать ещё»)
+// Типоразмеры модели по диаметрам .model-sizes (фаза 2; 12.08.2026 — диаметр в URL;
+// 16.10.2026 — живые данные: диаметры и размеры приходят с сервера, вкладка перезапрашивает страницу)
 "use client";
 
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import type { TireProduct } from "@/features/catalog/types";
 import { ProductCard } from "./ProductCard";
@@ -9,33 +10,23 @@ import { ProductCard } from "./ProductCard";
 const PAGE_SIZE = 24;
 
 interface ModelSizesProps {
-  sizesByDiameter: Record<string, TireProduct[]>;
-  initialDiameter?: string;
+  /** Вкладки диаметров: value — r-ключ (r17), count — сколько размеров у бэка. */
+  diameters: { value: string; count: number }[];
+  /** Размеры активного диаметра (живой листинг). */
+  sizes: TireProduct[];
+  /** Активный диаметр из URL; на смене родитель монтирует компонент заново (key). */
+  diameter: string;
   cityLabel?: string;
   cityValue?: string;
 }
 
-export function ModelSizes({ sizesByDiameter, initialDiameter, cityLabel, cityValue }: ModelSizesProps) {
+export function ModelSizes({ diameters, sizes, diameter, cityLabel, cityValue }: ModelSizesProps) {
   const router = useRouter();
-  const diameters = useMemo(
-    () =>
-      Object.keys(sizesByDiameter).sort(
-        (a, b) => parseInt(a.replace("r", "")) - parseInt(b.replace("r", "")),
-      ),
-    [sizesByDiameter],
-  );
-
-  const validInitial = initialDiameter && diameters.includes(initialDiameter) ? initialDiameter : undefined;
-  const [diameter, setDiameter] = useState(validInitial ?? diameters[0]);
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
-
-  const sizes = sizesByDiameter[diameter] ?? [];
   const shown = sizes.slice(0, visibleCount);
 
   function selectDiameter(d: string) {
-    if (d === diameter) return;
-    setDiameter(d);
-    setVisibleCount(PAGE_SIZE);
+    if (!d || d === diameter) return;
     router.replace(`?diameter=${d}`, { scroll: false });
   }
 
@@ -43,15 +34,19 @@ export function ModelSizes({ sizesByDiameter, initialDiameter, cityLabel, cityVa
     <div className="model-sizes">
       <h2 className="model-sizes-title">Типоразмеры в наличии</h2>
 
-      {/* Вкладки диаметров — выбор пишется в URL (?diameter=r17) */}
+      {/* Вкладки диаметров — выбор пишется в URL (?diameter=r17), страница перезапрашивает размеры */}
       <ul className="model-sizes-nav">
         {diameters.map((d) => (
-          <li key={d}>
+          <li key={d.value}>
             <button
-              className={d === diameter ? "model-sizes-nav-link model-sizes-nav-link_active" : "model-sizes-nav-link"}
-              onClick={() => selectDiameter(d)}
+              className={
+                d.value === diameter
+                  ? "model-sizes-nav-link model-sizes-nav-link_active"
+                  : "model-sizes-nav-link"
+              }
+              onClick={() => selectDiameter(d.value)}
             >
-              {d.toUpperCase()}
+              {d.value.toUpperCase()}
             </button>
           </li>
         ))}

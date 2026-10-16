@@ -1,17 +1,21 @@
-// Блок описания модели .model-description (фаза 2)
+// Блок описания модели .model-description (фаза 2; 16.10.2026 — описание от бэка:
+// rich-текст HTML, пустое — блок скрыт)
 interface ModelDescriptionProps {
   name: string;
   brandName: string;
   image: string;
   params: { name: string; value: string }[];
-  description: string;
+  description: string | null;
 }
 
 export function ModelDescription({ name, brandName, image, params, description }: ModelDescriptionProps) {
   return (
     <div className="model-description">
       <div className="model-info">
-        <img className="model-description-image" src={image} alt={name} />
+        {/* Разметка макета: класс-обёртка на div, размер задаёт правило `.model-description-image img` */}
+        <div className="model-description-image">
+          <img src={image} alt={name} />
+        </div>
         <div className="model-description-params">
           {params.map((p) => (
             <div className="model-param" key={p.name}>
@@ -22,9 +26,12 @@ export function ModelDescription({ name, brandName, image, params, description }
           ))}
         </div>
       </div>
-      <div className="model-description-text">
-        <p>{description}</p>
-      </div>
+      {description && (
+        <div
+          className="model-description-text"
+          dangerouslySetInnerHTML={{ __html: description }}
+        />
+      )}
     </div>
   );
 }

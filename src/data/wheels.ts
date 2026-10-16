@@ -93,6 +93,7 @@ for (const brand of BRANDS) {
           category: "wheels" as const,
           brandId: brand.id,
           brandName: brand.name,
+          brandSlug: brand.slug,
           modelSlug: `wheels-${brand.slug}-${sizeSlug}`,
           modelName,
           width,

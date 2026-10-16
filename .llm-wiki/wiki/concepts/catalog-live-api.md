@@ -1,11 +1,11 @@
 # Каталог (шины и диски): живой API (листинг, гео, SEO-мета)
 
-> Sources: План и реализация catalog-tires-live-api, 2026-08-21; плашка «Самовывоз» из origin.delivery_days_after_order, 2026-10-15; живые поля карточки (ПВЗ, наличие, зачёркнутая цена), 2026-10-16; каталог дисков на живом API, 2026-10-16
-> Raw: [catalog-tires-live-api](../../raw/project/2026-08-21-catalog-tires-live-api.md); [pickup-badge-card](../../raw/project/2026-10-15-pickup-badge-card.md); [catalog-card-live-fields](../../raw/project/2026-10-16-catalog-card-live-fields.md); [wheels-live-migration](../../raw/project/2026-10-16-wheels-live-migration.md)
+> Sources: План и реализация catalog-tires-live-api, 2026-08-21; плашка «Самовывоз» из origin.delivery_days_after_order, 2026-10-15; живые поля карточки (ПВЗ, наличие, зачёркнутая цена), 2026-10-16; каталог дисков на живом API, 2026-10-16; страница модели шин на живом API, 2026-10-16; фото товаров из API, 2026-10-16
+> Raw: [catalog-tires-live-api](../../raw/project/2026-08-21-catalog-tires-live-api.md); [pickup-badge-card](../../raw/project/2026-10-15-pickup-badge-card.md); [catalog-card-live-fields](../../raw/project/2026-10-16-catalog-card-live-fields.md); [wheels-live-migration](../../raw/project/2026-10-16-wheels-live-migration.md); [tire-model-live](../../raw/project/2026-10-16-tire-model-live.md); [catalog-photos](../../raw/project/2026-10-16-catalog-photos.md)
 
 ## Overview
 
-Страница `/catalog/tires` полностью переведена на живой бэк: листинг `GET /api/catalog/tires`, гео `GET /api/reference/city`, фильтры `GET /api/reference/filter/tire` (было раньше). Моки листинга и гео удалены. Ключевое решение: город в query идёт **слагом `city=`**, бэк резолвит его сам — фронт не делает предварительный запрос гео для резолва id (один RTT на страницу). С 16.10.2026 так же живёт каталог дисков (`/catalog/wheels`).
+Страница `/catalog/tires` полностью переведена на живой бэк: листинг `GET /api/catalog/tires`, гео `GET /api/reference/city`, фильтры `GET /api/reference/filter/tire` (было раньше). Моки листинга и гео удалены. Ключевое решение: город в query идёт **слагом `city=`**, бэк резолвит его сам — фронт не делает предварительный запрос гео для резолва id (один RTT на страницу). С 16.10.2026 так же живёт каталог дисков (`/catalog/wheels`) и страница модели шин (`/tires/<бренд>/<модель>`) с типоразмерами из листинга.
 
 ## Контракт и адаптеры
 
@@ -40,6 +40,24 @@
   контракте). Мок остаётся только авто-подбору дисков (каскад и результат — эндпоинтов
   у бэка нет).
 
+## Модель шины (16.10.2026)
+
+- `GET /api/catalog/tire-models/{brand}/{model}` — `{brand}` слаг бренда, `{model}`
+  **короткий** слаг (в листинге `model.slug` полный — префикс бренда срезается
+  `toShortModelSlug`); ответ: name/brand/image_url/params [{name, value}]/description
+  (HTML|null)/`diameters [{value: "17", count}]`/meta.seo; нет модели → 404.
+- Маршруты фронта — схема бэка: `/tires/[brandSlug]/[modelSlug]` (модель) и
+  `…/[sizeSlug]` (товар — пока мок); старые `/tires/[modelSlug]…` удалены, ссылки
+  карточек и крошки обновлены. `ProductBase` + `brandSlug`, `modelSlug` — короткий
+  (и у дисков: поле общее).
+- Размеры модели — листинг с `model=<короткий>&brand=<слаг>&diameter[]=<число>&city`
+  (`getTireModelSizes`, per_page=100); count модели сходится с `meta.total`.
+- Тип `TireModelData` переехал из мока; мок `getTireModel` удалён, слаги моделей мока
+  укорочены. `ModelSizes` — живые пропсы (диаметры+count, размеры активной вкладки);
+  `ModelDescription` — обёртка `.model-description-image` (правило макета 300px) и
+  HTML-описание. Известное переходное: крошка мок-товара ведёт на живую модель → 404
+  (мок-слаги бэку неизвестны; уйдёт с портом страницы товара).
+
 ## SEO
 
 - `meta.seo {title, description}` — мета-заголовок и описание страницы: title готовый от бэка (предложный падеж города эвристикой по суффиксам «в Челябинске», при выбранном brand — «Шины Michelin в Челябинске»).
@@ -51,6 +69,11 @@
 - Слаги городов в БД nullable (сидера нет) — если не заполнены, `city=<слаг>` фолбэчится на дефолт; URL-слаги должны совпадать с БД.
 - Описания плашек-попапов — HTML (фронт рендерит разметку через `ParamBadge`); у бэка `cityText` (срок доставки) и настройки ПВЗ — простой текст с `\n` — правка передана в бэкенд (`cityText` → `<br>` + `e()`, настройки → `nl2br`); до неё переносы в попапах «ПВЗ»/«Самовывоз» теряются.
 - `price|null` — блок цен в карточке рендерится только при числе (`typeof price === "number"`); в корзинных хуках `?? 0`.
+- Фото товаров (16.10.2026): бэк отдаёт `images[0].url` (`/storage/images/…`); раздача
+  требует симлинка `public/storage` на бэке (`php artisan storage:link` — выполнен в dev,
+  **на проде за бэкенд-релизом**). Колонка фото карточки зафиксирована 172px (макет
+  рисовал ассеты «своим» размером, живые фото 600×600 раздували карточку). У дисков фото
+  пока нет — заглушка. Пожелание бэку: превью вместо 600px.
 - Scramble-экспорт генерится в docker (`docker exec imsd-backend-app php artisan scramble:export-docs`) — на хосте нет pdo_pgsql.
 
 ## See Also

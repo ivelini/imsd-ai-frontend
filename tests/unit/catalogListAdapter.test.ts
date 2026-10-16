@@ -88,7 +88,8 @@ describe("toTireListQuery", () => {
 describe("toTireProduct", () => {
   it("test_product_slug_and_sizeslug_built_from_fields", () => {
     const p = toTireProduct(baseDto);
-    expect(p.modelSlug).toBe("yokohama-bluearth-e70b");
+    // слаг модели — короткий (URL страницы модели строится схемой бэка: бренд/модель)
+    expect(p.modelSlug).toBe("bluearth-e70b");
     expect(p.modelName).toBe("Bluearth E70B");
     expect(p.sizeSlug).toBe("yokohama-bluearth-e70b-215-55-17");
     expect(p.season).toBe("summer");
@@ -250,6 +251,20 @@ describe("toTireProduct", () => {
     };
     expect(toTireProduct({ ...baseDto, origin: noPickUp }).pvzDelivery).toBeNull();
     expect(toTireProduct({ ...baseDto, origin: null }).pvzDelivery).toBeNull();
+  });
+
+  it("test_product_short_model_slug_and_brand_slug", () => {
+    const p = toTireProduct(baseDto);
+    // ссылки карточек строятся как /tires/<бренд>/<короткий слаг>/<размер>
+    expect(p.brandSlug).toBe("yokohama");
+    expect(p.modelSlug).toBe("bluearth-e70b");
+
+    // нет префикса бренда в полном слаге — не гадаем, оставляем как есть
+    const other = toTireProduct({
+      ...baseDto,
+      model: { id: 61, name: "Other", slug: "other-slug" },
+    });
+    expect(other.modelSlug).toBe("other-slug");
   });
 
   it("test_product_maps_quantity_from_count_in_stock", () => {
