@@ -1,7 +1,7 @@
 // Детали товара: заголовок, параметры, цена, корзина (фаза 3, 04.08.2026)
-// Server Component — интерактивные острова: ParamBadge, AddToCartBlock
+// Server Component — интерактивные острова: BadgeValue (ParamBadge), AddToCartBlock
 import { AddToCartBlock } from "./AddToCartBlock";
-import { ParamBadge } from "@/shared/ui/ParamBadge";
+import { BadgeValue } from "@/shared/ui/BadgeValue";
 import type { ProductDetailData } from "../types";
 
 export function ProductDetails({ product }: { product: ProductDetailData }) {
@@ -16,11 +16,7 @@ export function ProductDetails({ product }: { product: ProductDetailData }) {
                 <span className="parameter-name">{p.name}</span>
                 <span className="parameter-dots"></span>
                 {p.badge ? (
-                  p.description ? (
-                    <ParamBadge label={p.value} description={p.description} />
-                  ) : (
-                    <span className="p-badge">{p.value} {">"}</span>
-                  )
+                  <BadgeValue label={p.value} description={p.description} />
                 ) : (
                   <span className="parameter-value">{p.value}</span>
                 )}

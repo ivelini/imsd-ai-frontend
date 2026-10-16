@@ -41,6 +41,9 @@ export interface ProductBase {
   /** Параметры для отображения в карточке (формирует «бэк»).
    *  badge + description → ParamBadge с попапом, иначе parameter-value. */
   parameters: ProductParam[];
+  /** Плашка строки «Самовывоз» (origin.delivery_days_after_order): дата + текст попапа.
+   *  null — плашки у бэка нет, строка скрывается. */
+  pickup: ProductParam | null;
 }
 
 // ============================================================================
@@ -177,11 +180,13 @@ export interface TireOriginItem {
   description: string | null;
 }
 
-/** Происхождение шины: производитель, страна производства, год выпуска. */
+/** Происхождение шины: производитель, страна производства, год выпуска + плашка срока выдачи. */
 export interface TireOrigin {
   vendor: TireOriginItem | null;
   manufacture_country: TireOriginItem | null;
   manufacture_year: TireOriginItem | null;
+  /** Плашка срока: badge — дата словами («10 Окт (Сб)»), description — HTML текста выдачи города. */
+  delivery_days_after_order: TireOriginItem | null;
 }
 
 /** Элемент листинга шин. slug — sizeSlug (brand-name-width-profile-diameter). */

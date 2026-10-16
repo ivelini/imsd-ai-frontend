@@ -15,7 +15,7 @@ const WHEEL_TYPE_LABELS: Record<string, string> = {
 };
 
 // Реэкспорт для моков (общие словари)
-import { COUNTRY_LABELS, DELIVERY_OPTIONS } from "./catalog";
+import { COUNTRY_LABELS, DELIVERY_OPTIONS, PICKUP_BADGE } from "./catalog";
 export { COUNTRY_LABELS };
 
 // ============================================================================
@@ -129,6 +129,7 @@ for (const brand of BRANDS) {
             },
             { name: "Год выпуска:", value: "2026" },
           ],
+          pickup: PICKUP_BADGE,
         });
         _nextId++;
       }

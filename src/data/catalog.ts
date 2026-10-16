@@ -3,6 +3,7 @@
 // Мок имитирует ответ бэкенда: value — латинские slug (совпадают с URL),
 // label/готовые строки формируются здесь (как это сделает API).
 import type { TireProduct, FilterOptions, FilterOption, FilterState, SeoContent } from "@/features/catalog/types";
+import type { ProductParam } from "@/shared/types/product";
 
 // ============================================================================
 // Словари «бэка»: value → готовый label для отображения
@@ -253,6 +254,17 @@ const MODELS: Record<string, ModelDef[]> = {
 // Генерация товаров
 // ============================================================================
 
+/** Плашка строки «Самовывоз» карточки (у бэка — origin.delivery_days_after_order, город по умолчанию). */
+export const PICKUP_BADGE: ProductParam = {
+  name: "Самовывоз",
+  value: "8 авг (сб)",
+  badge: true,
+  description: {
+    title: "8 авг (сб)",
+    text: "Самовывоз осуществляется из центрального офиса.<br>Адрес: Челябинск, Свердловский тракт 3Н (Автоальянс)<br>Время работы: рабочие дни 09:00–19:00, выходные 09:00–17:00",
+  },
+};
+
 function generateProducts(): TireProduct[] {
   let codeCounter = 75631;
   let idCounter = 0;
@@ -351,6 +363,7 @@ function generateProducts(): TireProduct[] {
                   },
                 },
               ],
+              pickup: PICKUP_BADGE,
             });
           }
         }

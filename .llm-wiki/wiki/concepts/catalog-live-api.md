@@ -1,7 +1,7 @@
 # Каталог шин: живой API (листинг, гео, SEO-мета)
 
-> Sources: План и реализация catalog-tires-live-api, 2026-08-21
-> Raw: [catalog-tires-live-api](../../raw/project/2026-08-21-catalog-tires-live-api.md)
+> Sources: План и реализация catalog-tires-live-api, 2026-08-21; плашка «Самовывоз» из origin.delivery_days_after_order, 2026-10-15
+> Raw: [catalog-tires-live-api](../../raw/project/2026-08-21-catalog-tires-live-api.md); [pickup-badge-card](../../raw/project/2026-10-15-pickup-badge-card.md)
 
 ## Overview
 
@@ -10,8 +10,9 @@
 ## Контракт и адаптеры
 
 - Справочник фильтра `GET /api/reference/filter/tire` с 21.08.2026 отдаёт value размеров с префиксами (`w185`, `p60`, `r15`) — 1:1 с сегментами URL; `toFilterOptions` (`sizeOpts`) нормализует голое число в префикс (`185` → `w185`) — переходный период до обновления бэка (см. [catalog-url-grammar](catalog-url-grammar.md)).
-- Ответ листинга: `data[]` (slug товара = sizeSlug `brand-name-width-profile-diameter`, `brand.slug`, `euro_label {rollingResistance, wetGrip, noiseEmission}|null`, `price|null`, `season {label, value}|null`, `model {id, name, slug}|null`) + `meta {current_page, last_page, per_page, total, seo {title, description|null}}`.
+- Ответ листинга: `data[]` (slug товара = sizeSlug `brand-name-width-profile-diameter`, `brand.slug`, `euro_label {rollingResistance, wetGrip, noiseEmission}|null`, `price|null`, `season {label, value}|null`, `model {id, name, slug}|null`, `origin {vendor, manufacture_country, manufacture_year, delivery_days_after_order}|null` — каждая запись `{badge, description|null}`) + `meta {current_page, last_page, per_page, total, seo {title, description|null}}`.
 - `src/shared/api/catalog.ts`: `toTireListQuery(filter, city?)` — массивы `width[]=`/`delivery[]=` каноничным видом (URLSearchParams кодирует `[]` в `%5B%5D` — replace обратно), `city=<слаг>`; `toTireProduct(dto)` — маппинг с дефолтами (поля, которых нет на бэке: code/year/quantity — пустые; C-диаметр `"13c"` → число 13; `euro_label.noiseEmission` — строка от бэка → число); `getCatalogProducts(filter, city?)` — fetch + `per_page=12`, маппинг meta → PaginatedResult + seo.
+- Плашка «Самовывоз» карточки (15.10.2026): `origin.delivery_days_after_order` → `toOriginParam("Самовывоз", …)` → поле `pickup: ProductParam|null` на `ProductBase` (в `parameters` не дублируется); рендер — `BadgeValue` (есть `description` → `ParamBadge` с попапом, нет → сухой `p-badge`), общий для параметров карточки и страницы товара. `pickup: null` — строка скрыта. Мок-страницы (диски, автоподбор, модель) плашку получают из мока (`PICKUP_BADGE` в `data/catalog.ts`).
 - `src/shared/api/geo.ts`: `getGeo()` → fetch `/api/reference/city` + `toGeoData` (value = слаг, id = String(value), дефолт из meta.default с fallback на первый город; контракт GeoData не менялся — потребители шапки/попапа не трогались).
 
 ## Город в листинге

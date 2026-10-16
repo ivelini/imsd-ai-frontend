@@ -33,3 +33,6 @@
 - Updated: project-architecture.md (карта: роуты /booking/*, живой API записи, стили домена в src)
 - Updated: ui-porting-rules.md (пример переезда стилей вместе с портом домена)
 - Updated: adr-practice.md (индекс 0001–0005)
+
+## [2026-10-15] ingest | Плашка «Самовывоз» в карточке каталога из origin.delivery_days_after_order
+- Updated: catalog-live-api.md (контракт листинга + origin, маппинг pickup → ProductBase, BadgeValue)

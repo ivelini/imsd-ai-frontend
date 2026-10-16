@@ -177,6 +177,8 @@ export function toTireProduct(dto: TireListItemDto): TireProduct {
       toOriginParam("Страна производства:", dto.origin?.manufacture_country),
       toOriginParam("Год производства:", dto.origin?.manufacture_year),
     ].filter((p): p is ProductParam => Boolean(p)),
+    // плашка срока выдачи — в строку «Самовывоз» карточки (в parameters не дублируется)
+    pickup: toOriginParam("Самовывоз", dto.origin?.delivery_days_after_order),
     loadIndex: "",
     speedRating: "",
     tireType: "",

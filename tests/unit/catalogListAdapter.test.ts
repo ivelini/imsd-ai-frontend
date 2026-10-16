@@ -3,7 +3,7 @@
 // euro_label {rollingResistance, wetGrip, noiseEmission}; город — слагом city= (резолвит бэк)
 import { describe, expect, it } from "vitest";
 import { toTireListQuery, toTireProduct } from "@/shared/api/catalog";
-import type { TireListItemDto } from "@/features/catalog/types";
+import type { TireListItemDto, TireOrigin } from "@/features/catalog/types";
 
 const baseDto: TireListItemDto = {
   id: 188,
@@ -19,6 +19,10 @@ const baseDto: TireListItemDto = {
     vendor: { badge: "Yokohama", description: "Японский производитель шин." },
     manufacture_country: { badge: "Япония", description: "Завод в Японии." },
     manufacture_year: { badge: "2025", description: null },
+    delivery_days_after_order: {
+      badge: "10 Окт (Сб)",
+      description: "Самовывоз осуществляется из центрального офиса",
+    },
   },
   season: { label: "Летняя", value: "summer" },
   is_studded: false,
@@ -147,10 +151,53 @@ describe("toTireProduct", () => {
   it("test_product_partial_origin_skips_nulls", () => {
     const p = toTireProduct({
       ...baseDto,
-      origin: { vendor: { badge: "Yokohama", description: null }, manufacture_country: null, manufacture_year: null },
+      origin: {
+        vendor: { badge: "Yokohama", description: null },
+        manufacture_country: null,
+        manufacture_year: null,
+        delivery_days_after_order: null,
+      },
     });
     expect(p.parameters).toHaveLength(1);
     expect(p.parameters[0].value).toBe("Yokohama");
     expect(p.parameters[0].description).toBeUndefined();
+  });
+
+  it("test_product_maps_pickup_badge_from_origin", () => {
+    const p = toTireProduct(baseDto);
+    expect(p.pickup).toEqual({
+      name: "Самовывоз",
+      value: "10 Окт (Сб)",
+      badge: true,
+      description: {
+        title: "10 Окт (Сб)",
+        text: "Самовывоз осуществляется из центрального офиса",
+      },
+    });
+    // плашка срока не дублируется в parameters (там только vendor/country/year)
+    expect(p.parameters).toHaveLength(3);
+  });
+
+  it("test_product_pickup_without_description_renders_badge_only", () => {
+    const noDescription: TireOrigin = {
+      vendor: null,
+      manufacture_country: null,
+      manufacture_year: null,
+      delivery_days_after_order: { badge: "10 Окт (Сб)", description: null },
+    };
+    const p = toTireProduct({ ...baseDto, origin: noDescription });
+    expect(p.pickup?.value).toBe("10 Окт (Сб)");
+    expect(p.pickup?.description).toBeUndefined();
+  });
+
+  it("test_product_pickup_null_without_badge", () => {
+    const noBadge: TireOrigin = {
+      vendor: { badge: "Yokohama", description: null },
+      manufacture_country: null,
+      manufacture_year: null,
+      delivery_days_after_order: null,
+    };
+    expect(toTireProduct({ ...baseDto, origin: noBadge }).pickup).toBeNull();
+    expect(toTireProduct({ ...baseDto, origin: null }).pickup).toBeNull();
   });
 });

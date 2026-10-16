@@ -2,7 +2,7 @@
 import Link from "next/link";
 import type { ProductBase } from "@/features/catalog/types";
 import { appendCityParam } from "@/shared/lib/cityUrl";
-import { ParamBadge } from "@/shared/ui/ParamBadge";
+import { BadgeValue } from "@/shared/ui/BadgeValue";
 import { SeasonIcons } from "@/shared/ui/SeasonIcons";
 import { BuyButton } from "./BuyButton";
 import { EuLabel } from "@/shared/ui/EuLabel";
@@ -58,11 +58,7 @@ export function ProductCard({ product, showLink = true, pair = false, cityLabel,
               <p className="country" key={i}>
                 {p.name}{" "}
                 {p.badge ? (
-                  p.description ? (
-                    <ParamBadge label={p.value} description={p.description} />
-                  ) : (
-                    <span className="p-badge">{p.value} {">"}</span>
-                  )
+                  <BadgeValue label={p.value} description={p.description} />
                 ) : (
                   <span><b>{p.value}</b></span>
                 )}
@@ -72,7 +68,12 @@ export function ProductCard({ product, showLink = true, pair = false, cityLabel,
           <div className="merge-block">
             <div className="catalog-product-flex-item catalog-product-location-info">
               <CardCityBadge cityLabel={cityLabel} />
-              <p className="pickup">Самовывоз <span className="p-badge">8 авг (сб) &gt;</span></p>
+              {product.pickup && (
+                <p className="pickup">
+                  {product.pickup.name}{" "}
+                  <BadgeValue label={product.pickup.value} description={product.pickup.description} />
+                </p>
+              )}
               <p className="free-shipping">Доставка до ПВЗ <span className="p-badge">бесплатно &gt;</span></p>
             </div>
             <div className="catalog-product-flex-item catalog-product-purchase-actions">
