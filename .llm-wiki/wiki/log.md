@@ -52,3 +52,7 @@
 ## [2026-10-16] ingest | Порт макета страницы ошибки в error.tsx (живая обвязка)
 - Updated: backend-error-fallback.md (страница ошибки — карточка макета в живой обвязке; global-error — нижний слой; цена — пустой город)
 - Updated: project-architecture.md (карта: фоллбэк — error.tsx в обвязке)
+
+## [2026-10-16] ingest | Каталог дисков на живом API
+- Updated: catalog-live-api.md (заголовок «Каталог (шины и диски)»: листинг/фильтр дисков, адаптеры toWheel*, нормализация decimal и значений фасетов, карточки без ссылок)
+- Updated: project-architecture.md (карта: каталог дисков живой; мок — авто-подбор)

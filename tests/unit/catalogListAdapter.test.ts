@@ -3,7 +3,7 @@
 // euro_label {rollingResistance, wetGrip, noiseEmission}; город — слагом city= (резолвит бэк)
 import { describe, expect, it } from "vitest";
 import { toTireListQuery, toTireProduct } from "@/shared/api/catalog";
-import type { TireListItemDto, TireOrigin } from "@/features/catalog/types";
+import type { OriginDto, TireListItemDto } from "@/features/catalog/types";
 
 const baseDto: TireListItemDto = {
   id: 188,
@@ -188,7 +188,7 @@ describe("toTireProduct", () => {
   });
 
   it("test_product_pickup_without_description_renders_badge_only", () => {
-    const noDescription: TireOrigin = {
+    const noDescription: OriginDto = {
       vendor: null,
       manufacture_country: null,
       manufacture_year: null,
@@ -201,7 +201,7 @@ describe("toTireProduct", () => {
   });
 
   it("test_product_pickup_null_without_badge", () => {
-    const noBadge: TireOrigin = {
+    const noBadge: OriginDto = {
       vendor: { badge: "Yokohama", description: null },
       manufacture_country: null,
       manufacture_year: null,
@@ -228,7 +228,7 @@ describe("toTireProduct", () => {
   });
 
   it("test_product_pvz_delivery_without_description_renders_badge_only", () => {
-    const noDescription: TireOrigin = {
+    const noDescription: OriginDto = {
       vendor: null,
       manufacture_country: null,
       manufacture_year: null,
@@ -241,7 +241,7 @@ describe("toTireProduct", () => {
   });
 
   it("test_product_pvz_delivery_null_without_pick_up", () => {
-    const noPickUp: TireOrigin = {
+    const noPickUp: OriginDto = {
       vendor: { badge: "Yokohama", description: null },
       manufacture_country: null,
       manufacture_year: null,

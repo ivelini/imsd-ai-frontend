@@ -1,11 +1,11 @@
-# Каталог шин: живой API (листинг, гео, SEO-мета)
+# Каталог (шины и диски): живой API (листинг, гео, SEO-мета)
 
-> Sources: План и реализация catalog-tires-live-api, 2026-08-21; плашка «Самовывоз» из origin.delivery_days_after_order, 2026-10-15; живые поля карточки (ПВЗ, наличие, зачёркнутая цена), 2026-10-16
-> Raw: [catalog-tires-live-api](../../raw/project/2026-08-21-catalog-tires-live-api.md); [pickup-badge-card](../../raw/project/2026-10-15-pickup-badge-card.md); [catalog-card-live-fields](../../raw/project/2026-10-16-catalog-card-live-fields.md)
+> Sources: План и реализация catalog-tires-live-api, 2026-08-21; плашка «Самовывоз» из origin.delivery_days_after_order, 2026-10-15; живые поля карточки (ПВЗ, наличие, зачёркнутая цена), 2026-10-16; каталог дисков на живом API, 2026-10-16
+> Raw: [catalog-tires-live-api](../../raw/project/2026-08-21-catalog-tires-live-api.md); [pickup-badge-card](../../raw/project/2026-10-15-pickup-badge-card.md); [catalog-card-live-fields](../../raw/project/2026-10-16-catalog-card-live-fields.md); [wheels-live-migration](../../raw/project/2026-10-16-wheels-live-migration.md)
 
 ## Overview
 
-Страница `/catalog/tires` полностью переведена на живой бэк: листинг `GET /api/catalog/tires`, гео `GET /api/reference/city`, фильтры `GET /api/reference/filter/tire` (было раньше). Моки листинга и гео удалены. Ключевое решение: город в query идёт **слагом `city=`**, бэк резолвит его сам — фронт не делает предварительный запрос гео для резолва id (один RTT на страницу).
+Страница `/catalog/tires` полностью переведена на живой бэк: листинг `GET /api/catalog/tires`, гео `GET /api/reference/city`, фильтры `GET /api/reference/filter/tire` (было раньше). Моки листинга и гео удалены. Ключевое решение: город в query идёт **слагом `city=`**, бэк резолвит его сам — фронт не делает предварительный запрос гео для резолва id (один RTT на страницу). С 16.10.2026 так же живёт каталог дисков (`/catalog/wheels`).
 
 ## Контракт и адаптеры
 
@@ -22,6 +22,23 @@
 - Бэк (GetTireListController): резолв `city_id` → `city`-слаг → дефолт `config/shop.php`. Валидация `city` без `exists` — несуществующий слаг не даёт 422, фолбэк на дефолтный город (старые/битые ссылки не ломают страницу).
 - Резолв id до кеша (`City::where('slug')->value('id')` — лёгкий запрос), модель загружается только при промахе кеша — кеш-hit без лишних запросов (проверяется тестом `test_response_is_cached`).
 - Двухфазность запросов на странице (geo → products для резолва city_id) не понадобилась — бэк резолвит сам.
+
+## Диски (16.10.2026)
+
+- Листинг `GET /api/catalog/wheels` и фильтр `GET /api/reference/filter/wheel` — живые;
+  страница `/catalog/wheels` получила `generateMetadata`/h2 из `meta.seo` (был хардкод).
+- Адаптеры `toWheelFilterOptions`/`toWheelListQuery`/`toWheelProduct` в
+  `shared/api/catalog.ts`; `OriginDto` — общий с шинами (переименован из `TireOrigin`:
+  форма origin у листингов одна).
+- Значения фасетов нормализуются под URL/селекты: диаметр-фасет — integer (15) → `r15`,
+  decimal-строки («7.0», «40.0») → числа; в query decimal-поля уходят числами — бэк
+  нормализует их сам (`WheelProductBuilder::normalizeDecimal`, сравнение с БД:
+  «40» = «40.0»). Тип дисков — `alloy|steel|forged` (у мока были litoy/kovanyy/
+  shtampovannyy).
+- Карточки дисков — без ссылок (`showLink={false}`): страницы товара дисков нет
+  (`/wheels/...` не существует — ссылки вели в 404); «Код товара» скрыт (поля нет в
+  контракте). Мок остаётся только авто-подбору дисков (каскад и результат — эндпоинтов
+  у бэка нет).
 
 ## SEO
 

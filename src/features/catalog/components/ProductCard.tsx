@@ -53,7 +53,8 @@ export function ProductCard({ product, showLink = true, pair = false, cityLabel,
         </div>
         <div className="catalog-product-flex-container">
           <div className="catalog-product-flex-item catalog-product-general-info">
-            <p className="country">Код товара: {product.ean}</p>
+            {/* У дисков кода товара в контракте нет — строка скрывается при пустом значении */}
+            {product.ean && <p className="country">Код товара: {product.ean}</p>}
             {product.parameters.map((p, i) => (
               <p className="country" key={i}>
                 {p.name}{" "}

@@ -1,5 +1,4 @@
 // Catalog: стартовая страница /catalog, каталог шин и дисков, авто-каскад
-import type { PaginatedResult } from "./types";
 import { apiBase, delay } from "./base";
 import { CATALOG_START } from "@/data/catalogStart";
 import type { CatalogStartData } from "@/features/catalog/types";
@@ -20,17 +19,19 @@ import type {
 import type {
   FilterOptions,
   FilterState,
+  OriginItemDto,
   TireFilterValuesDto,
   TireListItemDto,
   TireListDto,
   TireListResult,
-  TireOriginItem,
   TireProduct,
+  WheelFilterValuesDto,
+  WheelListItemDto,
+  WheelListDto,
+  WheelListResult,
 } from "@/features/catalog/types";
 import type { ProductParam } from "@/shared/types/product";
 import {
-  getWheelsFilterOptions,
-  getWheelsProductsMock,
   getWheelsAutoResult,
   getWheelsCarBlock,
   generateWheelMods,
@@ -127,7 +128,7 @@ function parseDiameter(diameter: string | null): number {
 }
 
 /** origin-бейдж бэка → параметр карточки (description строкой → {title, text} для ParamBadge). */
-function toOriginParam(name: string, item: TireOriginItem | null | undefined): ProductParam | null {
+function toOriginParam(name: string, item: OriginItemDto | null | undefined): ProductParam | null {
   if (!item) return null;
   return {
     name,
@@ -246,18 +247,139 @@ export async function fetchAutoResult(
   return delay(50, getAutoResult(brand, model, year, mod, filter));
 }
 
-// --- Диски ---
+// --- Диски (живые: GET /api/catalog/wheels, GET /api/reference/filter/wheel) ---
+
+/**
+ * Адаптер фасетов фильтра дисков → FilterOptions.
+ * Decimal-значения бэка («7.0», «40.0») приводим к каноничному виду URL/селектов
+ * (диаметр — префикс `r15`, остальные — числа без хвостовых нулей); label — от бэка.
+ */
+export function toWheelFilterOptions(data: WheelFilterValuesDto): FilterOptions {
+  const opts = (items: WheelFilterValuesDto["width"]): FilterOptions["brands"] =>
+    items.map((o) => ({ label: String(o.label), value: String(o.value) }));
+
+  const diameterOpts = (items: WheelFilterValuesDto["diameter"]): FilterOptions["diameters"] =>
+    items.map((o) => {
+      const value = String(o.value);
+      return { label: String(o.label), value: value.startsWith("r") ? value : `r${value}` };
+    });
+
+  const decimalOpts = (items: WheelFilterValuesDto["width"]): FilterOptions["widths"] =>
+    items.map((o) => ({ label: String(o.label), value: String(Number(o.value)) }));
+
+  return {
+    seasons: [],
+    brands: opts(data.brand),
+    widths: decimalOpts(data.width),
+    profiles: [],
+    diameters: diameterOpts(data.diameter),
+    studded: [],
+    pcds: opts(data.pcd),
+    ets: decimalOpts(data.et),
+    hubBores: decimalOpts(data.hub_diameter),
+    wheelTypes: opts(data.type),
+    countries: opts(data.country),
+    delivery: opts(data.delivery),
+    priceMin: data.price.min,
+    priceMax: data.price.max,
+  };
+}
 
 export async function getWheelsFilters(): Promise<FilterOptions> {
-  return delay(50, getWheelsFilterOptions());
+  const res = await fetch(`${apiBase()}/reference/filter/wheel`);
+  if (!res.ok) {
+    throw new Error(`getWheelsFilters: HTTP ${res.status}`);
+  }
+  const body = (await res.json()) as { data: WheelFilterValuesDto };
+  return toWheelFilterOptions(body.data);
+}
+
+/** Фильтр каталога дисков → query листинга: decimal-поля — числами (бэк нормализует). */
+export function toWheelListQuery(filter: FilterState, city?: string): string {
+  const params = new URLSearchParams();
+  if (filter.width !== undefined) params.append("width[]", String(filter.width));
+  if (filter.diameter !== undefined) params.append("diameter[]", String(filter.diameter));
+  if (filter.pcd) params.append("pcd[]", filter.pcd);
+  if (filter.et !== undefined) params.append("et[]", String(filter.et));
+  if (filter.hubBore !== undefined) params.append("hub_diameter[]", String(filter.hubBore));
+  if (filter.wheelType) params.append("type", filter.wheelType);
+  if (filter.brand) params.append("brand", filter.brand);
+  if (filter.country) params.append("country", filter.country);
+  filter.delivery?.forEach((d) => params.append("delivery[]", d));
+  if (filter.priceMin !== undefined) params.append("price_min", String(filter.priceMin));
+  if (filter.priceMax !== undefined) params.append("price_max", String(filter.priceMax));
+  if (filter.page !== undefined) params.append("page", String(filter.page));
+  if (city) params.append("city", city);
+  // URLSearchParams кодирует [] в %5B%5D — бэк ждёт каноничный вид width[]= (PHP parse_str)
+  return params.toString().replace(/%5B/g, "[").replace(/%5D/g, "]");
+}
+
+/** DTO листинга дисков → WheelProduct (как toTireProduct; кода товара у дисков нет). */
+export function toWheelProduct(dto: WheelListItemDto): WheelProduct {
+  const width = dto.width !== null ? parseFloat(dto.width) : 0;
+  const diameter = dto.diameter ?? 0;
+  const pcd = dto.pcd ?? "";
+  const et = dto.et !== null ? parseFloat(dto.et) : 0;
+  const hubBore = dto.hub_diameter !== null ? parseFloat(dto.hub_diameter) : 0;
+
+  return {
+    id: String(dto.id),
+    category: "wheels",
+    ean: "",
+    slug: dto.slug,
+    brandId: String(dto.brand.id),
+    brandName: dto.brand.name,
+    modelSlug: dto.model?.slug ?? "",
+    modelName: dto.model?.name ?? dto.name,
+    width,
+    diameter,
+    pcd,
+    et,
+    hubBore,
+    wheelType: dto.type?.value ?? "",
+    price: dto.price ?? undefined,
+    // зачёркнутая цена; карточка рисует её только выше текущей (условие в ProductCard)
+    oldPrice: dto.old_price ?? undefined,
+    code: "",
+    country: "",
+    countryLabel: "",
+    year: "",
+    // наличие из листинга; null — бэк не назвал число (строка «Наличие …» скрывается)
+    quantity: dto.count_in_stock ?? null,
+    image: dto.images[0]?.url ?? PRODUCT_PLACEHOLDER,
+    title: dto.name,
+    sizeSlug: dto.slug,
+    sizeTitle: `${width}J R${diameter} ${pcd} ET${et}`,
+    // origin (vendor/country/year с badge+description) → параметры карточки
+    parameters: [
+      toOriginParam("Производитель:", dto.origin?.vendor),
+      toOriginParam("Страна производства:", dto.origin?.manufacture_country),
+      toOriginParam("Год производства:", dto.origin?.manufacture_year),
+    ].filter((p): p is ProductParam => Boolean(p)),
+    // плашки выдачи — в строки «Самовывоз» и «Доставка до ПВЗ» карточки
+    pickup: toOriginParam("Самовывоз", dto.origin?.delivery_days_after_order),
+    pvzDelivery: toOriginParam("Доставка до ПВЗ", dto.origin?.pick_up?.pick_up_point),
+  };
 }
 
 export async function getWheelsProducts(
   filter: FilterState,
   city?: string,
-): Promise<PaginatedResult<WheelProduct>> {
-  // city — контекст запроса; при подключении API уходит в query fetch-запроса
-  return delay(50, getWheelsProductsMock(filter, city));
+): Promise<WheelListResult> {
+  const query = toWheelListQuery(filter, city);
+  const url = `${apiBase()}/catalog/wheels?${query ? `${query}&` : ""}per_page=${CATALOG_PER_PAGE}`;
+  const res = await fetch(url);
+  if (!res.ok) {
+    throw new Error(`getWheelsProducts: HTTP ${res.status}`);
+  }
+  const body = (await res.json()) as WheelListDto;
+  return {
+    items: body.data.map(toWheelProduct),
+    total: body.meta.total,
+    page: body.meta.current_page,
+    perPage: body.meta.per_page,
+    seo: body.meta.seo ?? null,
+  };
 }
 
 export async function getWheelsAutoBrands(): Promise<WheelAutoBrand[]> {

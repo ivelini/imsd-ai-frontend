@@ -179,20 +179,20 @@ export interface TireFilterValuesDto {
 // ============================================================================
 
 /** origin-бейдж: badge — текст бейджа, description — текст попапа (строка от бэка). */
-export interface TireOriginItem {
+export interface OriginItemDto {
   badge: string;
   description: string | null;
 }
 
-/** Происхождение шины: производитель, страна производства, год выпуска + плашки срока и выдачи. */
-export interface TireOrigin {
-  vendor: TireOriginItem | null;
-  manufacture_country: TireOriginItem | null;
-  manufacture_year: TireOriginItem | null;
+/** Происхождение товара (шины и диски): производитель, страна, год + плашки срока и выдачи. */
+export interface OriginDto {
+  vendor: OriginItemDto | null;
+  manufacture_country: OriginItemDto | null;
+  manufacture_year: OriginItemDto | null;
   /** Плашка срока: badge — дата словами («10 Окт (Сб)»), description — HTML текста выдачи города. */
-  delivery_days_after_order: TireOriginItem | null;
+  delivery_days_after_order: OriginItemDto | null;
   /** Плашка «Доставка до ПВЗ»: пункт выдачи города (badge «бесплатно» + HTML текста доставки). */
-  pick_up: { pick_up_point: TireOriginItem } | null;
+  pick_up: { pick_up_point: OriginItemDto } | null;
 }
 
 /** Элемент листинга шин. slug — sizeSlug (brand-name-width-profile-diameter). */
@@ -203,7 +203,7 @@ export interface TireListItemDto {
   slug: string;
   brand: { id: number; name: string; slug: string };
   model: { id: number; name: string; slug: string } | null;
-  origin: TireOrigin | null;
+  origin: OriginDto | null;
   width: number | null;
   profile: number | null;
   diameter: string | null; // "17" | "13c"
@@ -244,4 +244,63 @@ export interface TireListResult {
   page: number;
   perPage: number;
   seo: TireListSeo | null;
+}
+
+// ============================================================================
+// DTO бэкенда: GET /api/catalog/wheels и /api/reference/filter/wheel
+// (Scramble public-api.json, 16.10.2026)
+// Decimal-поля — строками из БД («7.0», «40.0»); бэк нормализует вход
+// (normalizeDecimal), поэтому в query значения уходят числами.
+// ============================================================================
+
+/** Элемент листинга дисков. slug — sizeSlug; origin идентичен шинному. */
+export interface WheelListItemDto {
+  id: number;
+  name: string;
+  slug: string;
+  brand: { id: number; name: string; slug: string };
+  model: { id: number; name: string; slug: string } | null;
+  origin: OriginDto | null;
+  width: string | null;
+  diameter: number | null;
+  pcd: string | null;
+  et: string | null;
+  hub_diameter: string | null;
+  type: { label: string; value: string } | null;
+  color: string | null;
+  price: number | null;
+  old_price: number | null;
+  promotion: boolean;
+  delivery: { delivery_min: number; delivery_max: number; delivery_days_after_order: number } | null;
+  count_in_stock: number | null;
+  images: { id: number; url: string }[];
+}
+
+export interface WheelListDto {
+  data: WheelListItemDto[];
+  meta: TireListMetaDto; // shape meta у дисков тот же (включая seo)
+}
+
+/** Результат листинга дисков для страницы: товары + пагинация + seo-мета. */
+export interface WheelListResult {
+  items: WheelProduct[];
+  total: number;
+  page: number;
+  perPage: number;
+  seo: TireListSeo | null;
+}
+
+/** Фасеты фильтра дисков: label — готовый от бэка, value — значение фасета. */
+export interface WheelFilterValuesDto {
+  width: FilterValueDto[];
+  diameter: FilterValueDto[];
+  pcd: FilterValueDto[];
+  et: FilterValueDto[];
+  hub_diameter: FilterValueDto[];
+  type: FilterValueDto[];
+  color: FilterValueDto[];
+  brand: FilterValueDto[];
+  country: FilterValueDto[];
+  delivery: FilterValueDto[];
+  price: { min: number; max: number };
 }

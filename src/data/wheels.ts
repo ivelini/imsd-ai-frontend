@@ -1,8 +1,9 @@
-// Мок-данные каталога дисков (фаза 2, 04.08.2026)
-// ~200 товаров, 4 бренда, справочники фильтра, авто-словарь
+// Мок-данные авто-подбора дисков (фаза 2, 04.08.2026)
+// Листинг и фильтр дисков переведены на живой API 16.10.2026 — мок остался
+// авто-подбору (каскад и результат): таких эндпоинтов у бэка нет.
 // Мок имитирует ответ бэкенда: value — латинские slug (совпадают с URL),
 // label/готовые строки формируются здесь (как это сделает API).
-import type { WheelProduct, FilterOptions, FilterOption, FilterState } from "@/features/catalog/types";
+import type { WheelProduct, FilterOption, FilterState } from "@/features/catalog/types";
 
 // ============================================================================
 // Словари «бэка»: value → готовый label для отображения
@@ -15,7 +16,7 @@ const WHEEL_TYPE_LABELS: Record<string, string> = {
 };
 
 // Реэкспорт для моков (общие словари)
-import { COUNTRY_LABELS, DELIVERY_OPTIONS, PICKUP_BADGE, PVZ_BADGE } from "./catalog";
+import { COUNTRY_LABELS, PICKUP_BADGE, PVZ_BADGE } from "./catalog";
 export { COUNTRY_LABELS };
 
 // ============================================================================
@@ -136,102 +137,6 @@ for (const brand of BRANDS) {
       }
     }
   }
-}
-
-export function getWheelPriceRange() {
-  if (ALL_WHEELS.length === 0) return { min: 0, max: 100000 };
-  const prices = ALL_WHEELS.map((p) => p.price ?? 0);
-  return { min: Math.min(...prices), max: Math.max(...prices) };
-}
-
-// ============================================================================
-// Товары каталога (мок ответа бэка)
-// ============================================================================
-
-const WHEELS_PER_PAGE = 12;
-
-/**
- * Мок эндпоинта товаров дисков: фильтрация + пагинация.
- * city — контекст запроса (региональные цены/наличие на реальном бэке);
- * в моке не влияет на данные — параметр существует для контракта.
- */
-export function getWheelsProductsMock(
-  filter: FilterState,
-  city?: string,
-): { items: WheelProduct[]; total: number; page: number; perPage: number } {
-  let items = [...ALL_WHEELS];
-
-  if (filter.brand) items = items.filter((p) => p.brandId === filter.brand);
-  // diameter: number (15) или C-строка ("13c" — в моке дисков нет C-размеров)
-  if (filter.diameter != null) {
-    const diameterNum = typeof filter.diameter === "number" ? filter.diameter : parseInt(filter.diameter, 10);
-    items = items.filter((p) => p.diameter === diameterNum);
-  }
-  if (filter.width) items = items.filter((p) => p.width === filter.width);
-  if (filter.pcd) items = items.filter((p) => p.pcd === filter.pcd);
-  if (filter.et) items = items.filter((p) => p.et === filter.et);
-  if (filter.hubBore) items = items.filter((p) => p.hubBore === filter.hubBore);
-  if (filter.wheelType) items = items.filter((p) => p.wheelType === filter.wheelType);
-  if (filter.priceMin != null) items = items.filter((p) => (p.price ?? 0) >= filter.priceMin!);
-  if (filter.priceMax != null) items = items.filter((p) => (p.price ?? 0) <= filter.priceMax!);
-  if (filter.country) items = items.filter((p) => p.country === filter.country);
-  if (filter.delivery && filter.delivery.length > 0) {
-    // В моках все товары доступны — фильтр delivery не сужает
-  }
-
-  const total = items.length;
-  const page = filter.page ?? 1;
-  const start = (page - 1) * WHEELS_PER_PAGE;
-  const paged = items.slice(start, start + WHEELS_PER_PAGE);
-
-  return { items: paged, total, page, perPage: WHEELS_PER_PAGE };
-}
-
-// ============================================================================
-// Опции фильтра
-// ============================================================================
-
-export function getWheelsFilterOptions(): FilterOptions {
-  const diameters: FilterOption[] = [...new Set(ALL_WHEELS.map((p) => p.diameter))]
-    .sort((a, b) => a - b)
-    .map((d) => ({ label: `R${d}`, value: `r${d}` })); // value = сегмент URL (r15)
-
-  const widths: FilterOption[] = [...new Set(ALL_WHEELS.map((p) => p.width))]
-    .sort((a, b) => Number(a) - Number(b))
-    .map((w) => ({ label: `${w}J`, value: String(w) }));
-
-  const pcds: FilterOption[] = ALL_PCD.map((v) => ({ label: v, value: v.toLowerCase() }));
-  const ets: FilterOption[] = ALL_ET.map((v) => ({ label: `ET${v}`, value: String(v) }));
-  const hubBores: FilterOption[] = ALL_HUB_BORES.map((v) => ({ label: `D${v}`, value: String(v) }));
-
-  const brands: FilterOption[] = BRANDS.map((b) => ({
-    label: `${b.name} (${ALL_WHEELS.filter((p) => p.brandId === b.id).length})`,
-    value: b.slug,
-  }));
-
-  const countries: FilterOption[] = [...new Set(BRANDS.map((b) => b.country))].map((c) => ({
-    label: COUNTRY_LABELS[c] ?? c,
-    value: c,
-  }));
-
-  const priceRange = getWheelPriceRange();
-
-  return {
-    seasons: [],
-    brands,
-    widths,
-    profiles: [],
-    diameters,
-    studded: [],
-    pcds,
-    ets,
-    hubBores,
-    wheelTypes: WHEEL_TYPES,
-    countries,
-    delivery: DELIVERY_OPTIONS,
-    priceMin: priceRange.min,
-    priceMax: priceRange.max,
-  };
 }
 
 // ============================================================================
