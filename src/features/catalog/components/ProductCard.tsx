@@ -74,11 +74,18 @@ export function ProductCard({ product, showLink = true, pair = false, cityLabel,
                   <BadgeValue label={product.pickup.value} description={product.pickup.description} />
                 </p>
               )}
-              <p className="free-shipping">Доставка до ПВЗ <span className="p-badge">бесплатно &gt;</span></p>
+              {product.pvzDelivery && (
+                <p className="free-shipping">
+                  {product.pvzDelivery.name}{" "}
+                  <BadgeValue label={product.pvzDelivery.value} description={product.pvzDelivery.description} />
+                </p>
+              )}
             </div>
             <div className="catalog-product-flex-item catalog-product-purchase-actions">
               <BuyButton product={product} />
-              <p className="availability">Наличие {product.quantity} шт.</p>
+              {product.quantity !== null && (
+                <p className="availability">Наличие {product.quantity} шт.</p>
+              )}
             </div>
           </div>
         </div>

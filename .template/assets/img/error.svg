@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="230" height="170" viewBox="0 0 230 170" fill="none">
+  <!-- тень под шиной -->
+  <ellipse cx="95" cy="151" rx="66" ry="9" fill="#ededed"/>
+  <!-- покрышка -->
+  <circle cx="95" cy="85" r="64" fill="#303030"/>
+  <!-- протектор -->
+  <circle cx="95" cy="85" r="52" fill="none" stroke="#5a5a5a" stroke-width="20" stroke-dasharray="10 6.4"/>
+  <!-- диск -->
+  <circle cx="95" cy="85" r="38" fill="#ededed"/>
+  <!-- спицы -->
+  <g stroke="#c5c5c5" stroke-width="6" stroke-linecap="round">
+    <line x1="95" y1="85" x2="122" y2="58"/>
+    <line x1="95" y1="85" x2="68" y2="58"/>
+    <line x1="95" y1="85" x2="122" y2="112"/>
+    <line x1="95" y1="85" x2="68" y2="112"/>
+  </g>
+  <!-- ступица -->
+  <circle cx="95" cy="85" r="10" fill="#303030"/>
+  <!-- знак предупреждения -->
+  <circle cx="170" cy="42" r="30" fill="#ffffff"/>
+  <circle cx="170" cy="42" r="27" fill="#dd062a"/>
+  <path d="M170 27v18" stroke="#ffffff" stroke-width="5" stroke-linecap="round"/>
+  <circle cx="170" cy="54" r="3.4" fill="#ffffff"/>
+</svg>

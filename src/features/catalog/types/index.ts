@@ -28,7 +28,8 @@ export interface ProductBase {
   country: string; // value: "russia", "france"...
   countryLabel: string; // готовый label от «бэка»
   year: string;
-  quantity: number;
+  /** Наличие (count_in_stock); null — бэк не назвал число, строка «Наличие …» скрывается. */
+  quantity: number | null;
   image: string;
   title: string; // готовый заголовок карточки (формирует «бэк»)
   sizeSlug: string; // URL-сегмент типоразмера
@@ -44,6 +45,9 @@ export interface ProductBase {
   /** Плашка строки «Самовывоз» (origin.delivery_days_after_order): дата + текст попапа.
    *  null — плашки у бэка нет, строка скрывается. */
   pickup: ProductParam | null;
+  /** Плашка строки «Доставка до ПВЗ» (origin.pick_up.pick_up_point): значение + текст попапа.
+   *  null — плашки у бэка нет, строка скрывается. */
+  pvzDelivery: ProductParam | null;
 }
 
 // ============================================================================
@@ -180,13 +184,15 @@ export interface TireOriginItem {
   description: string | null;
 }
 
-/** Происхождение шины: производитель, страна производства, год выпуска + плашка срока выдачи. */
+/** Происхождение шины: производитель, страна производства, год выпуска + плашки срока и выдачи. */
 export interface TireOrigin {
   vendor: TireOriginItem | null;
   manufacture_country: TireOriginItem | null;
   manufacture_year: TireOriginItem | null;
   /** Плашка срока: badge — дата словами («10 Окт (Сб)»), description — HTML текста выдачи города. */
   delivery_days_after_order: TireOriginItem | null;
+  /** Плашка «Доставка до ПВЗ»: пункт выдачи города (badge «бесплатно» + HTML текста доставки). */
+  pick_up: { pick_up_point: TireOriginItem } | null;
 }
 
 /** Элемент листинга шин. slug — sizeSlug (brand-name-width-profile-diameter). */
@@ -205,6 +211,8 @@ export interface TireListItemDto {
   is_studded: boolean;
   euro_label: { rollingResistance: string; wetGrip: string; noiseEmission: string } | null;
   price: number | null;
+  old_price: number | null;
+  count_in_stock: number | null;
   delivery_min: number | null;
   delivery_max: number | null;
   images: { id: number; url: string }[];

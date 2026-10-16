@@ -18,6 +18,7 @@ const VIEWPORTS = [
 
 const PAGES = [
   ['index', '/.template/index.html'],
+  ['error', '/.template/error.html'],
   ['catalog-index', '/.template/catalog/index.html'],
   ['catalog-filter-params', '/.template/catalog/filter-params.html'],
   ['catalog-filter-car', '/.template/catalog/filter-car.html'],

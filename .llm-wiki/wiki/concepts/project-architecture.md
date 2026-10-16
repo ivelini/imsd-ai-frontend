@@ -1,7 +1,7 @@
 # Архитектура проекта (карта)
 
-> Sources: CLAUDE.md, 2026-08-19; catalog-tires-live-api, 2026-08-21; Перенос мокапа шиномонтажа, 2026-09-12; React-порт записи на живой API, 2026-09-30; Фоллбэк ошибок бэка (global-error), 2026-10-16
-> Raw: [CLAUDE.md](../../raw/project/2026-08-19-claude-md.md); [catalog-tires-live-api](../../raw/project/2026-08-21-catalog-tires-live-api.md); [booking-domain-port](../../raw/project/2026-09-12-booking-domain-port.md); [booking-react-port](../../raw/project/2026-09-30-booking-react-port.md); [global-error-page](../../raw/project/2026-10-16-global-error-page.md)
+> Sources: CLAUDE.md, 2026-08-19; catalog-tires-live-api, 2026-08-21; Перенос мокапа шиномонтажа, 2026-09-12; React-порт записи на живой API, 2026-09-30; Фоллбэк ошибок бэка (global-error), 2026-10-16; Макет страницы ошибки (error.html), 2026-10-16; Живые поля карточки и порт страницы ошибки, 2026-10-16
+> Raw: [CLAUDE.md](../../raw/project/2026-08-19-claude-md.md); [catalog-tires-live-api](../../raw/project/2026-08-21-catalog-tires-live-api.md); [booking-domain-port](../../raw/project/2026-09-12-booking-domain-port.md); [booking-react-port](../../raw/project/2026-09-30-booking-react-port.md); [global-error-page](../../raw/project/2026-10-16-global-error-page.md); [error-page-mockup](../../raw/project/2026-10-16-error-page-mockup.md); [catalog-card-live-fields](../../raw/project/2026-10-16-catalog-card-live-fields.md); [error-page-port](../../raw/project/2026-10-16-error-page-port.md)
 
 ## Overview
 
@@ -10,7 +10,7 @@
 ## Слои
 
 - **`src/app/`** — роутинг и композиция страниц; **`src/features/`** — домены (каталог, корзина, товар, автоподбор); **`src/shared/`** — ядро (api-баррел, UI, lib, layout); **`src/data/`** — моки; **`src/stores/`** — Zustand (только UI).
-- **`.template/`** — эталон вёрстки: 27 страниц, BEM-классы, без JS. `style.css` — база 4701 строка плюс доменные блоки в конце с пометкой даты (booking — +1206 строк, 12.09.2026; стили самого потока записи с 30.09.2026 живут в `src/app/style.css`, в макете остались только стили «Моих записей»).
+- **`.template/`** — эталон вёрстки: 28 страниц, BEM-классы, без JS. `style.css` — база 4701 строка плюс доменные блоки в конце с пометкой даты (booking — +1206 строк, 12.09.2026; стили самого потока записи с 30.09.2026 живут в `src/app/style.css`, в макете остались только стили «Моих записей»).
 
 ## Ключевые роуты
 
@@ -25,15 +25,15 @@
 - Моки в `src/data/` (nav, servicePages 10 стр., products, catalog, articles 9, cart, checkout); доступ только через `shared/api/data.ts`.
 - Источник истины по маршрутам API — `../backend/documentations/scramble/public-api.json` (Scramble-экспорт, генерится в docker `scramble:export-docs`), не моки.
 - **Живое (30.09.2026):** запись на шиномонтаж — слоты `GET /api/booking/slots`, каталог услуг `GET /api/booking/catalog`, код `POST /api/booking/code`, подтверждение `POST /api/booking/confirm`, справочник `GET /api/reference/booking` (адрес, телефон, сроки); слой — `shared/api/booking.ts`, ошибки различаются машинными кодами `booking.*`.
-- **Живое (21.08.2026):** каталог шин целиком — листинг `GET /api/catalog/tires` (адаптеры `toTireListQuery`/`toTireProduct`, город слагом `city=` — резолвит бэк), гео `GET /api/reference/city` (`toGeoData`; мок `data/geo.ts` удалён), опции фильтра `GET /api/reference/filter/tire`. SEO-мета страницы — `meta.seo {title, description}` → generateMetadata/h2. Остальное — моки (модель шины, auto-каскад, диски; SeoBlock {title, subtitle} для auto-страницы). Кэш — на бэке (`tire-list:v5`).
+- **Живое (21.08.2026):** каталог шин целиком — листинг `GET /api/catalog/tires` (адаптеры `toTireListQuery`/`toTireProduct`, город слагом `city=` — резолвит бэк), гео `GET /api/reference/city` (`toGeoData`; мок `data/geo.ts` удалён), опции фильтра `GET /api/reference/filter/tire`. SEO-мета страницы — `meta.seo {title, description}` → generateMetadata/h2. Карточка показывает из листинга также ПВЗ (`origin.pick_up`), наличие (`count_in_stock`) и зачёркнутую цену (`old_price`) — 16.10.2026. Остальное — моки (модель шины, auto-каскад, диски; SeoBlock {title, subtitle} для auto-страницы). Кэш — на бэке (`tire-list:v5`).
 - Zustand — только UI (город, попапы, меню); корзина/сессия — React Query + localStorage (`cart`, `orders`, `session`).
-- **Фоллбэк ошибок бэка (16.10.2026):** любое необработанное исключение (5xx, недоступность) → HTTP 500 и единственная верхняя граница `src/app/global-error.tsx` — самостоятельная страница ошибки без шапки/подвала и без обращений к API, кнопки «Обновить» и «На главную»; детали — [backend-error-fallback](backend-error-fallback.md).
+- **Фоллбэк ошибок бэка (16.10.2026):** любое необработанное исключение (5xx, недоступность) → HTTP 500 и карточка «Сервис временно недоступен» из макета (`error.html`, 28-я страница) внутри живой обвязки — граница `src/app/error.tsx`; `global-error.tsx` — нижний слой (падение самой обвязки). Цена живой обвязки — пустой город в шапке при мёртвом бэке; детали — [backend-error-fallback](backend-error-fallback.md).
 - Кастомный CSS (страницы без макетов) — в конце `src/app/style.css` с датой.
 
 ## Разработка
 
 - Dev-сервер через Docker (`make up`, порт 30034), образ с `USER node` uid 1000; build/`npm run dev` не запускать одновременно с контейнером (общий `.next`, кэш turbopack).
-- Верификация мокапа: `node .claude/verify/verify.mjs` (скриншоты 5×27), `check-all.mjs` (переполнения, битые картинки, битые ссылки). Требуют `playwright` — в `devDependencies` проекта его нет.
+- Верификация мокапа: `node .claude/verify/verify.mjs` (скриншоты 5×28), `check-all.mjs` (переполнения, битые картинки, битые ссылки). Требуют `playwright` — в `devDependencies` проекта его нет.
 - Формат slug: бренды — транслит (`bmw`, `michelin`, `nokian-tyres`), модели — как в данных, типоразмеры — `185-60-r15-84h`.
 
 ## Решения

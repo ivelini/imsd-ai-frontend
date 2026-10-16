@@ -158,11 +158,14 @@ export function toTireProduct(dto: TireListItemDto): TireProduct {
     profile: dto.profile ?? 0,
     diameter: parseDiameter(dto.diameter),
     price: dto.price ?? undefined,
+    // зачёркнутая цена; карточка рисует её только выше текущей (условие в ProductCard)
+    oldPrice: dto.old_price ?? undefined,
     code: "",
     country: "",
     countryLabel: "",
     year: "",
-    quantity: 0,
+    // наличие из листинга; null — бэк не назвал число (строка «Наличие …» скрывается)
+    quantity: dto.count_in_stock ?? null,
     image: dto.images[0]?.url ?? PRODUCT_PLACEHOLDER,
     title: dto.name,
     sizeSlug: dto.slug,
@@ -179,6 +182,8 @@ export function toTireProduct(dto: TireListItemDto): TireProduct {
     ].filter((p): p is ProductParam => Boolean(p)),
     // плашка срока выдачи — в строку «Самовывоз» карточки (в parameters не дублируется)
     pickup: toOriginParam("Самовывоз", dto.origin?.delivery_days_after_order),
+    // плашка выдачи города — в строку «Доставка до ПВЗ» (у бэка вложена в pick_up_point)
+    pvzDelivery: toOriginParam("Доставка до ПВЗ", dto.origin?.pick_up?.pick_up_point),
     loadIndex: "",
     speedRating: "",
     tireType: "",

@@ -6297,3 +6297,59 @@ input[type="checkbox"] {
 .error-page-link:hover {
   text-decoration: none;
 }
+
+/* ===== Страница «Сервис временно недоступен» (error.html, перенос из мокапа) — 16.10.2026 ===== */
+.error-section {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  box-sizing: border-box;
+  padding: 34px 0 20px;
+}
+.error-card {
+  max-width: 680px;
+  width: 100%;
+  background: var(--color-white);
+  box-shadow: 0 0 20px 1px var(--shadow-1);
+  border-radius: 5px;
+  padding: 44px 40px 48px;
+  box-sizing: border-box;
+  text-align: center;
+}
+.error-picture {
+  width: 230px;
+  max-width: 100%;
+  height: auto;
+}
+.error-title {
+  font-size: 32px;
+  font-weight: 700;
+  color: var(--color-text-dark);
+  margin: 20px 0 0;
+}
+.error-text {
+  margin: 12px auto 0;
+  max-width: 480px;
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--color-text);
+}
+.error-button {
+  margin-top: 24px;
+  padding: 12px 28px;
+  font-size: 15px;
+}
+@media (max-width: 639px) {
+  .error-section {
+    padding-top: 20px;
+  }
+  .error-card {
+    padding: 28px 18px 32px;
+  }
+  .error-picture {
+    width: 160px;
+  }
+  .error-title {
+    font-size: 24px;
+  }
+}

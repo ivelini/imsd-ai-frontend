@@ -20,6 +20,8 @@ const tire: TireListItemDto = {
   is_studded: false,
   euro_label: null,
   price: 11133.15,
+  old_price: null,
+  count_in_stock: 40,
   delivery_min: 1,
   delivery_max: 3,
   images: [{ id: 1, url: "/img/1.jpg" }],

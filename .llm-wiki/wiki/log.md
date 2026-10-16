@@ -40,3 +40,15 @@
 ## [2026-10-16] ingest | Фоллбэк ошибок бэка: самостоятельная страница ошибки
 - Created: backend-error-fallback.md
 - Updated: project-architecture.md (карта: фоллбэк ошибок бэка, See Also)
+
+## [2026-10-16] ingest | Макет страницы ошибки «Сервис временно недоступен» (.template/error.html)
+- Updated: backend-error-fallback.md (макет с шапкой/подвалом, расхождение с global-error, не портирован)
+- Updated: project-architecture.md (карта: мокап 28 страниц, страница error.html, verify 5×28)
+
+## [2026-10-16] ingest | Живые поля карточки каталога: ПВЗ, наличие, зачёркнутая цена
+- Updated: catalog-live-api.md (контракт листинга: pick_up/count_in_stock/old_price, маппинги pvzDelivery/quantity/oldPrice, формат описаний попапов — HTML)
+- Updated: project-architecture.md (карта: поля карточки из листинга)
+
+## [2026-10-16] ingest | Порт макета страницы ошибки в error.tsx (живая обвязка)
+- Updated: backend-error-fallback.md (страница ошибки — карточка макета в живой обвязке; global-error — нижний слой; цена — пустой город)
+- Updated: project-architecture.md (карта: фоллбэк — error.tsx в обвязке)

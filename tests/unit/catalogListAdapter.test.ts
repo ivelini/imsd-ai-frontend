@@ -23,11 +23,19 @@ const baseDto: TireListItemDto = {
       badge: "10 Окт (Сб)",
       description: "Самовывоз осуществляется из центрального офиса",
     },
+    pick_up: {
+      pick_up_point: {
+        badge: "бесплатно",
+        description: "Доставка осуществляется, по согласованию с заказчиком",
+      },
+    },
   },
   season: { label: "Летняя", value: "summer" },
   is_studded: false,
   euro_label: { rollingResistance: "C", wetGrip: "B", noiseEmission: "72" },
   price: 11133.15,
+  old_price: 13100,
+  count_in_stock: 40,
   delivery_min: 1,
   delivery_max: 3,
   images: [{ id: 1, url: "/img/1.jpg" }],
@@ -156,6 +164,7 @@ describe("toTireProduct", () => {
         manufacture_country: null,
         manufacture_year: null,
         delivery_days_after_order: null,
+        pick_up: null,
       },
     });
     expect(p.parameters).toHaveLength(1);
@@ -184,6 +193,7 @@ describe("toTireProduct", () => {
       manufacture_country: null,
       manufacture_year: null,
       delivery_days_after_order: { badge: "10 Окт (Сб)", description: null },
+      pick_up: null,
     };
     const p = toTireProduct({ ...baseDto, origin: noDescription });
     expect(p.pickup?.value).toBe("10 Окт (Сб)");
@@ -196,8 +206,67 @@ describe("toTireProduct", () => {
       manufacture_country: null,
       manufacture_year: null,
       delivery_days_after_order: null,
+      pick_up: null,
     };
     expect(toTireProduct({ ...baseDto, origin: noBadge }).pickup).toBeNull();
     expect(toTireProduct({ ...baseDto, origin: null }).pickup).toBeNull();
+  });
+
+  it("test_product_maps_pvz_delivery_from_pick_up", () => {
+    const p = toTireProduct(baseDto);
+    expect(p.pvzDelivery).toEqual({
+      name: "Доставка до ПВЗ",
+      value: "бесплатно",
+      badge: true,
+      description: {
+        title: "бесплатно",
+        text: "Доставка осуществляется, по согласованию с заказчиком",
+      },
+    });
+    // плашка ПВЗ не дублируется в parameters (там только vendor/country/year)
+    expect(p.parameters).toHaveLength(3);
+  });
+
+  it("test_product_pvz_delivery_without_description_renders_badge_only", () => {
+    const noDescription: TireOrigin = {
+      vendor: null,
+      manufacture_country: null,
+      manufacture_year: null,
+      delivery_days_after_order: null,
+      pick_up: { pick_up_point: { badge: "бесплатно", description: null } },
+    };
+    const p = toTireProduct({ ...baseDto, origin: noDescription });
+    expect(p.pvzDelivery?.value).toBe("бесплатно");
+    expect(p.pvzDelivery?.description).toBeUndefined();
+  });
+
+  it("test_product_pvz_delivery_null_without_pick_up", () => {
+    const noPickUp: TireOrigin = {
+      vendor: { badge: "Yokohama", description: null },
+      manufacture_country: null,
+      manufacture_year: null,
+      delivery_days_after_order: null,
+      pick_up: null,
+    };
+    expect(toTireProduct({ ...baseDto, origin: noPickUp }).pvzDelivery).toBeNull();
+    expect(toTireProduct({ ...baseDto, origin: null }).pvzDelivery).toBeNull();
+  });
+
+  it("test_product_maps_quantity_from_count_in_stock", () => {
+    expect(toTireProduct(baseDto).quantity).toBe(40);
+  });
+
+  it("test_product_quantity_null_without_count_in_stock", () => {
+    const p = toTireProduct({ ...baseDto, count_in_stock: null });
+    expect(p.quantity).toBeNull();
+  });
+
+  it("test_product_maps_old_price_from_listing", () => {
+    expect(toTireProduct(baseDto).oldPrice).toBe(13100);
+  });
+
+  it("test_product_old_price_absent_without_old_price", () => {
+    const p = toTireProduct({ ...baseDto, old_price: null });
+    expect(p.oldPrice).toBeUndefined();
   });
 });

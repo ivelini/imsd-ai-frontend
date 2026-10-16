@@ -8,8 +8,8 @@
 |---------|---------|---------|
 | [Архитектура проекта (карта)](concepts/project-architecture.md) | Слои src/.template/, роуты, данные/состояние, разработка, решения ADR 0001–0005; каталог шин живой с 21.08, запись на шиномонтаж — с 30.09, фоллбэк ошибок бэка — с 16.10 | 2026-10-16 |
 | [Домен booking (шиномонтаж)](concepts/booking-domain.md) | Пять роутов /booking/* на живом API: контракты слотов/каталога/кода/подтверждения, ловушки (quantities объектом, обязательные ключи, пара параметров), отказы по машинному коду, черновик в sessionStorage | 2026-09-30 |
-| [Каталог шин: живой API](concepts/catalog-live-api.md) | Листинг/гео/SEO на бэке: адаптеры, city-слаг (резолв бэком), meta.seo, euro_label, origin (плашка «Самовывоз» через BadgeValue), SeoBlock {title, subtitle} | 2026-10-15 |
-| [Фоллбэк ошибок бэка](concepts/backend-error-fallback.md) | При 5xx/недоступности — HTTP 500 и самостоятельная страница (global-error: без обвязки и без обращений к API, «Обновить»/«На главную»); кто ждёт живой бэк, прогоны | 2026-10-16 |
+| [Каталог шин: живой API](concepts/catalog-live-api.md) | Листинг/гео/SEO на бэке: адаптеры, city-слаг, meta.seo, euro_label, origin (плашки «Самовывоз» и «Доставка до ПВЗ» через BadgeValue), наличие (count_in_stock), зачёркнутая цена (old_price), SeoBlock {title, subtitle} | 2026-10-16 |
+| [Фоллбэк ошибок бэка](concepts/backend-error-fallback.md) | При 5xx/недоступности — HTTP 500 и карточка «Сервис временно недоступен» из макета внутри живой обвязки (error.tsx; цена — пустой город); global-error — нижний слой; кто ждёт живой бэк, прогоны | 2026-10-16 |
 | [Баррел `shared/api/data.ts` (ADR 0001)](concepts/api-barrel-data-ts.md) | Доменные модули shared/api + баррел export *; подключение API без правки потребителей | 2026-08-19 |
 | [Конфиг-грамматика URL каталога (ADR 0002)](concepts/catalog-url-grammar.md) | CatalogUrlConfig + parseUrl/buildUrl; префиксные размеры w185/p60/r15 (21.08), невалидный сегмент → 404 | 2026-08-21 |
 | [Пагинация типоразмеров модели (ADR 0003)](concepts/model-sizes-pagination.md) | Вкладки диаметров (диаметр в URL) + «Показать ещё» по 24 | 2026-08-19 |

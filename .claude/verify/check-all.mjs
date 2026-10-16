@@ -4,7 +4,7 @@ const VPS = [
   [390, 844], [768, 1024], [1024, 768], [1366, 768], [1920, 1080],
 ];
 const PAGES = [
-  '/.template/index.html', '/.template/catalog/index.html', '/.template/catalog/filter-params.html', '/.template/catalog/filter-car.html',
+  '/.template/index.html', '/.template/error.html', '/.template/catalog/index.html', '/.template/catalog/filter-params.html', '/.template/catalog/filter-car.html',
   '/.template/catalog/filter-applied.html', '/.template/catalog/filter-mobile.html', '/.template/product/index.html',
   '/.template/cart/index.html', '/.template/order/index.html', '/.template/user/login.html', '/.template/user/register.html', '/.template/article/index.html', '/.template/article/view.html', '/.template/popups/cart.html', '/.template/popups/catalog-menu.html', '/.template/popups/geo.html',
 ];

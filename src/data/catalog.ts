@@ -265,6 +265,17 @@ export const PICKUP_BADGE: ProductParam = {
   },
 };
 
+/** Плашка строки «Доставка до ПВЗ» карточки (у бэка — origin.pick_up.pick_up_point, город по умолчанию). */
+export const PVZ_BADGE: ProductParam = {
+  name: "Доставка до ПВЗ",
+  value: "бесплатно",
+  badge: true,
+  description: {
+    title: "бесплатно",
+    text: "Доставка осуществляется, по согласованию с заказчиком, с 9:00 до 20:00.<br>Доставка осуществляется в пределах городской черты. Стоимость доставки 400р.<br>Доставка в отдаленные районы города согласно тарифам доставки в удаленные районы.",
+  },
+};
+
 function generateProducts(): TireProduct[] {
   let codeCounter = 75631;
   let idCounter = 0;
@@ -364,6 +375,7 @@ function generateProducts(): TireProduct[] {
                 },
               ],
               pickup: PICKUP_BADGE,
+              pvzDelivery: PVZ_BADGE,
             });
           }
         }
