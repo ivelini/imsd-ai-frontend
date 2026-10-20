@@ -4,7 +4,7 @@
 
 import { useEffect, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
-import type { FilterOptions, FilterState } from "@/features/catalog/types";
+import type { FilterOption, FilterOptions, FilterState } from "@/features/catalog/types";
 import { buildCatalogUrl, buildWheelsUrl, buildQueryString } from "@/shared/lib/parseParams";
 import { formatSelectValue, parseSelectValue } from "@/shared/lib/filterSelect";
 import { useAutoBrands } from "@/features/catalog/api/useAutoBrands";
@@ -13,16 +13,16 @@ import { useCity } from "@/shared/layout/api/useCity";
 import { PriceSlider } from "./PriceSlider";
 
 export interface AutoFilterData {
-  brand?: string; // id марки (bmw, audi...)
+  brand?: string; // слаг марки (acura, alfa-romeo...)
   brandName?: string;
-  model?: string; // slug модели
+  model?: string; // слаг модели
   modelName?: string;
-  year?: string;
-  mod?: string; // id модификации
+  year?: string; // год числом строкой
+  mod?: string; // слаг модификации
   modName?: string;
-  models?: { slug: string; name: string }[]; // опции моделей (с сервера каскада)
+  models?: FilterOption[]; // опции моделей (слаг → подпись)
   years?: number[]; // опции годов
-  modifications?: { id: string; name: string }[]; // опции модификаций
+  modifications?: FilterOption[]; // опции модификаций (слаг → подпись)
 }
 
 interface CatalogFilterProps {
@@ -279,8 +279,8 @@ export function CatalogFilter({ options, current, initialTab = "params", autoDat
                 placeholder="Производитель"
               >
                 {autoBrands?.map((b) => (
-                  <option key={b.id} value={b.id}>
-                    {b.name}
+                  <option key={b.value} value={b.value}>
+                    {b.label}
                   </option>
                 ))}
               </CatSelect>
@@ -291,8 +291,8 @@ export function CatalogFilter({ options, current, initialTab = "params", autoDat
                 placeholder="Модель"
               >
                 {autoData?.models?.map((m) => (
-                  <option key={m.slug} value={m.slug}>
-                    {m.name}
+                  <option key={m.value} value={m.value}>
+                    {m.label}
                   </option>
                 ))}
               </CatSelect>
@@ -315,8 +315,8 @@ export function CatalogFilter({ options, current, initialTab = "params", autoDat
                 placeholder="Модификация"
               >
                 {autoData?.modifications?.map((m) => (
-                  <option key={m.id} value={m.id}>
-                    {m.name}
+                  <option key={m.value} value={m.value}>
+                    {m.label}
                   </option>
                 ))}
               </CatSelect>

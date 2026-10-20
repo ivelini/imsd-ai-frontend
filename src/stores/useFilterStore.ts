@@ -67,8 +67,8 @@ export const useFilterStore = create<FilterStore>()(
     }),
     {
       name: "catalog-filter",
-      version: 1,
-      // Формат изменился (filters[cat] вместо плоских полей) — старые данные сбрасываем
+      version: 4,
+      // v4: авто-каскад перешёл с числовых id на слаги — память фильтров сбрасываем
       migrate: () => ({ filters: { tires: emptyTabs(), wheels: emptyTabs() } }),
     },
   ),

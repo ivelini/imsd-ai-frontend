@@ -166,12 +166,12 @@ export function MainFilter() {
         {mode === "auto" ? (
           <div className="filter-content-item auto">
             <div className="select-row">
-              <Select value={autoBrand} onChange={(v) => { setAutoBrand(v); setAutoModel(""); setAutoYear(""); setAutoMod(""); }} placeholder="Производитель" options={(autoBrands ?? []).map((b) => ({ label: b.name, value: b.id }))} />
-              <Select value={autoModel} onChange={(v) => { setAutoModel(v); setAutoYear(""); setAutoMod(""); }} placeholder="Модель" options={(autoModels ?? []).map((m) => ({ label: m.name, value: m.slug }))} />
+              <Select value={autoBrand} onChange={(v) => { setAutoBrand(v); setAutoModel(""); setAutoYear(""); setAutoMod(""); }} placeholder="Производитель" options={autoBrands ?? []} />
+              <Select value={autoModel} onChange={(v) => { setAutoModel(v); setAutoYear(""); setAutoMod(""); }} placeholder="Модель" options={autoModels ?? []} />
             </div>
             <div className="select-row">
               <Select value={autoYear} onChange={(v) => { setAutoYear(v); setAutoMod(""); }} placeholder="Год выпуска" options={(autoYears ?? []).map((y) => ({ label: String(y), value: String(y) }))} />
-              <Select value={autoMod} onChange={setAutoMod} placeholder="Модификация" options={(autoMods ?? []).map((m) => ({ label: m.name, value: m.id }))} />
+              <Select value={autoMod} onChange={setAutoMod} placeholder="Модификация" options={autoMods ?? []} />
             </div>
           </div>
         ) : category === "wheels" ? (

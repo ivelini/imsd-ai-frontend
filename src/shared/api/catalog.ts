@@ -2,19 +2,6 @@
 import { apiBase, delay } from "./base";
 import { CATALOG_START } from "@/data/catalogStart";
 import type { CatalogStartData } from "@/features/catalog/types";
-import {
-  AUTO_BRANDS,
-  AUTO_YEARS,
-  generateModifications,
-  getAutoResult,
-  getCarBlock,
-} from "@/data/catalog";
-import type {
-  AutoBrandData,
-  AutoModData,
-  AutoResultProduct,
-  CarBlockData,
-} from "@/data/catalog";
 import type {
   FilterOptions,
   FilterState,
@@ -34,21 +21,11 @@ import type {
   WheelListResult,
 } from "@/features/catalog/types";
 import type { ProductParam } from "@/shared/types/product";
-import {
-  getWheelsAutoResult,
-  getWheelsCarBlock,
-  generateWheelMods,
-  WHEEL_AUTO_BRANDS,
-  WHEEL_AUTO_YEARS,
-} from "@/data/wheels";
-import type { WheelAutoBrand, WheelAutoResultItem, WheelCarBlockData } from "@/data/wheels";
 import type { WheelProduct } from "@/features/catalog/types";
 
 export type { CatalogStartData };
-export type { AutoBrandData, AutoModData, AutoResultProduct, CarBlockData, FilterOptions, TireProduct };
-export type { WheelAutoBrand, WheelAutoResultItem, WheelCarBlockData, WheelProduct };
-export { getAutoResult, getCarBlock };
-export { getWheelsCarBlock };
+export type { FilterOptions, TireProduct };
+export type { WheelProduct };
 
 export async function getCatalogStart(): Promise<CatalogStartData> {
   return delay(30, CATALOG_START);
@@ -225,42 +202,6 @@ export async function getCatalogProducts(
     perPage: body.meta.per_page,
     seo: body.meta.seo ?? null,
   };
-}
-
-export async function getAutoBrands(): Promise<AutoBrandData[]> {
-  return delay(30, AUTO_BRANDS);
-}
-
-export async function getAutoModels(
-  brand: string,
-): Promise<{ slug: string; name: string }[]> {
-  const brandData = AUTO_BRANDS.find((b) => b.id === brand);
-  return delay(30, brandData?.models ?? []);
-}
-
-export async function getAutoYears(
-  _brand: string,
-  _model: string,
-): Promise<number[]> {
-  return delay(30, AUTO_YEARS);
-}
-
-export async function getAutoModifications(
-  brand: string,
-  model: string,
-  year: number,
-): Promise<AutoModData[]> {
-  return delay(30, generateModifications(brand, model, year));
-}
-
-export async function fetchAutoResult(
-  brand: string,
-  model: string,
-  year: number,
-  mod: string,
-  filter?: FilterState,
-): Promise<AutoResultProduct[] | null> {
-  return delay(50, getAutoResult(brand, model, year, mod, filter));
 }
 
 // --- Модель шины: GET /api/catalog/tire-models/{brand}/{model} + размеры листингом ---
@@ -471,41 +412,4 @@ export async function getWheelsProducts(
     perPage: body.meta.per_page,
     seo: body.meta.seo ?? null,
   };
-}
-
-export async function getWheelsAutoBrands(): Promise<WheelAutoBrand[]> {
-  return delay(30, WHEEL_AUTO_BRANDS);
-}
-
-export async function getWheelsAutoModels(
-  brand: string,
-): Promise<{ slug: string; name: string }[]> {
-  const brandData = WHEEL_AUTO_BRANDS.find((b) => b.id === brand);
-  return delay(30, brandData?.models ?? []);
-}
-
-export async function getWheelsAutoYears(
-  _brand: string,
-  _model: string,
-): Promise<number[]> {
-  return delay(30, WHEEL_AUTO_YEARS);
-}
-
-export async function getWheelsAutoModifications(
-  brand: string,
-  model: string,
-  year: number,
-): Promise<{ id: string; name: string }[]> {
-  const mods = generateWheelMods(brand, model, year);
-  return delay(30, mods.map((m) => ({ id: m.id, name: m.name })));
-}
-
-export async function fetchWheelsAutoResult(
-  brand: string,
-  model: string,
-  year: number,
-  mod: string,
-  filter?: FilterState,
-): Promise<WheelAutoResultItem[] | null> {
-  return delay(50, getWheelsAutoResult(brand, model, year, mod, filter));
 }

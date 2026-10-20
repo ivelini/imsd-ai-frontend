@@ -64,3 +64,15 @@
 ## [2026-10-16] ingest | Фото товаров из API: раздача и размер колонки
 - Updated: catalog-live-api.md (storage:link, колонка 172px, пожелание превью)
 - Updated: project-architecture.md (карта: фото товаров)
+
+## [2026-10-20] ingest | Подбор шин по автомобилю на живом API
+- Updated: catalog-live-api.md (раздел «Авто-подбор шин»: 5 эндпоинтов Vehicle, id в URL, секции OEM/альтернатива, пары front/rear, лимит 12; диски — фаза 2; SEO-блок скрыт)
+- Updated: project-architecture.md (карта: авто-подбор шин живой; моки AUTO_*/SEO удалены)
+
+## [2026-10-20] ingest | Подбор дисков по автомобилю на живом API
+- Updated: catalog-live-api.md (раздел «Авто-подбор дисков»: wheels/by-vehicle, спецификации, допуски width/ET/hub, пары, лимит 12; мок wheels.ts удалён)
+- Updated: project-architecture.md (карта: авто-подбор дисков живой; оба каскада live)
+
+## [2026-10-20] ingest | Слаги Vehicle в URL авто-подбора
+- Updated: catalog-live-api.md (адресация слагами, вложенные справочники make/model, композитный результат, numeric fallback и 307; store v4)
+- Updated: project-architecture.md (карта: авто-подбор на слагах; numeric id — legacy)
