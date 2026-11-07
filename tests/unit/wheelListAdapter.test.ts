@@ -137,4 +137,36 @@ describe("toWheelProduct", () => {
     expect(p.image).toBe("/assets/img/wheel-product.png");
     expect(p.ean).toBe("");
   });
+
+  it("test_wheel_list_badges_pass_through", () => {
+    const p = toWheelProduct({
+      ...baseDto,
+      badges: [
+        {
+          text: "Хит продаж",
+          color: "red",
+          icon_key: null,
+          link: null,
+          owner_type: "brand",
+          owner_name: "LS",
+        },
+        {
+          text: "Новинка",
+          color: "gold",
+          icon_key: "gold",
+          link: "/promo",
+          owner_type: "model",
+          owner_name: "367",
+        },
+      ],
+    });
+    // порядок и дедуп — на бэке: фронт переносит стек как есть
+    expect(p.badges).toHaveLength(2);
+    expect(p.badges[0].text).toBe("Хит продаж");
+  });
+
+  it("test_wheel_list_missing_badges_yields_empty_stack", () => {
+    const p = toWheelProduct(baseDto);
+    expect(p.badges).toEqual([]);
+  });
 });

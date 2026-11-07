@@ -3,7 +3,7 @@
  * «Сентябрь 2026». Разбор — в UTC: строка 'YYYY-MM-DD' не должна сдвигаться часовым поясом.
  */
 
-const LOCALE = "ru-RU";
+import { formatRuLongDate, RU_LOCALE } from "@/shared/lib/date";
 
 function parse(date: string): Date {
   return new Date(`${date}T00:00:00Z`);
@@ -12,19 +12,19 @@ function parse(date: string): Date {
 /** «11 сентября (пт)» — подпись выбранного дня в сводке записи. */
 export function formatDayShort(date: string): string {
   const value = parse(date);
-  const day = value.toLocaleDateString(LOCALE, {
+  const day = value.toLocaleDateString(RU_LOCALE, {
     day: "numeric",
     month: "long",
     timeZone: "UTC",
   });
-  const weekday = value.toLocaleDateString(LOCALE, { weekday: "short", timeZone: "UTC" });
+  const weekday = value.toLocaleDateString(RU_LOCALE, { weekday: "short", timeZone: "UTC" });
 
   return `${day} (${weekday})`;
 }
 
 /** «11 сентября, пятница» — подпись дня над сеткой часов. */
 export function formatDayLong(date: string): string {
-  return parse(date).toLocaleDateString(LOCALE, {
+  return parse(date).toLocaleDateString(RU_LOCALE, {
     day: "numeric",
     month: "long",
     weekday: "long",
@@ -35,23 +35,18 @@ export function formatDayLong(date: string): string {
 /** «11 сентября 2026, пятница» — строка экрана успеха. */
 export function formatDayFull(date: string): string {
   const value = parse(date);
-  // Собираем порядок вручную: у ru-RU «г.» в конце и день недели перед датой
-  const day = value.toLocaleDateString(LOCALE, {
-    day: "numeric",
-    month: "long",
-    year: "numeric",
-    timeZone: "UTC",
-  });
-  const weekday = value.toLocaleDateString(LOCALE, { weekday: "long", timeZone: "UTC" });
+  // День недели у ru-RU идёт перед датой — собираем порядок вручную
+  const day = formatRuLongDate(value, "UTC");
+  const weekday = value.toLocaleDateString(RU_LOCALE, { weekday: "long", timeZone: "UTC" });
 
-  return `${day.replace(/\s*г\.$/, "")}, ${weekday}`;
+  return `${day}, ${weekday}`;
 }
 
 /** «Сентябрь 2026» — заголовок сетки календаря. */
 export function formatMonthTitle(month: string): string {
   const [year, monthNumber] = month.split("-").map(Number);
   const value = new Date(Date.UTC(year, monthNumber - 1, 1));
-  const title = value.toLocaleDateString(LOCALE, { month: "long", timeZone: "UTC" });
+  const title = value.toLocaleDateString(RU_LOCALE, { month: "long", timeZone: "UTC" });
 
   return `${title.charAt(0).toUpperCase()}${title.slice(1)} ${year}`;
 }

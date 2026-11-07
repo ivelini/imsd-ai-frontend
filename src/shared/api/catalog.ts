@@ -1,11 +1,17 @@
 // Catalog: стартовая страница /catalog, каталог шин и дисков, авто-каскад
-import { apiBase, delay } from "./base";
-import { CATALOG_START } from "@/data/catalogStart";
-import type { CatalogStartData } from "@/features/catalog/types";
+import { apiBase, cityQuery } from "./base";
+import { toOriginParam } from "./origin";
+import { PRODUCT_PLACEHOLDER } from "@/shared/lib/productImage";
+import { appendCityParam } from "@/shared/lib/cityUrl";
+import { decimal } from "@/shared/lib/decimal";
+import { toArticleBlock } from "@/shared/lib/articleBlock";
+import { mockArticleIfAbsent } from "@/data/articleBlock";
 import type {
+  BrandLink,
+  CatalogStartCard,
+  CatalogStartData,
   FilterOptions,
   FilterState,
-  OriginItemDto,
   TireFilterValuesDto,
   TireListItemDto,
   TireListDto,
@@ -19,16 +25,84 @@ import type {
   WheelListItemDto,
   WheelListDto,
   WheelListResult,
+  WheelProduct,
 } from "@/features/catalog/types";
 import type { ProductParam } from "@/shared/types/product";
-import type { WheelProduct } from "@/features/catalog/types";
+import type { ArticleBlockData } from "@/shared/types/articleBlock";
 
 export type { CatalogStartData };
 export type { FilterOptions, TireProduct };
 export type { WheelProduct };
 
-export async function getCatalogStart(): Promise<CatalogStartData> {
-  return delay(30, CATALOG_START);
+/**
+ * Карточки стартовой («по параметрам»/«по автомобилю») — статика фронта
+ * (макет .template/catalog/start.html); бэк-эндпоинта для них нет.
+ */
+const CATALOG_START_CARDS: CatalogStartCard[] = [
+  {
+    id: "tires-params",
+    icon: "tire",
+    title: "Шины по параметрам",
+    sub: "Ширина, профиль, диаметр, сезонность, тип",
+    link: "/catalog/tires",
+  },
+  {
+    id: "tires-auto",
+    icon: "tire",
+    title: "Шины по автомобилю",
+    sub: "Марка, модель, год выпуска, модификация",
+    link: "/catalog/tires/auto",
+  },
+  {
+    id: "wheels-params",
+    icon: "disk",
+    title: "Диски по параметрам",
+    sub: "Ширина, диаметр, PCD, вылет (ET), ступица",
+    link: "/catalog/wheels",
+  },
+  {
+    id: "wheels-auto",
+    icon: "disk",
+    title: "Диски по автомобилю",
+    sub: "Марка, модель, год выпуска, модификация",
+    link: "/catalog/wheels/auto",
+  },
+];
+
+/** Ссылки брендов стартовой: value фасета — слаг в URL каталога, label — от бэка. */
+function toBrandLinks(
+  brands: FilterOptions["brands"],
+  base: "/catalog/tires" | "/catalog/wheels",
+  city?: string,
+): BrandLink[] {
+  return brands.map((b) => ({
+    link: appendCityParam(`${base}/${b.value}`, city ?? ""),
+    link_name: b.label,
+  }));
+}
+
+/**
+ * Стартовая /catalog из живых данных (задача 2 плана catalog-product-start-live):
+ * бренды — фасеты фильтров шин и дисков; карточки — статика фронта.
+ */
+export function toCatalogStart(
+  tireFacets: FilterOptions,
+  wheelFacets: FilterOptions,
+  city?: string,
+): CatalogStartData {
+  return {
+    cards: CATALOG_START_CARDS.map((card) => ({
+      ...card,
+      link: appendCityParam(card.link, city ?? ""),
+    })),
+    tireBrands: toBrandLinks(tireFacets.brands, "/catalog/tires", city),
+    wheelBrands: toBrandLinks(wheelFacets.brands, "/catalog/wheels", city),
+  };
+}
+
+export async function getCatalogStart(city?: string): Promise<CatalogStartData> {
+  const [tires, wheels] = await Promise.all([getCatalogFilters(), getWheelsFilters()]);
+  return toCatalogStart(tires, wheels, city);
 }
 
 /**
@@ -77,8 +151,6 @@ export async function getCatalogFilters(): Promise<FilterOptions> {
 
 // --- Живой листинг GET /api/catalog/tires (контракт public-api.json, 21.08.2026) ---
 
-/** Заглушка карточки без изображения (как в моке). */
-const PRODUCT_PLACEHOLDER = "/assets/img/wheel-product.png";
 /** Элементов на странице каталога (допустимо 10–100, бэк по умолчанию 48). */
 const CATALOG_PER_PAGE = 12;
 
@@ -107,17 +179,6 @@ function parseDiameter(diameter: string | null): number {
   return match ? Number(match[1]) : 0;
 }
 
-/** origin-бейдж бэка → параметр карточки (description строкой → {title, text} для ParamBadge). */
-function toOriginParam(name: string, item: OriginItemDto | null | undefined): ProductParam | null {
-  if (!item) return null;
-  return {
-    name,
-    value: item.badge,
-    badge: true,
-    description: item.description ? { title: item.badge, text: item.description } : undefined,
-  };
-}
-
 /**
  * Короткий слаг модели для URL: у полного слага листинга («бренд-модель») срезается
  * префикс бренда (страницы модели/типоразмера адресуются схемой бэка: бренд + модель).
@@ -129,7 +190,7 @@ function toShortModelSlug(fullSlug: string | null | undefined, brandSlug: string
   return fullSlug.startsWith(prefix) ? fullSlug.slice(prefix.length) : fullSlug;
 }
 
-/** DTO листинга → TireProduct (поля, которых нет на бэке, — пустые дефолты). */
+/** DTO листинга → TireProduct (состав полей — как в ответе бэка). */
 export function toTireProduct(dto: TireListItemDto): TireProduct {
   const sizeTitle = [dto.width, dto.profile].filter(Boolean).join("/");
   return {
@@ -142,7 +203,6 @@ export function toTireProduct(dto: TireListItemDto): TireProduct {
     isStudded: dto.is_studded,
     deliveryMin: dto.delivery_min,
     deliveryMax: dto.delivery_max,
-    brandId: String(dto.brand.id),
     brandName: dto.brand.name,
     brandSlug: dto.brand.slug,
     // ссылки карточек строятся коротким слагом: у полного «бренд-модель» префикс срезается
@@ -154,10 +214,6 @@ export function toTireProduct(dto: TireListItemDto): TireProduct {
     price: dto.price ?? undefined,
     // зачёркнутая цена; карточка рисует её только выше текущей (условие в ProductCard)
     oldPrice: dto.old_price ?? undefined,
-    code: "",
-    country: "",
-    countryLabel: "",
-    year: "",
     // наличие из листинга; null — бэк не назвал число (строка «Наличие …» скрывается)
     quantity: dto.count_in_stock ?? null,
     image: dto.images[0]?.url ?? PRODUCT_PLACEHOLDER,
@@ -178,9 +234,8 @@ export function toTireProduct(dto: TireListItemDto): TireProduct {
     pickup: toOriginParam("Самовывоз", dto.origin?.delivery_days_after_order),
     // плашка выдачи города — в строку «Доставка до ПВЗ» (у бэка вложена в pick_up_point)
     pvzDelivery: toOriginParam("Доставка до ПВЗ", dto.origin?.pick_up?.pick_up_point),
-    loadIndex: "",
-    speedRating: "",
-    tireType: "",
+    // стек баджей товара — как отдал бэк (порядок и дедуп на бэке)
+    badges: dto.badges ?? [],
   };
 }
 
@@ -201,6 +256,7 @@ export async function getCatalogProducts(
     page: body.meta.current_page,
     perPage: body.meta.per_page,
     seo: body.meta.seo ?? null,
+    article: toArticleBlock(mockArticleIfAbsent(body.article)),
   };
 }
 
@@ -226,6 +282,8 @@ export function toTireModel(dto: TireModelDto): TireModelData {
       value: `r${String(d.value).replace(/^r/i, "")}`,
       count: d.count,
     })),
+    // стек баджей модели (модель → бренд) — как отдал бэк
+    badges: dto.badges ?? [],
   };
 }
 
@@ -234,15 +292,23 @@ export async function getTireModel(
   brandSlug: string,
   modelSlug: string,
   city?: string,
-): Promise<{ model: TireModelData; seo: TireListSeo | null } | null> {
-  const query = city ? `?city=${encodeURIComponent(city)}` : "";
+): Promise<{
+  model: TireModelData;
+  seo: TireListSeo | null;
+  article: ArticleBlockData | null;
+} | null> {
+  const query = cityQuery(city);
   const res = await fetch(`${apiBase()}/catalog/tire-models/${brandSlug}/${modelSlug}${query}`);
   if (res.status === 404) return null;
   if (!res.ok) {
     throw new Error(`getTireModel: HTTP ${res.status}`);
   }
   const body = (await res.json()) as TireModelResponseDto;
-  return { model: toTireModel(body.data), seo: body.meta.seo ?? null };
+  return {
+    model: toTireModel(body.data),
+    seo: body.meta.seo ?? null,
+    article: toArticleBlock(mockArticleIfAbsent(body.article)),
+  };
 }
 
 /** Query размеров модели: короткий слаг + бренд + диаметр числом (r18 → 18) + город. */
@@ -295,7 +361,7 @@ export function toWheelFilterOptions(data: WheelFilterValuesDto): FilterOptions 
     });
 
   const decimalOpts = (items: WheelFilterValuesDto["width"]): FilterOptions["widths"] =>
-    items.map((o) => ({ label: String(o.label), value: String(Number(o.value)) }));
+    items.map((o) => ({ label: String(o.label), value: decimal(String(o.value)) }));
 
   return {
     seasons: [],
@@ -357,10 +423,9 @@ export function toWheelProduct(dto: WheelListItemDto): WheelProduct {
     category: "wheels",
     ean: "",
     slug: dto.slug,
-    brandId: String(dto.brand.id),
     brandName: dto.brand.name,
     brandSlug: dto.brand.slug,
-    // как у шин: короткий слаг модели (ссылок у дисков нет, но поле — общее)
+    // как у шин: короткий слаг модели (поле общее; у диска модель в слаг позиции не входит)
     modelSlug: toShortModelSlug(dto.model?.slug, dto.brand.slug),
     modelName: dto.model?.name ?? dto.name,
     width,
@@ -372,10 +437,6 @@ export function toWheelProduct(dto: WheelListItemDto): WheelProduct {
     price: dto.price ?? undefined,
     // зачёркнутая цена; карточка рисует её только выше текущей (условие в ProductCard)
     oldPrice: dto.old_price ?? undefined,
-    code: "",
-    country: "",
-    countryLabel: "",
-    year: "",
     // наличие из листинга; null — бэк не назвал число (строка «Наличие …» скрывается)
     quantity: dto.count_in_stock ?? null,
     image: dto.images[0]?.url ?? PRODUCT_PLACEHOLDER,
@@ -391,6 +452,8 @@ export function toWheelProduct(dto: WheelListItemDto): WheelProduct {
     // плашки выдачи — в строки «Самовывоз» и «Доставка до ПВЗ» карточки
     pickup: toOriginParam("Самовывоз", dto.origin?.delivery_days_after_order),
     pvzDelivery: toOriginParam("Доставка до ПВЗ", dto.origin?.pick_up?.pick_up_point),
+    // стек баджей товара — как отдал бэк (порядок и дедуп на бэке)
+    badges: dto.badges ?? [],
   };
 }
 
@@ -411,5 +474,6 @@ export async function getWheelsProducts(
     page: body.meta.current_page,
     perPage: body.meta.per_page,
     seo: body.meta.seo ?? null,
+    article: toArticleBlock(mockArticleIfAbsent(body.article)),
   };
 }

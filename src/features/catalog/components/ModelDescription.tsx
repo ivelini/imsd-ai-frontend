@@ -1,14 +1,18 @@
 // Блок описания модели .model-description (фаза 2; 16.10.2026 — описание от бэка:
-// rich-текст HTML, пустое — блок скрыт)
+// rich-текст HTML, пустое — блок скрыт; 07.11.2026 — блок статьи внизу блока)
+import { ArticleBlock } from "@/shared/ui/ArticleBlock";
+import type { ArticleBlockData } from "@/shared/types/articleBlock";
+
 interface ModelDescriptionProps {
   name: string;
   brandName: string;
   image: string;
   params: { name: string; value: string }[];
   description: string | null;
+  article: ArticleBlockData | null;
 }
 
-export function ModelDescription({ name, brandName, image, params, description }: ModelDescriptionProps) {
+export function ModelDescription({ name, brandName, image, params, description, article }: ModelDescriptionProps) {
   return (
     <div className="model-description">
       <div className="model-info">
@@ -32,6 +36,7 @@ export function ModelDescription({ name, brandName, image, params, description }
           dangerouslySetInnerHTML={{ __html: description }}
         />
       )}
+      {article && <ArticleBlock article={article} className="article-block" />}
     </div>
   );
 }

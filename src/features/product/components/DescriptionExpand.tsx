@@ -1,17 +1,18 @@
 "use client";
 // Раскрытие/скрытие описания товара (фаза 3, 04.08.2026)
+// Описание с бэка — plain text (XLSX, без тегов): рендерим текстом, не HTML.
 import { useState } from "react";
 
-export function DescriptionExpand({ html }: { html: string }) {
+export function DescriptionExpand({ text }: { text: string }) {
   const [expanded, setExpanded] = useState(false);
 
   return (
     <>
-      <div
-        className="section-content"
-        style={expanded ? undefined : { maxHeight: "200px", overflow: "hidden" }}
-        dangerouslySetInnerHTML={{ __html: html }}
-      />
+      <p
+        className={`section-content product-description${expanded ? "" : " product-description--collapsed"}`}
+      >
+        {text}
+      </p>
       <div
         className="show-hide-btn-description"
         onClick={() => setExpanded(!expanded)}

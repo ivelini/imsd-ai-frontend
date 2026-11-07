@@ -1,6 +1,7 @@
 // Живой листинг каталога: city-слаг в query, маппинг meta → PaginatedResult, seo из meta
 // (тест-лист плана catalog-tires-live-api)
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { mockFetch } from "./helpers/mockFetch";
 
 import { getCatalogProducts } from "@/shared/api/catalog";
 import type { TireListItemDto, TireListDto } from "@/features/catalog/types";
@@ -27,11 +28,7 @@ const tire: TireListItemDto = {
   images: [{ id: 1, url: "/img/1.jpg" }],
 };
 
-function mockFetch(body: TireListDto) {
-  const fn = vi.fn(async () => ({ ok: true, json: async () => body }));
-  vi.stubGlobal("fetch", fn);
-  return fn;
-}
+const mockList = (body: TireListDto) => mockFetch(() => ({ status: 200, body }));
 
 beforeEach(() => {
   vi.unstubAllGlobals();
@@ -43,7 +40,7 @@ afterEach(() => {
 
 describe("getCatalogProducts (живой fetch)", () => {
   it("test_products_fetch_live_api_with_city", async () => {
-    const fetchFn = mockFetch({
+    const fetchFn = mockList({
       data: [tire],
       meta: { current_page: 1, last_page: 1, per_page: 12, total: 1, seo: null },
     });
@@ -57,7 +54,7 @@ describe("getCatalogProducts (живой fetch)", () => {
   });
 
   it("test_products_maps_meta_to_paginated_result", async () => {
-    mockFetch({
+    mockList({
       data: [tire],
       meta: { current_page: 2, last_page: 3, per_page: 12, total: 30, seo: null },
     });
@@ -71,7 +68,7 @@ describe("getCatalogProducts (живой fetch)", () => {
   });
 
   it("test_products_passes_seo_through", async () => {
-    mockFetch({
+    mockList({
       data: [tire],
       meta: {
         current_page: 1,
@@ -90,7 +87,7 @@ describe("getCatalogProducts (живой fetch)", () => {
   });
 
   it("test_products_null_seo_returns_null", async () => {
-    mockFetch({
+    mockList({
       data: [],
       meta: { current_page: 1, last_page: 0, per_page: 12, total: 0, seo: null },
     });

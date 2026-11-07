@@ -7,6 +7,7 @@ import type {
   WheelListItemDto,
   WheelProduct,
 } from "./index";
+import type { ArticleBlockData, ArticleBlockDto } from "@/shared/types/articleBlock";
 
 // ── Справочники каскада ────────────────────────────────────────────────
 
@@ -135,6 +136,8 @@ export interface VehicleSelectionDto {
     sections: VehicleSectionDto[];
   };
   meta: VehicleSelectionMeta;
+  /** Блок статьи в корне ответа; поля нет — блока нет. */
+  article?: ArticleBlockDto | null;
 }
 
 // ── Доменные типы для компонентов ──────────────────────────────────────
@@ -166,6 +169,7 @@ export interface VehicleSelection {
   seo: VehicleSeo;
   offersPerOption: number;
   totalOffers: number;
+  article: ArticleBlockData | null;
 }
 
 // ── Диски: спецификация вместо шинного размера ─────────────────────────
@@ -206,6 +210,8 @@ export interface VehicleWheelSelectionDto {
     sections: VehicleWheelSectionDto[];
   };
   meta: VehicleSelectionMeta;
+  /** Блок статьи в корне ответа; поля нет — блока нет. */
+  article?: ArticleBlockDto | null;
 }
 
 export interface VehicleWheelOffer {
@@ -235,4 +241,5 @@ export interface VehicleWheelSelection {
   seo: VehicleSeo;
   offersPerOption: number;
   totalOffers: number;
+  article: ArticleBlockData | null;
 }

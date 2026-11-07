@@ -44,22 +44,32 @@ export function AddToCartBlock({ product }: { product: ProductDetailData }) {
       <div className="payment-info">
         <div className="payment-option">
           <span className="payment-title">Оплата при получении</span>
-          <span className="payment-details">Наличие {product.quantity} шт.</span>
-          <span className="payment-details">
-            Самовывоз <span className="highlight-text">{product.pickupDate}</span>
-          </span>
-          <span className="payment-details">
-            Доставка до ПВЗ <span className="highlight-text">{product.deliveryLabel}</span>
-          </span>
+          {product.quantity !== null && (
+            <span className="payment-details">Наличие {product.quantity} шт.</span>
+          )}
+          {product.pickupDate && (
+            <span className="payment-details">
+              Самовывоз <span className="highlight-text">{product.pickupDate}</span>
+            </span>
+          )}
+          {product.deliveryLabel && (
+            <span className="payment-details">
+              Доставка до ПВЗ <span className="highlight-text">{product.deliveryLabel}</span>
+            </span>
+          )}
         </div>
-        <div className="payment-option">
-          <div><strong>Самовывоз из ПВЗ по адресу:</strong></div>
-          <div><strong>Адрес:</strong> {product.storeAddress}</div>
-          <div>
-            <strong>Время работы:</strong>{" "}
-            <div>{product.storeHours}</div>
+        {/* Самовывоз: городозависимый текст бэка — первая строка заголовок, дальше строки
+            (адрес и часы). Заголовок приходит от бэка: фронт не подменяет его своим. */}
+        {product.pickupPointText && (
+          <div className="payment-option">
+            {product.pickupPointText
+              .split("\n")
+              .filter(Boolean)
+              .map((line, i) => (
+                <div key={i}>{i === 0 ? <strong>{line}</strong> : line}</div>
+              ))}
           </div>
-        </div>
+        )}
       </div>
 
       <button

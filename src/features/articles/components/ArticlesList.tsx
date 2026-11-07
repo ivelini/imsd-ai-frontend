@@ -1,22 +1,19 @@
-// Список статей: .news-list из NewsCard (фаза 4). Серверный — данные через props.
+// Список статей: .news-list из NewsCard (живой API 05.11.2026). Серверный — данные через props.
 import { NewsCard } from "@/shared/ui/NewsCard";
-import type { Article } from "@/features/articles/types";
+import type { ArticleListItem } from "@/features/articles/types";
 
-export function ArticlesList({ articles }: { articles: Article[] }) {
+export function ArticlesList({ articles }: { articles: ArticleListItem[] }) {
   return (
-    <section className="articles-section container">
-      <h2>Статьи</h2>
-      <div className="news-list">
-        {articles.map((a) => (
-          <NewsCard
-            key={a.slug}
-            image="/assets/img/news.png"
-            title={a.title}
-            text={a.text}
-            href={`/articles/${a.slug}`}
-          />
-        ))}
-      </div>
-    </section>
+    <div className="news-list">
+      {articles.map((a) => (
+        <NewsCard
+          key={a.slug}
+          image={a.image}
+          title={a.title}
+          text={a.text}
+          href={`/articles/${a.slug}`}
+        />
+      ))}
+    </div>
   );
 }

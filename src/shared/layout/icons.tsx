@@ -1,4 +1,5 @@
 // Инлайн-SVG из мокапа (.template/*.html) — 1-в-1
+import type { BadgeIconKey } from "@/shared/types/badge";
 
 export function BurgerIcon() {
   return (
@@ -72,7 +73,7 @@ export function ArrowRightBlackIcon() {
   );
 }
 
-export function BenefitIcon({ type }: { type: "red" | "gold" | "green" }) {
+export function BenefitIcon({ type }: { type: BadgeIconKey }) {
   const paths: Record<typeof type, string> = {
     red: "M22.7 19l-9.1-9.1c.9-2.3.4-5-1.5-6.9-2-2-5-2.4-7.4-1.3L9 6 6 9 1.6 4.7C.4 7.1.9 10.1 2.9 12.1c1.9 1.9 4.6 2.4 6.9 1.5l9.1 9.1c.4.4 1 .4 1.4 0l2.3-2.3c.5-.4.5-1.1.1-1.4z",
     gold: "M12 2a10 10 0 100 20 10 10 0 000-20zm0 3a7 7 0 110 14 7 7 0 010-14zm0 3a4 4 0 100 8 4 4 0 000-8z",

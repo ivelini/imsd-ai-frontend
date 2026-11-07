@@ -56,7 +56,7 @@ export function ModelSizes({ diameters, sizes, diameter, cityLabel, cityValue }:
       <div className="model-diameter">
         <h3 className="model-diameter-title">{diameter.toUpperCase()}</h3>
         {shown.map((p) => (
-          <ProductCard product={p} showLink={false} key={p.id} cityLabel={cityLabel} cityValue={cityValue} />
+          <ProductCard product={p} key={p.id} cityLabel={cityLabel} cityValue={cityValue} />
         ))}
         {sizes.length > visibleCount && (
           <button className="model-sizes-more" onClick={() => setVisibleCount((v) => v + PAGE_SIZE)}>

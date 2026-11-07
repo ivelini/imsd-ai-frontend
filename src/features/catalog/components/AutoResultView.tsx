@@ -58,11 +58,11 @@ export function AutoResultView({ carBlock, sections, cityLabel, cityValue }: Aut
               {item.sizes.map((sz, pi) =>
                 sz.rear ? (
                   <div className="pair-group" key={pi}>
-                    <ProductCard product={sz.front} showLink={false} cityLabel={cityLabel} cityValue={cityValue} />
-                    <ProductCard product={sz.rear} showLink={false} pair cityLabel={cityLabel} cityValue={cityValue} />
+                    <ProductCard product={sz.front} cityLabel={cityLabel} cityValue={cityValue} />
+                    <ProductCard product={sz.rear} pair cityLabel={cityLabel} cityValue={cityValue} />
                   </div>
                 ) : (
-                  <ProductCard key={pi} product={sz.front} showLink={false} cityLabel={cityLabel} cityValue={cityValue} />
+                  <ProductCard key={pi} product={sz.front} cityLabel={cityLabel} cityValue={cityValue} />
                 )
               )}
             </div>

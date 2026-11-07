@@ -18,6 +18,7 @@ import { CatalogFilter, type AutoFilterData } from "@/features/catalog/component
 import { AutoModelsList } from "@/features/catalog/components/AutoModelsList";
 import { AutoResultView } from "@/features/catalog/components/AutoResultView";
 import { SeoBlock } from "@/features/catalog/components/SeoBlock";
+import { ArticleBlock } from "@/shared/ui/ArticleBlock";
 import { toAutoOptions } from "@/features/catalog/lib/autoOptions";
 import { parseCatalogParams, buildQueryString } from "@/shared/lib/parseParams";
 import { resolveCityLabel } from "@/shared/lib/cityUrl";
@@ -302,6 +303,7 @@ export default async function AutoPage({ params, searchParams }: PageProps) {
         <CatalogLayout current={current} autoData={autoData}>
           <p>Для выбранного автомобиля товаров не найдено.</p>
         </CatalogLayout>
+        {result.article && <ArticleBlock article={result.article} className="article-block" />}
       </section>
     );
   }
@@ -357,6 +359,8 @@ export default async function AutoPage({ params, searchParams }: PageProps) {
           content={{ title: result.seo.title, subtitle: result.seo.description }}
         />
       )}
+
+      {result.article && <ArticleBlock article={result.article} className="article-block" />}
     </section>
   );
 }

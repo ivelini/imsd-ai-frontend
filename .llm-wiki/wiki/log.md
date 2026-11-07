@@ -76,3 +76,28 @@
 ## [2026-10-20] ingest | Слаги Vehicle в URL авто-подбора
 - Updated: catalog-live-api.md (адресация слагами, вложенные справочники make/model, композитный результат, numeric fallback и 307; store v4)
 - Updated: project-architecture.md (карта: авто-подбор на слагах; numeric id — legacy)
+
+## [2026-10-22] ingest | Карточка товара шин и дисков на живом API
+- Updated: catalog-live-api.md (эндпоинты карточки и /reference/store, ProductDetailData, вкладки по контенту, pickupDate из badge, ссылки карточек, ADR 0007)
+- Updated: project-architecture.md (карта: карточки товара живые, товарные моки удалены, формат слага позиции)
+- Updated: adr-practice.md (индекс 0001–0007, ADR 0007)
+
+## [2026-10-23] ingest | Бейджи товара: общий объект фронта и вывод в карточке
+- Updated: catalog-live-api.md (контракт data.badges, ядро shared/types+badgeView+Badge, разметка плашки шаблона .benefit, ADR 0008, ТЗ бэку на остальные зоны)
+- Updated: project-architecture.md (карта: ADR 0008 в разделе решений)
+- Updated: adr-practice.md (индекс 0001–0008, ADR 0008)
+
+## [2026-10-23] ingest | Бейджи: правило «пришёл data.badges — страница выводит плашки»
+- Updated: catalog-live-api.md (раздел переписан: общее правило, полоса .benefits из шаблона, мок attention_blocks → badges, мок полосы в шапке убран, страницы-подключения)
+- Updated: project-architecture.md (карта: ADR 0008 уточнён)
+- Updated: adr-practice.md (индекс 0001–0008, формулировка 0008)
+
+## [2026-10-27] ingest | Бейджи во всех зонах витрины: листинг, подбор по авто, карточка модели
+- Updated: catalog-live-api.md (раздел бейджей: зоны витрины, перенос стека в адаптерах, место плашек в карточке и на странице модели, находка в бэке по пути payload)
+
+## [2026-11-05] ingest | Статьи и системные страницы: живой API
+- Updated: project-architecture.md (карта: статьи и меню живы с 05.11, моки статей/сервисных страниц удалены, ADR 0009, See Also)
+- Updated: adr-practice.md (индекс 0001–0009, формулировка 0009)
+
+## [2026-11-07] ingest | Блок статьи в зонах витрины (article в корне ответа)
+- Updated: catalog-live-api.md (раздел «Блок статьи в зонах»: контракт article, ядро shared/, мок только в dev, See Also)

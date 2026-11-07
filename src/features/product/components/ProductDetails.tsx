@@ -30,11 +30,14 @@ export function ProductDetails({ product }: { product: ProductDetailData }) {
             <span className="current-price">
               {product.price?.toLocaleString("ru-RU") ?? ""} ₽
             </span>
-            {product.oldPrice && (
-              <span className="old-price">
-                {product.oldPrice.toLocaleString("ru-RU")} ₽
-              </span>
-            )}
+            {/* зачёркнутая цена — только выше текущей (как в карточке каталога) */}
+            {product.oldPrice !== undefined &&
+              product.price !== undefined &&
+              product.oldPrice > product.price && (
+                <span className="old-price">
+                  {product.oldPrice.toLocaleString("ru-RU")} ₽
+                </span>
+              )}
           </div>
 
           <AddToCartBlock product={product} />

@@ -1,8 +1,9 @@
 // Карточка товара каталога .catalog-product (фаза 2)
 import Link from "next/link";
 import type { ProductBase } from "@/features/catalog/types";
-import { appendCityParam } from "@/shared/lib/cityUrl";
+import { productUrl } from "@/features/catalog/lib/productUrl";
 import { BadgeValue } from "@/shared/ui/BadgeValue";
+import { Badges } from "@/shared/ui/Badge";
 import { SeasonIcons } from "@/shared/ui/SeasonIcons";
 import { BuyButton } from "./BuyButton";
 import { EuLabel } from "@/shared/ui/EuLabel";
@@ -11,17 +12,13 @@ import { CardCityBadge } from "./CardCityBadge";
 
 interface ProductCardProps {
   product: ProductBase;
-  showLink?: boolean; // true в каталоге, false в автоподборе/модели
   pair?: boolean; // вторая шина комплекта → класс product-pair
   cityLabel?: string;
   cityValue?: string;
 }
 
-export function ProductCard({ product, showLink = true, pair = false, cityLabel, cityValue }: ProductCardProps) {
-  const href = appendCityParam(
-    `/${product.category}/${product.brandSlug}/${product.modelSlug}/${product.sizeSlug}`,
-    cityValue ?? "",
-  );
+export function ProductCard({ product, pair = false, cityLabel, cityValue }: ProductCardProps) {
+  const href = productUrl(product, cityValue);
 
   return (
     <div className={`catalog-product${pair ? " product-pair" : ""}`}>
@@ -36,13 +33,11 @@ export function ProductCard({ product, showLink = true, pair = false, cityLabel,
 
       {/* Информация */}
       <div className="catalog-product-details">
+        {/* Плашки баджей товара (стек от бэка) — полосой над заголовком */}
+        <Badges badges={product.badges} />
         <div className="catalog-product-info">
           <h2 className="catalog-product-title">
-            {showLink ? (
-              <Link href={href}>{product.title}</Link>
-            ) : (
-              <span>{product.title}</span>
-            )}
+            <Link href={href}>{product.title}</Link>
           </h2>
           <div className="catalog-product-prices">
             {/* price nullable с бэка (нет цены города) — блок цен скрывается */}

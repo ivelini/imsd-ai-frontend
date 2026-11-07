@@ -14,6 +14,11 @@ export function apiBase(): string {
   return typeof window === "undefined" ? `${SERVER_API_BASE}/api` : API_BASE;
 }
 
+/** Город как query запроса: city=слаг (резолвит бэк, ADR 0004); без города — пустая строка */
+export function cityQuery(city?: string): string {
+  return city ? `?city=${encodeURIComponent(city)}` : "";
+}
+
 // Эмуляция сетевой задержки (мок-геттеры)
 export function delay<T>(ms: number, value: T): Promise<T> {
   return new Promise((resolve) => setTimeout(() => resolve(value), ms));

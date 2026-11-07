@@ -1,14 +1,6 @@
 // Типы главной страницы (05.08.2026)
 // Структура ответа GET /api/service-page/main — поля как у бэка.
-
-/** Плашки-бенефиты: .benefit (раньше red/gold/green, теперь color hex) */
-export interface AttentionBlock {
-  title: string;
-  /** Путь (по конвенции service_pages: link — путь, link_name — название) */
-  link: string;
-  link_name: string;
-  color: string;
-}
+import type { Badge } from "@/shared/types/badge";
 
 /** Товар слайдера главной (шины/диски) */
 export interface SliderProduct {
@@ -38,7 +30,11 @@ export interface HomeSeo {
 }
 
 export interface HomeData {
-  attention_blocks: AttentionBlock[];
+  /**
+   * Стек бейджей страницы (общий контракт `badges`): если пришёл — страница
+   * выводит плашки `.benefits`. Раньше здесь был `attention_blocks` с цветом-hex.
+   */
+  badges: Badge[];
   slider: {
     tires: SliderTire[];
     wheels: SliderProduct[];

@@ -1,5 +1,7 @@
 // Типы каталога (фаза 2, 03.08.2026)
+import type { Badge } from "@/shared/types/badge";
 import type { ProductParam } from "@/shared/types/product";
+import type { ArticleBlockData, ArticleBlockDto } from "@/shared/types/articleBlock";
 
 /** Единый формат опций фильтра/селекта: label — от бэка, value — латинский slug = URL */
 export interface FilterOption {
@@ -16,7 +18,6 @@ export interface ProductBase {
   ean: string;
   category: "tires" | "wheels";
   season?: string; // только у шин; у дисков нет
-  brandId: string;
   brandName: string;
   /** Слаг бренда (листинг) — сегмент URL страницы модели/типоразмера. */
   brandSlug: string;
@@ -27,10 +28,6 @@ export interface ProductBase {
   diameter: number;
   price?: number; // null с бэка → карточка скрывает блок цен
   oldPrice?: number;
-  code: string;
-  country: string; // value: "russia", "france"...
-  countryLabel: string; // готовый label от «бэка»
-  year: string;
   /** Наличие (count_in_stock); null — бэк не назвал число, строка «Наличие …» скрывается. */
   quantity: number | null;
   image: string;
@@ -51,6 +48,8 @@ export interface ProductBase {
   /** Плашка строки «Доставка до ПВЗ» (origin.pick_up.pick_up_point): значение + текст попапа.
    *  null — плашки у бэка нет, строка скрывается. */
   pvzDelivery: ProductParam | null;
+  /** Стек баджей товара (модель → бренд) — готовые данные бэка; пустой — полосы нет. */
+  badges: Badge[];
 }
 
 // ============================================================================
@@ -66,9 +65,6 @@ export interface TireProduct extends ProductBase {
   deliveryMin?: number | null; // срок доставки города, дни
   deliveryMax?: number | null;
   profile: number;
-  loadIndex: string;
-  speedRating: string;
-  tireType: string; // value: "passenger" | "suv" | "commercial"
 }
 
 // ============================================================================
@@ -107,7 +103,8 @@ export interface FilterState {
 }
 
 // ============================================================================
-// Стартовая страница каталога (/api/catalog-start)
+// Стартовая страница каталога: карточки — статика фронта (CATALOG_START_CARDS
+// в shared/api/catalog.ts), бренды — фасеты фильтров; эндпоинта /api/catalog-start нет
 // ============================================================================
 
 export interface CatalogStartCard {
@@ -192,9 +189,9 @@ export interface OriginDto {
   vendor: OriginItemDto | null;
   manufacture_country: OriginItemDto | null;
   manufacture_year: OriginItemDto | null;
-  /** Плашка срока: badge — дата словами («10 Окт (Сб)»), description — HTML текста выдачи города. */
+  /** Плашка срока: badge — дата словами («10 Окт (Сб)»), description — текст выдачи города (строки через «\n»). */
   delivery_days_after_order: OriginItemDto | null;
-  /** Плашка «Доставка до ПВЗ»: пункт выдачи города (badge «бесплатно» + HTML текста доставки). */
+  /** Плашка «Доставка до ПВЗ»: пункт выдачи города (badge «бесплатно» + текст доставки). */
   pick_up: { pick_up_point: OriginItemDto } | null;
 }
 
@@ -219,6 +216,8 @@ export interface TireListItemDto {
   delivery_min: number | null;
   delivery_max: number | null;
   images: { id: number; url: string }[];
+  /** Стек баджей товара (товар → модель → бренд); optional — на случай отката бэка. */
+  badges?: Badge[];
 }
 
 /** SEO-мета листинга: title готовый (предложный падеж города), description из бренда/конфига. */
@@ -238,15 +237,18 @@ export interface TireListMetaDto {
 export interface TireListDto {
   data: TireListItemDto[];
   meta: TireListMetaDto;
+  /** Блок статьи в корне ответа; поля нет — блока нет. */
+  article?: ArticleBlockDto | null;
 }
 
-/** Результат листинга для страницы: товары + пагинация + seo-мета. */
+/** Результат листинга для страницы: товары + пагинация + seo-мета + блок статьи. */
 export interface TireListResult {
   items: TireProduct[];
   total: number;
   page: number;
   perPage: number;
   seo: TireListSeo | null;
+  article: ArticleBlockData | null;
 }
 
 // ============================================================================
@@ -277,20 +279,25 @@ export interface WheelListItemDto {
   delivery: { delivery_min: number; delivery_max: number; delivery_days_after_order: number } | null;
   count_in_stock: number | null;
   images: { id: number; url: string }[];
+  /** Стек баджей товара (товар → модель → бренд); optional — на случай отката бэка. */
+  badges?: Badge[];
 }
 
 export interface WheelListDto {
   data: WheelListItemDto[];
   meta: TireListMetaDto; // shape meta у дисков тот же (включая seo)
+  /** Блок статьи в корне ответа; поля нет — блока нет. */
+  article?: ArticleBlockDto | null;
 }
 
-/** Результат листинга дисков для страницы: товары + пагинация + seo-мета. */
+/** Результат листинга дисков для страницы: товары + пагинация + seo-мета + блок статьи. */
 export interface WheelListResult {
   items: WheelProduct[];
   total: number;
   page: number;
   perPage: number;
   seo: TireListSeo | null;
+  article: ArticleBlockData | null;
 }
 
 // ============================================================================
@@ -307,11 +314,15 @@ export interface TireModelDto {
   params: { name: string; value: string }[];
   description: string | null;
   diameters: { value: string; count: number }[];
+  /** Стек баджей модели (модель → бренд); optional — на случай отката бэка. */
+  badges?: Badge[];
 }
 
 export interface TireModelResponseDto {
   data: TireModelDto;
   meta: { seo: TireListSeo | null };
+  /** Блок статьи в корне ответа; поля нет — блока нет. */
+  article?: ArticleBlockDto | null;
 }
 
 /** Модель для страницы: диаметры — r-ключами вкладок (?diameter=r17). */
@@ -325,6 +336,8 @@ export interface TireModelData {
   description: string | null;
   /** Вкладки диаметров: value — r-ключ (r17), count — размеров у бэка. */
   diameters: { value: string; count: number }[];
+  /** Стек баджей модели (модель → бренд) — готовые данные бэка; пустой — полосы нет. */
+  badges: Badge[];
 }
 
 /** Фасеты фильтра дисков: label — готовый от бэка, value — значение фасета. */

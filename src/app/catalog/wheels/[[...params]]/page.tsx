@@ -5,7 +5,8 @@ import { parseWheelsParams, buildWheelsUrl } from "@/shared/lib/parseParams";
 import { resolveCityLabel } from "@/shared/lib/cityUrl";
 import { CatalogFilter } from "@/features/catalog/components/CatalogFilter";
 import { ProductCard } from "@/features/catalog/components/ProductCard";
-import { Pagination } from "@/features/catalog/components/Pagination";
+import { Pagination } from "@/shared/ui/Pagination";
+import { ArticleBlock } from "@/shared/ui/ArticleBlock";
 
 interface PageProps {
   params: Promise<{ params?: string[] }>;
@@ -46,8 +47,8 @@ export default async function WheelsCatalogPage({ params, searchParams }: PagePr
           {result.items.length === 0 ? (
             <p className="catalog-empty">Товаров не найдено</p>
           ) : (
-            // Страницы товара дисков нет — карточка без ссылки (showLink=false)
-            result.items.map((p) => <ProductCard product={p} showLink={false} key={p.id} cityLabel={cityLabel} cityValue={cityValue} />)
+            // Страница товара диска — /wheels/{brand}/{size} (слаг без префикса бренда)
+            result.items.map((p) => <ProductCard product={p} key={p.id} cityLabel={cityLabel} cityValue={cityValue} />)
           )}
         </div>
       </div>
@@ -58,6 +59,7 @@ export default async function WheelsCatalogPage({ params, searchParams }: PagePr
                 buildHref={(page) => buildWheelsUrl({ ...filter, page }, cityValue)}
             />
         )}
+        {result.article && <ArticleBlock article={result.article} className="article-block" />}
     </section>
   );
 }

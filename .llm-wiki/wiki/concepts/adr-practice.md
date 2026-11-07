@@ -1,7 +1,7 @@
 # Практика ADR в проекте
 
-> Sources: documentations/adr/README.md, 2026-08-19; documentations/adr/0000-template.md, 2026-08-19
-> Raw: [README.md](../../raw/project/2026-08-19-adr-practice-readme.md); [0000-template.md](../../raw/project/2026-08-19-adr-template.md)
+> Sources: documentations/adr/README.md, 2026-08-19; documentations/adr/0000-template.md, 2026-08-19; ADR 0007 (адреса карточек товара), 2026-10-22; бейджи товара на фронте, 2026-10-23; ADR 0009 (статьи и системные страницы), 2026-11-05
+> Raw: [README.md](../../raw/project/2026-08-19-adr-practice-readme.md); [0000-template.md](../../raw/project/2026-08-19-adr-template.md); [product-card-live](../../raw/project/2026-10-22-product-card-live.md); [product-badges](../../raw/project/2026-10-23-product-badges.md); [articles-live](../../raw/project/2026-11-05-articles-live.md)
 
 ## Overview
 
@@ -22,7 +22,7 @@
 
 ## Состояние базы
 
-5 принятых ADR (0001–0005): баррел data.ts, конфиг-грамматика URL, пагинация типоразмеров, город как контекст, черновик записи в sessionStorage. Индекс — в `documentations/adr/README.md` и в [project-architecture](project-architecture.md).
+9 принятых ADR (0001–0009): баррел data.ts, конфиг-грамматика URL, пагинация типоразмеров, город как контекст, черновик записи в sessionStorage, свой сервер Next на unix-сокете, адреса карточек товара зеркалят API (0007, 22.10.2026: слаг позиции; у дисков без модельного сегмента), бейдж — общий объект фронта (0008, 23.10.2026: тип + чистая функция представления + компонент в `shared/`; правило «пришёл `data.badges` — страница выводит плашки», разметка полосы шаблона `.benefits`, цвет-пресет бэка 1:1; мок полосы в шапке убран), статьи и системные страницы — одна сущность Article при двух URL (0009, 05.11.2026: `/articles/{slug}` и `/service-page/{slug}` не сливаются, меню из API, фикс-пункты в коде, fallback при недоступном меню). Индекс — в `documentations/adr/README.md` и в [project-architecture](project-architecture.md).
 
 ## See Also
 

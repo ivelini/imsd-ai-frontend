@@ -6,6 +6,7 @@ import { getGeo, getTireModel, getTireModelSizes } from "@/shared/api/data";
 import { resolveCityLabel } from "@/shared/lib/cityUrl";
 import { ModelDescription } from "@/features/catalog/components/ModelDescription";
 import { ModelSizes } from "@/features/catalog/components/ModelSizes";
+import { Badges } from "@/shared/ui/Badge";
 
 interface PageProps {
   params: Promise<{ brandSlug: string; modelSlug: string }>;
@@ -47,6 +48,8 @@ export default async function ModelPage({ params, searchParams }: PageProps) {
 
   return (
     <section className="catalog-section container model-page">
+      {/* Плашки баджей модели (стек «модель → бренд» от бэка) */}
+      <Badges badges={model.badges} />
       <h2>
         Шины {model.brandName} {model.name}
       </h2>
@@ -56,6 +59,7 @@ export default async function ModelPage({ params, searchParams }: PageProps) {
         image={model.image}
         params={model.params}
         description={model.description}
+        article={result.article}
       />
       <ModelSizes
         key={active}

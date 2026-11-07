@@ -284,4 +284,36 @@ describe("toTireProduct", () => {
     const p = toTireProduct({ ...baseDto, old_price: null });
     expect(p.oldPrice).toBeUndefined();
   });
+
+  it("test_list_product_badges_pass_through", () => {
+    const p = toTireProduct({
+      ...baseDto,
+      badges: [
+        {
+          text: "Хит продаж",
+          color: "red",
+          icon_key: null,
+          link: null,
+          owner_type: "brand",
+          owner_name: "Yokohama",
+        },
+        {
+          text: "Новинка",
+          color: "gold",
+          icon_key: "gold",
+          link: "/promo",
+          owner_type: "model",
+          owner_name: "Bluearth E70B",
+        },
+      ],
+    });
+    // порядок и дедуп — на бэке: фронт переносит стек как есть
+    expect(p.badges).toHaveLength(2);
+    expect(p.badges[0].text).toBe("Хит продаж");
+  });
+
+  it("test_list_product_missing_badges_yields_empty_stack", () => {
+    const p = toTireProduct(baseDto);
+    expect(p.badges).toEqual([]);
+  });
 });

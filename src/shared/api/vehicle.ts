@@ -6,6 +6,8 @@
 // общий toTireProduct/toWheelProduct.
 import { apiBase } from "./base";
 import { toTireProduct, toWheelProduct } from "./catalog";
+import { toArticleBlock } from "@/shared/lib/articleBlock";
+import { mockArticleIfAbsent } from "@/data/articleBlock";
 import type { FilterState } from "@/features/catalog/types";
 import type {
   VehicleMakeRef,
@@ -138,6 +140,7 @@ export function toVehicleSelection(dto: VehicleSelectionDto): VehicleSelection {
     seo: dto.meta.seo,
     offersPerOption: dto.meta.offers_per_option,
     totalOffers: dto.meta.total_offers,
+    article: toArticleBlock(mockArticleIfAbsent(dto.article)),
   };
 }
 
@@ -188,6 +191,7 @@ export function toWheelSelection(dto: VehicleWheelSelectionDto): VehicleWheelSel
     seo: dto.meta.seo,
     offersPerOption: dto.meta.offers_per_option,
     totalOffers: dto.meta.total_offers,
+    article: toArticleBlock(mockArticleIfAbsent(dto.article)),
   };
 }
 

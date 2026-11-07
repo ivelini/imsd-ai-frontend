@@ -3,7 +3,6 @@ import "./style.css";
 import { getNav } from "@/shared/api/data";
 import { ClientLayout } from "@/shared/layout/ClientLayout";
 
-import { Benefits } from "@/shared/layout/Benefits";
 import { CatalogMenu } from "@/shared/layout/CatalogMenu";
 import { Footer } from "@/shared/layout/Footer";
 import { GeoPopup } from "@/shared/layout/GeoPopup";
@@ -32,7 +31,7 @@ export default async function RootLayout({
               <CatalogMenu nav={nav} />
               <GeoPopup />
               <Header nav={nav} />
-              <Benefits benefits={nav.attentionBlocks} />
+              {/* Бейджи страницы выводит сама страница: если в её data пришёл badges */}
               {children}
               <Footer nav={nav} />
 

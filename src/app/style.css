@@ -6368,3 +6368,88 @@ input[type="checkbox"] {
   height: auto;
 }
 
+
+/* ===== Описание товара: plain text от бэка — переносы строк сохраняем (23.10.2026) ===== */
+/* Описание приходит текстом (XLSX), а не HTML: абзацы разделены переносом строки —
+   без pre-line текст склеивается в один абзац. Свёрнутое описание режется по высоте. */
+.product-description {
+  white-space: pre-line;
+}
+.product-description--collapsed {
+  max-height: 200px;
+  overflow: hidden;
+}
+
+
+/* ===== Баджи товара в карточке каталога: полоса плашек от бэка (27.10.2026) ===== */
+/* Плашки стека баджей (листинг, подбор, модель) рисуются полосой .benefits первым
+   элементом .catalog-product-details. Полоса страничная — с внешними отступами; внутри
+   карточки отступы задаёт gap колонки, поэтому свой margin снимаем. */
+.catalog-product-details .benefits {
+  margin: 0;
+}
+
+
+/* ===== Статьи: фильтр категорий (05.11.2026) ===== */
+/* Макета фильтра нет — полоска корневых категорий над списком .news-list.
+   Категория в .article-meta — та же синяя ссылка, что .go-news-link. */
+.articles-categories {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 20px;
+  margin-bottom: 24px;
+}
+.articles-category-link {
+  color: var(--color-text);
+  font-size: 15px;
+  line-height: 1.4;
+  text-decoration: none;
+}
+.articles-category-link:hover {
+  color: var(--color-red);
+}
+.articles-category-link_active {
+  color: var(--color-red);
+  font-weight: 600;
+}
+.article-meta a {
+  color: #2496ff;
+  text-decoration: none;
+}
+.article-meta a:hover {
+  text-decoration: underline;
+}
+@media (max-width: 639px) {
+  .articles-categories {
+    gap: 6px 14px;
+    margin-bottom: 18px;
+  }
+  .articles-category-link {
+    font-size: 14px;
+  }
+}
+
+
+/* ===== Карточка новости: обложка из API — по ширине карточки (06.11.2026) ===== */
+/* В макете news.png = 370 px, поэтому ширину задавали только медиазапросы до 1365 px;
+   живые обложки статей (1920 px) на десктопе вылезали из .news и растягивали страницу
+   по горизонтали. Базовое правило повторяет мобильное: картинка = ширина карточки. */
+.news-image {
+  width: 100%;
+}
+
+
+/* ===== Тело статьи: картинки из RichEditor — по ширине текста (06.11.2026) ===== */
+/* Редактор вкладывает в HTML инлайн width/height (726×370 на фото 2490 px): на узких
+   экранах картинка вылезала из колонки. max-width ограничивает ширину и без !important,
+   а высоту задаёт инлайн-стиль — её снимаем только !important, иначе кадр искажается. */
+.article-content img {
+  max-width: 100%;
+  height: auto !important;
+}
+
+/* ===== Блок статьи в зонах витрины (07.11.2026) ===== */
+/* Листинги: отступ от пагинации. В модели и карточке отступ даёт контейнер зоны. */
+.catalog-section > .article-block {
+  margin-top: 40px;
+}

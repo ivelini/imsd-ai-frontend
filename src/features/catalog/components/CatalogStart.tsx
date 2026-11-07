@@ -1,6 +1,6 @@
 // Стартовая страница каталога: .catalog-start-grid + бренды (05.08.2026)
-// Данные — getCatalogStart (мок /api/catalog-start): карточки и бренды
-// готовыми строками; иконки карточек — на фронте (tire/disk из мокапа).
+// Данные — getCatalogStart (живые фасеты брендов 23.10.2026, карточки — статика
+// фронта); иконки карточек — на фронте (tire/disk из мокапа).
 import type { CatalogStartData } from "@/features/catalog/types";
 import { CatalogStartTireIcon, CatalogStartDiskIcon } from "./catalog-start-icons";
 

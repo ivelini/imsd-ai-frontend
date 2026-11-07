@@ -40,6 +40,38 @@ describe("toTireModel", () => {
       { value: "r18", count: 5 },
     ]);
   });
+
+  it("test_model_badges_pass_through", () => {
+    const m = toTireModel({
+      ...modelDto,
+      badges: [
+        {
+          text: "Хит продаж",
+          color: "red",
+          icon_key: null,
+          link: null,
+          owner_type: "brand",
+          owner_name: "Yokohama",
+        },
+        {
+          text: "Новинка",
+          color: "gold",
+          icon_key: "gold",
+          link: "/promo",
+          owner_type: "model",
+          owner_name: "BluEarth AE61",
+        },
+      ],
+    });
+    // порядок и дедуп — на бэке: фронт переносит стек как есть
+    expect(m.badges).toHaveLength(2);
+    expect(m.badges[0].text).toBe("Хит продаж");
+  });
+
+  it("test_model_missing_badges_yields_empty_stack", () => {
+    const m = toTireModel(modelDto);
+    expect(m.badges).toEqual([]);
+  });
 });
 
 describe("toModelSizesQuery", () => {

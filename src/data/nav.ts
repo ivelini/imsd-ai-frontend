@@ -1,7 +1,7 @@
 // Меню, подвал, соцсети, бенефиты из .template/*.html
 // Фаза 1: заменить на API (Laravel) при появлении страниц.
 // NAV_LINKS/FOOTER_GROUPS удалены (05.08.2026): ссылки шапки/футера приходят
-// с бэка по GET /api/service_pages → src/data/servicePages.ts.
+// с бэка по GET /api/reference/article-menu → src/shared/api/nav.ts.
 
 export interface NavLink {
   label: string;

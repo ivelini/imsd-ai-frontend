@@ -1,27 +1,40 @@
-// Статья: .article-section + похожие статьи (фаза 4). Серверный — данные через props.
-// Контент — HTML от «бэка» (как descriptionHtml в товаре).
+// Статья: .article-section + похожие статьи (живой API 05.11.2026).
+// Серверный — данные через props; контент — HTML RichEditor от бэка.
+import Link from "next/link";
 import { NewsCard } from "@/shared/ui/NewsCard";
-import type { Article } from "@/features/articles/types";
+import { ArticleBlock } from "@/shared/ui/ArticleBlock";
+import type { Article, ArticleListItem } from "@/features/articles/types";
 
 export function ArticlePage({
   article,
   related,
 }: {
   article: Article;
-  related: Article[];
+  related: ArticleListItem[];
 }) {
   return (
     <>
       <section className="article-section container">
         <h1 className="article-title">{article.title}</h1>
-        <div className="article-meta">{article.date}</div>
-        <div className="article-photo">
-          <img src="/assets/img/news.png" alt="" />
-        </div>
-        <div
-          className="article-content"
-          dangerouslySetInnerHTML={{ __html: article.contentHtml }}
-        />
+        {(article.date || article.category) && (
+          <div className="article-meta">
+            {article.date}
+            {article.date && article.category && " · "}
+            {article.category && (
+              <Link
+                href={`/articles?category=${encodeURIComponent(article.category.slug)}`}
+              >
+                {article.category.title}
+              </Link>
+            )}
+          </div>
+        )}
+        {article.image && (
+          <div className="article-photo">
+            <img src={article.image} alt="" />
+          </div>
+        )}
+        <ArticleBlock article={article} />
       </section>
       {related.length > 0 && (
         <section className="news-section container">
@@ -30,7 +43,7 @@ export function ArticlePage({
             {related.map((a) => (
               <NewsCard
                 key={a.slug}
-                image="/assets/img/news.png"
+                image={a.image}
                 title={a.title}
                 text={a.text}
                 href={`/articles/${a.slug}`}

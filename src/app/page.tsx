@@ -3,6 +3,7 @@
 // description, seo. Заголовки секций и блоки скидок — статичны.
 import type { Metadata } from "next";
 import { getHomeData } from "@/shared/api/data";
+import { Badges } from "@/shared/ui/Badge";
 import { MainFilter } from "@/features/home/components/MainFilter";
 import { DiscountBlock } from "@/features/home/components/DiscountBlock";
 import { ThreeBlocks } from "@/features/home/components/ThreeBlocks";
@@ -20,6 +21,7 @@ export default async function Home() {
 
   return (
     <>
+      <Badges badges={data.badges} />
       <div className="inner-wrapper">
         <div className="container main-block">
           <MainFilter />
