@@ -1,11 +1,6 @@
-// Блок статьи в зонах витрины: HTML RichEditor из объекта article в корне ответа бэка.
+// Блок статьи в зонах витрины: готовая HTML-строка из поля article в корне ответа бэка.
 
-/** DTO: { article: { body } | null } в корне ответов каталога, подбора, модели и карточки. */
-export interface ArticleBlockDto {
-  body: string;
-}
-
-/** Готовый к рендеру блок; null — блока нет (поле article отсутствует). */
+/** Готовый к рендеру блок; null — блока нет (ключа article нет, строка пустая). */
 export interface ArticleBlockData {
   contentHtml: string;
 }

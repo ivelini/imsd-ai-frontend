@@ -1,10 +1,12 @@
 // Страница товара диска: живой API (GET /api/catalog/wheels/{brand}/{size}, 22.10.2026)
-// Модели в слаге диска нет: {size} — слаг позиции без префикса бренда.
+// Адрес с 10.11.2026 — как у шин: /wheels/{brand}/{model}/{size}; {size} — слаг позиции
+// без префикса бренда. API модель не принимает, сегмент адреса в запрос не уходит.
 // Макета дискового товара нет — вёрстка шинной карточки, параметры дисков.
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { getProduct } from "@/shared/api/data";
 import { appendCityParam } from "@/shared/lib/cityUrl";
+import { modelCrumb } from "@/features/catalog/lib/productUrl";
 import { Breadcrumbs } from "@/shared/layout/Breadcrumbs";
 import { Badges } from "@/shared/ui/Badge";
 import { ProductGallery } from "@/features/product/components/ProductGallery";
@@ -12,7 +14,7 @@ import { ProductDetails } from "@/features/product/components/ProductDetails";
 import { ProductTabs } from "@/features/product/components/ProductTabs";
 
 interface PageProps {
-  params: Promise<{ brandSlug: string; sizeSlug: string }>;
+  params: Promise<{ brandSlug: string; modelSlug: string; sizeSlug: string }>;
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 }
 
@@ -46,6 +48,9 @@ export default async function WheelProductPage({ params, searchParams }: PagePro
   if (!result) notFound();
   const { product } = result;
 
+  // Модель — страница модели; диск без модели крошку не получает
+  const modelBreadcrumb = modelCrumb(product, cityValue ?? "");
+
   const breadcrumbs = [
     { label: "Главная", href: appendCityParam("/", cityValue ?? "") },
     { label: "Каталог дисков", href: appendCityParam("/catalog/wheels", cityValue ?? "") },
@@ -53,6 +58,7 @@ export default async function WheelProductPage({ params, searchParams }: PagePro
       label: product.brandName,
       href: appendCityParam(`/catalog/wheels/${resolvedParams.brandSlug}`, cityValue ?? ""),
     },
+    ...(modelBreadcrumb ? [modelBreadcrumb] : []),
     { label: product.sizeTitle },
   ];
 

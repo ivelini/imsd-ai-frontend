@@ -2,8 +2,9 @@
 // Адресация — схемой бэка: слаг бренда + короткий слаг модели (/tires/yokohama/bluearth-ae61)
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { getGeo, getTireModel, getTireModelSizes } from "@/shared/api/data";
+import { getGeo, getModelCard, getModelSizes } from "@/shared/api/data";
 import { resolveCityLabel } from "@/shared/lib/cityUrl";
+import { activeDiameter } from "@/features/catalog/lib/modelDiameters";
 import { ModelDescription } from "@/features/catalog/components/ModelDescription";
 import { ModelSizes } from "@/features/catalog/components/ModelSizes";
 import { Badges } from "@/shared/ui/Badge";
@@ -17,7 +18,7 @@ interface PageProps {
 export async function generateMetadata({ params, searchParams }: PageProps): Promise<Metadata> {
   const [{ brandSlug, modelSlug }, resolvedSearch] = await Promise.all([params, searchParams]);
   const cityValue = typeof resolvedSearch.city === "string" ? resolvedSearch.city : undefined;
-  const result = await getTireModel(brandSlug, modelSlug, cityValue);
+  const result = await getModelCard({ category: "tires", brandSlug, modelSlug, city: cityValue });
 
   if (!result) return { title: "Модель не найдена" };
 
@@ -31,18 +32,17 @@ export default async function ModelPage({ params, searchParams }: PageProps) {
   const [{ brandSlug, modelSlug }, resolvedSearch, geo] = await Promise.all([params, searchParams, getGeo()]);
   const cityValue = typeof resolvedSearch.city === "string" ? resolvedSearch.city : undefined;
 
-  const result = await getTireModel(brandSlug, modelSlug, cityValue);
+  const result = await getModelCard({ category: "tires", brandSlug, modelSlug, city: cityValue });
   if (!result) notFound();
   const { model } = result;
 
   // Активный диаметр — из URL (?diameter=r17); неизвестный/отсутствующий — первый у модели
   const requested = typeof resolvedSearch.diameter === "string" ? resolvedSearch.diameter : undefined;
-  const active =
-    requested && model.diameters.some((d) => d.value === requested)
-      ? requested
-      : model.diameters[0]?.value ?? "";
+  const active = activeDiameter(model.diameters, requested);
   // Размеры — живым листингом с фильтрами модели (адаптер карточек — общий с каталогом)
-  const sizes = active ? await getTireModelSizes(brandSlug, modelSlug, active, cityValue) : [];
+  const sizes = active
+    ? await getModelSizes({ category: "tires", brandSlug, modelSlug, diameter: active, city: cityValue })
+    : [];
 
   const cityLabel = resolveCityLabel(cityValue, geo.cities, geo.defaultCity);
 

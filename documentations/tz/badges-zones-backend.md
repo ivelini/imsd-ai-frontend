@@ -67,6 +67,7 @@
    | Листинг дисков | `GET /catalog/wheels` | `WheelListItemResource` | товар → модель → бренд |
    | Подбор по авто | `GET /catalog/tires\|wheels/by-vehicle/…` | `TireListItemResource` / `WheelListItemResource` (офферы) | товар → модель → бренд |
    | Карточка модели | `GET /catalog/tire-models/{brand}/{model}` | `TireModelCardResource` | модель → бренд |
+   | Карточка модели дисков | `GET /catalog/wheel-models/{brand}/{model}` | `ProductModelCardResource` | модель → бренд |
    | Карточка товара | `GET /catalog/tires\|wheels/…` | `TireProductResource` / `WheelProductResource` | уже есть |
    | Главная | `GET /service-page/main` | — | промо-бейджи сайта (владелец — сайт) |
    | Статья | `GET /articles/{id}` (когда появится) | — | статья |

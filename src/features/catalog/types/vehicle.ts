@@ -7,7 +7,7 @@ import type {
   WheelListItemDto,
   WheelProduct,
 } from "./index";
-import type { ArticleBlockData, ArticleBlockDto } from "@/shared/types/articleBlock";
+import type { ArticleBlockData } from "@/shared/types/articleBlock";
 
 // ── Справочники каскада ────────────────────────────────────────────────
 
@@ -137,7 +137,7 @@ export interface VehicleSelectionDto {
   };
   meta: VehicleSelectionMeta;
   /** Блок статьи в корне ответа; поля нет — блока нет. */
-  article?: ArticleBlockDto | null;
+  article?: string;
 }
 
 // ── Доменные типы для компонентов ──────────────────────────────────────
@@ -211,7 +211,7 @@ export interface VehicleWheelSelectionDto {
   };
   meta: VehicleSelectionMeta;
   /** Блок статьи в корне ответа; поля нет — блока нет. */
-  article?: ArticleBlockDto | null;
+  article?: string;
 }
 
 export interface VehicleWheelOffer {

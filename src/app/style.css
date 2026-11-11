@@ -4846,6 +4846,7 @@ input[type="checkbox"] {
 	line-height: 1.6;
 	margin: 0 0 15px;
 }
+.article-content h2,
 .article-content h3 {
 	color: var(--color-text-dark);
 
@@ -6452,4 +6453,10 @@ input[type="checkbox"] {
 /* Листинги: отступ от пагинации. В модели и карточке отступ даёт контейнер зоны. */
 .catalog-section > .article-block {
   margin-top: 40px;
+}
+
+/* ===== Блок статьи: заголовок h2 из текста маршрута (10.11.2026) ===== */
+/* Типографика h2 общая с h3 (правило выше); здесь только размер — h2 крупнее. */
+.article-content h2 {
+  font-size: 22px;
 }

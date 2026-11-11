@@ -1,11 +1,11 @@
 # Каталог (шины и диски): живой API (листинг, гео, SEO-мета, авто-подбор)
 
-> Sources: План и реализация catalog-tires-live-api, 2026-08-21; плашка «Самовывоз» из origin.delivery_days_after_order, 2026-10-15; живые поля карточки (ПВЗ, наличие, зачёркнутая цена), 2026-10-16; каталог дисков на живом API, 2026-10-16; страница модели шин на живом API, 2026-10-16; фото товаров из API, 2026-10-16; подбор шин по автомобилю на живом API, 2026-10-20; подбор дисков по автомобилю на живом API, 2026-10-20; слаги Vehicle в URL, 2026-10-20; карточка товара шин и дисков на живом API, 2026-10-22; бейджи товара на фронте, 2026-10-23; бейджи во всех зонах витрины (листинг, подбор, карточка модели), 2026-10-27; блок статьи в зонах витрины, 2026-11-07
-> Raw: [catalog-tires-live-api](../../raw/project/2026-08-21-catalog-tires-live-api.md); [pickup-badge-card](../../raw/project/2026-10-15-pickup-badge-card.md); [catalog-card-live-fields](../../raw/project/2026-10-16-catalog-card-live-fields.md); [wheels-live-migration](../../raw/project/2026-10-16-wheels-live-migration.md); [tire-model-live](../../raw/project/2026-10-16-tire-model-live.md); [catalog-photos](../../raw/project/2026-10-16-catalog-photos.md); [auto-selection-live](../../raw/project/2026-10-20-auto-selection-live.md); [wheel-by-vehicle](../../raw/project/2026-10-20-wheel-by-vehicle.md); [vehicle-slugs](../../raw/project/2026-10-20-vehicle-slugs.md); [product-card-live](../../raw/project/2026-10-22-product-card-live.md); [product-badges](../../raw/project/2026-10-23-product-badges.md); [badges-zones-front](../../raw/project/2026-10-27-badges-zones-front.md); [article-block-zones](../../raw/project/2026-11-07-article-block-zones.md)
+> Sources: План и реализация catalog-tires-live-api, 2026-08-21; плашка «Самовывоз» из origin.delivery_days_after_order, 2026-10-15; живые поля карточки (ПВЗ, наличие, зачёркнутая цена), 2026-10-16; каталог дисков на живом API, 2026-10-16; страница модели шин на живом API, 2026-10-16; фото товаров из API, 2026-10-16; подбор шин по автомобилю на живом API, 2026-10-20; подбор дисков по автомобилю на живом API, 2026-10-20; слаги Vehicle в URL, 2026-10-20; карточка товара шин и дисков на живом API, 2026-10-22; бейджи товара на фронте, 2026-10-23; бейджи во всех зонах витрины (листинг, подбор, карточка модели), 2026-10-27; блок статьи в зонах витрины, 2026-11-07; модель дисков на живом API и адреса карточек с модельным сегментом, 2026-11-11
+> Raw: [catalog-tires-live-api](../../raw/project/2026-08-21-catalog-tires-live-api.md); [pickup-badge-card](../../raw/project/2026-10-15-pickup-badge-card.md); [catalog-card-live-fields](../../raw/project/2026-10-16-catalog-card-live-fields.md); [wheels-live-migration](../../raw/project/2026-10-16-wheels-live-migration.md); [tire-model-live](../../raw/project/2026-10-16-tire-model-live.md); [catalog-photos](../../raw/project/2026-10-16-catalog-photos.md); [auto-selection-live](../../raw/project/2026-10-20-auto-selection-live.md); [wheel-by-vehicle](../../raw/project/2026-10-20-wheel-by-vehicle.md); [vehicle-slugs](../../raw/project/2026-10-20-vehicle-slugs.md); [product-card-live](../../raw/project/2026-10-22-product-card-live.md); [product-badges](../../raw/project/2026-10-23-product-badges.md); [badges-zones-front](../../raw/project/2026-10-27-badges-zones-front.md); [article-block-zones](../../raw/project/2026-11-07-article-block-zones.md); [wheel-models-live](../../raw/project/2026-11-11-wheel-models-live.md)
 
 ## Overview
 
-Страница `/catalog/tires` полностью переведена на живой бэк: листинг `GET /api/catalog/tires`, гео `GET /api/reference/city`, фильтры `GET /api/reference/filter/tire` (было раньше). Моки листинга и гео удалены. Ключевое решение: город в query идёт **слагом `city=`**, бэк резолвит его сам — фронт не делает предварительный запрос гео для резолва id (один RTT на страницу). С 16.10.2026 так же живёт каталог дисков (`/catalog/wheels`) и страница модели шин (`/tires/<бренд>/<модель>`) с типоразмерами из листинга. С 20.10.2026 живой автоподбор шин и дисков (`/catalog/tires|wheels/auto`): справочники Vehicle + результат с размерами/спецификациями и товарами. С 22.10.2026 живы карточки товара: `/tires/{бренд}/{модель}/{слаг позиции}` и `/wheels/{бренд}/{слаг без бренда}`; товарные моки удалены. С 23.10.2026 бейджи — общий объект фронта в `shared/`: пришёл в `data` объект `badges` — страница выводит плашки (ADR 0008).
+Страница `/catalog/tires` полностью переведена на живой бэк: листинг `GET /api/catalog/tires`, гео `GET /api/reference/city`, фильтры `GET /api/reference/filter/tire` (было раньше). Моки листинга и гео удалены. Ключевое решение: город в query идёт **слагом `city=`**, бэк резолвит его сам — фронт не делает предварительный запрос гео для резолва id (один RTT на страницу). С 16.10.2026 так же живёт каталог дисков (`/catalog/wheels`) и страница модели шин (`/tires/<бренд>/<модель>`) с типоразмерами из листинга. С 20.10.2026 живой автоподбор шин и дисков (`/catalog/tires|wheels/auto`): справочники Vehicle + результат с размерами/спецификациями и товарами. С 22.10.2026 живы карточки товара: `/tires/{бренд}/{модель}/{слаг позиции}`; у дисков с 11.11.2026 адрес тоже трёхсегментный — `/wheels/{бренд}/{модель}/{слаг}`. С 11.11.2026 жива и модель дисков (`/wheels/{бренд}/{модель}`), адреса дисков — зеркало шин (ADR 0011, 0007 заменён в части дисков). С 23.10.2026 бейджи — общий объект фронта в `shared/`: пришёл в `data` объект `badges` — страница выводит плашки (ADR 0008).
 
 ## Контракт и адаптеры
 
@@ -57,6 +57,29 @@
   `ModelDescription` — обёртка `.model-description-image` (правило макета 300px) и
   HTML-описание. С 22.10.2026 размеры модели ведут на живую карточку товара
   (`showLink` включён).
+- С 11.11.2026 API и адаптер общие для шин и дисков: `ModelCardInput {category, brandSlug,
+  modelSlug, city?}`, `toModelCard`, `modelCardPath`, `getModelCard`, `modelSizesUrl`,
+  `getModelSizes` (категория → `tire-models|wheel-models` и `tires|wheels`); типы
+  `TireModel*` переименованы в `ModelCardDto/ResponseDto/Data`.
+
+## Модель дисков (11.11.2026)
+
+- `GET /api/catalog/wheel-models/{brand}/{model}` — карточка модели дисков: диаметры со
+  счётчиками по правилам листинга, характеристики «Тип/Цвет/Страна», картинка
+  (`image_url`, fallback — первая картинка товара), HTML-описание, `meta.seo`, баджи;
+  404 — нет пары, чужой бренд, модель шин.
+- Маршрут `/wheels/[brandSlug]/[modelSlug]`; карточка диска переехала на
+  `/wheels/[brandSlug]/[modelSlug]/[sizeSlug]`. Модельный сегмент — декоративный: API
+  карточки диска модели не принимает. Старые двухсегментные адреса — 404 без редиректов
+  (каталог не проиндексирован). ADR 0011; ADR 0007 Superseded в части дисков.
+- Страница — по образцу модели шин: `Badges` → h2 «Диски {бренд} {модель}» →
+  `ModelDescription` → `ModelSizes` (вкладки диаметров `?diameter=r16`, размеры — листинг
+  `model&brand&diameter[]`). `activeDiameter` — общий выбор вкладки.
+- Ссылки: `productUrl` у дисков трёхсегментный, `modelUrl` — адрес модели, `modelCrumb` —
+  крошка модели в карточках шин и дисков.
+- Найденная смоуком ошибка: `modelUrl` и `toWheelProduct` срезали префикс бренда с
+  канонического короткого слага (`ls-367` → `367`); исправлено, тесты обновлены. Слаг
+  `model.slug` листинга используется как есть (без `toShortModelSlug`).
 
 ## Авто-подбор шин (20.10.2026)
 
@@ -142,11 +165,10 @@
 - Вкладки — `productTabs`: «Описание» только при непустом описании, «НАЛИЧИЕ»/
   «Доставка»/«Гарантия» — при непустых текстах, «Оплата» — как в макете, «Отзывы» нет.
   Описание рендерится текстом (plain text XLSX), не HTML.
-- Адреса mirror API (ADR 0007): шина — `/tires/{бренд}/{модель}/{слаг позиции}`;
-  диск — `/wheels/{бренд}/{слаг без бренда}`. Шина без модели — сегмент `-`
-  (бэк при `model = null` его не сверяет). Ссылки карточек — `productUrl`
-  (`features/catalog/lib/productUrl.ts`); включены в листинге дисков, размерах модели
-  и автоподборе.
+- Адреса mirror API (ADR 0007; для дисков — ADR 0011): шина — `/tires/{бренд}/{модель}/{слаг позиции}`;
+  диск — `/wheels/{бренд}/{модель}/{слаг без бренда}`. Нет модели — сегмент `-`.
+  Ссылки карточек — `productUrl` (`features/catalog/lib/productUrl.ts`); включены
+  в листинге дисков, размерах модели и автоподборе.
 - Старая цена — только при `old_price > price`; «Наличие»/«Самовывоз»/блок адреса
   скрываются при отсутствии данных.
 - Удалены `data/catalog.ts`, `ALL_PRODUCTS`, `PRODUCT_STATIC` и генераторы текстов,
@@ -194,16 +216,15 @@
   Зоны витрины (27.10.2026): +6 тестов адаптеров (139 всего), живой прогон — листинг Yokohama
   24 плашки, подбор по авто 8, карточка модели 4; диски 0 (в дев-базе нет привязок к дискам).
 
-## Блок статьи в зонах (07.11.2026)
+## Блок статьи в зонах (07.11.2026; строка с 11.11.2026)
 
-- Контракт: `article: { body: string } | null` в корне ответов листингов, подбора, модели и
-  карточки; `body` — HTML RichEditor как есть; поля нет — блока нет. Подробности и зоны —
+- Контракт: `article?: string` в корне ответов листингов, подбора, моделей и карточки —
+  HTML-строка из текстов маршрутов админки; ключа нет — блока нет. Подробности и зоны —
   [article-block-zones](article-block-zones.md).
-- Ядро в `shared/`: типы `ArticleBlockDto/ArticleBlockData`, адаптер `toArticleBlock`,
-  компонент `ArticleBlock` (`.article-content.article-block`). DTO и результаты страниц
-  получили поле `article`.
-- Мок `src/data/articleBlock.ts` работает только в dev; ТЗ бэку —
-  `documentations/tz/article-block-backend.md`.
+- Ядро в `shared/`: `ArticleBlockData`, адаптер `toArticleBlock(article?)`, компонент
+  `ArticleBlock` (`.article-content.article-block`). DTO и результаты страниц получили
+  `article?: string`; `ArticleBlockDto` удалён, dev-мок снят 11.11.2026.
+- ТЗ бэку — `documentations/tz/article-block-backend.md` (статус «реализовано»).
 
 ## SEO
 

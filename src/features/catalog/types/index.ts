@@ -1,7 +1,7 @@
 // Типы каталога (фаза 2, 03.08.2026)
 import type { Badge } from "@/shared/types/badge";
 import type { ProductParam } from "@/shared/types/product";
-import type { ArticleBlockData, ArticleBlockDto } from "@/shared/types/articleBlock";
+import type { ArticleBlockData } from "@/shared/types/articleBlock";
 
 /** Единый формат опций фильтра/селекта: label — от бэка, value — латинский slug = URL */
 export interface FilterOption {
@@ -238,7 +238,7 @@ export interface TireListDto {
   data: TireListItemDto[];
   meta: TireListMetaDto;
   /** Блок статьи в корне ответа; поля нет — блока нет. */
-  article?: ArticleBlockDto | null;
+  article?: string;
 }
 
 /** Результат листинга для страницы: товары + пагинация + seo-мета + блок статьи. */
@@ -287,7 +287,7 @@ export interface WheelListDto {
   data: WheelListItemDto[];
   meta: TireListMetaDto; // shape meta у дисков тот же (включая seo)
   /** Блок статьи в корне ответа; поля нет — блока нет. */
-  article?: ArticleBlockDto | null;
+  article?: string;
 }
 
 /** Результат листинга дисков для страницы: товары + пагинация + seo-мета + блок статьи. */
@@ -301,12 +301,12 @@ export interface WheelListResult {
 }
 
 // ============================================================================
-// DTO бэкенда: GET /api/catalog/tire-models/{brand}/{model}
-// (Scramble public-api.json, 16.10.2026: {brand} — слаг бренда,
+// DTO бэкенда: GET /api/catalog/{tire|wheel}-models/{brand}/{model}
+// (Scramble public-api.json, 16.10.2026 / 10.11.2026: {brand} — слаг бренда,
 // {model} — короткий слаг модели; диаметры — числами без префикса)
 // ============================================================================
 
-export interface TireModelDto {
+export interface ModelCardDto {
   slug: string;
   name: string;
   brand: { id: number; name: string; slug: string };
@@ -318,15 +318,15 @@ export interface TireModelDto {
   badges?: Badge[];
 }
 
-export interface TireModelResponseDto {
-  data: TireModelDto;
+export interface ModelCardResponseDto {
+  data: ModelCardDto;
   meta: { seo: TireListSeo | null };
   /** Блок статьи в корне ответа; поля нет — блока нет. */
-  article?: ArticleBlockDto | null;
+  article?: string;
 }
 
 /** Модель для страницы: диаметры — r-ключами вкладок (?diameter=r17). */
-export interface TireModelData {
+export interface ModelCardData {
   slug: string;
   name: string;
   brandName: string;

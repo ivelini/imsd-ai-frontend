@@ -5,7 +5,6 @@
 import type { OriginDto, TireListSeo } from "@/features/catalog/types";
 import type { Badge } from "@/shared/types/badge";
 import type { ProductParam } from "@/shared/types/product";
-import type { ArticleBlockDto } from "@/shared/types/articleBlock";
 
 export type { ProductParam, ParamDescription } from "@/shared/types/product";
 
@@ -18,7 +17,7 @@ export interface ProductResponseDto<T> {
   data: T;
   meta: { seo: TireListSeo | null };
   /** Блок статьи в корне ответа; поля нет — блока нет. */
-  article?: ArticleBlockDto | null;
+  article?: string;
 }
 
 /** GET /api/catalog/tires/{brand}/{model}/{size} — поля листинга + товарные. */

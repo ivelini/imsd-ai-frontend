@@ -1,9 +1,9 @@
-// Блок статьи в зонах витрины (тест-лист плана article-block-zones)
-// Контракт: article: { body: string } | null в корне ответа; HTML — как отдал RichEditor бэка.
+// Блок статьи в зонах витрины (тест-листы планов article-block-zones, article-route-texts-frontend)
+// Контракт: article?: string в корне ответа; ключа нет — блока нет; HTML — как отдал RichEditor бэка.
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { mockFetch } from "./helpers/mockFetch";
 import { toArticleBlock } from "@/shared/lib/articleBlock";
-import { getCatalogProducts, getTireModel, getWheelsProducts } from "@/shared/api/catalog";
+import { getCatalogProducts, getModelCard, getWheelsProducts } from "@/shared/api/catalog";
 import { getVehicleTireSelection, getVehicleWheelSelection } from "@/shared/api/vehicle";
 import { getProduct } from "@/shared/api/product";
 import type { TireProductDto } from "@/features/product/types";
@@ -81,12 +81,14 @@ describe("toArticleBlock", () => {
   it("test_absent_article_gives_null", () => {
     expect(toArticleBlock(undefined)).toBeNull();
     expect(toArticleBlock(null)).toBeNull();
+    // пустая строка — тоже «текста нет»: заглушку не выводим
+    expect(toArticleBlock("")).toBeNull();
   });
 
-  it("test_body_html_maps_to_content", () => {
-    expect(toArticleBlock({ body: "<p>Текст <b>жирный</b></p>" })).toEqual({
-      contentHtml: "<p>Текст <b>жирный</b></p>",
-    });
+  it("test_html_string_maps_to_content", () => {
+    const html = "<h2>Aplus A503</h2><p>Текст <b>жирный</b></p>";
+
+    expect(toArticleBlock(html)).toEqual({ contentHtml: html });
   });
 });
 
@@ -97,7 +99,7 @@ describe("article в корне ответа", () => {
       body: {
         data: [],
         meta: { current_page: 1, last_page: 1, per_page: 12, total: 0, seo: null },
-        article: { body: "<p>A</p>" },
+        article: "<p>A</p>",
       },
     }));
 
@@ -112,7 +114,7 @@ describe("article в корне ответа", () => {
       body: {
         data: [],
         meta: { current_page: 1, last_page: 1, per_page: 12, total: 0, seo: null },
-        article: { body: "<p>W</p>" },
+        article: "<p>W</p>",
       },
     }));
 
@@ -131,7 +133,7 @@ describe("article в корне ответа", () => {
 
     mockFetch(() => ({
       status: 200,
-      body: { data: { vehicle, sections: [] }, meta: vehicleMeta, article: { body: "<p>T</p>" } },
+      body: { data: { vehicle, sections: [] }, meta: vehicleMeta, article: "<p>T</p>" },
     }));
     const withArticle = await getVehicleTireSelection(vehicleRef, {}, "chelyabinsk");
 
@@ -155,7 +157,7 @@ describe("article в корне ответа", () => {
 
     mockFetch(() => ({
       status: 200,
-      body: { data: { vehicle, sections: [] }, meta: vehicleMeta, article: { body: "<p>V</p>" } },
+      body: { data: { vehicle, sections: [] }, meta: vehicleMeta, article: "<p>V</p>" },
     }));
     const withArticle = await getVehicleWheelSelection(vehicleRef, {}, "chelyabinsk");
 
@@ -172,17 +174,52 @@ describe("article в корне ответа", () => {
   it("test_model_result_carries_article", async () => {
     mockFetch(() => ({
       status: 200,
-      body: { data: modelDto, meta: { seo: null }, article: { body: "<p>M</p>" } },
+      body: { data: modelDto, meta: { seo: null }, article: "<p>M</p>" },
     }));
-    const withArticle = await getTireModel("yokohama", "bluearth-e70b", "chelyabinsk");
+    const withArticle = await getModelCard({
+      category: "tires",
+      brandSlug: "yokohama",
+      modelSlug: "bluearth-e70b",
+      city: "chelyabinsk",
+    });
 
     mockFetch(() => ({
       status: 200,
       body: { data: modelDto, meta: { seo: null } },
     }));
-    const withoutArticle = await getTireModel("yokohama", "bluearth-e70b", "chelyabinsk");
+    const withoutArticle = await getModelCard({
+      category: "tires",
+      brandSlug: "yokohama",
+      modelSlug: "bluearth-e70b",
+      city: "chelyabinsk",
+    });
 
     expect(withArticle?.article).toEqual({ contentHtml: "<p>M</p>" });
+    expect(withoutArticle?.article).toBeNull();
+  });
+
+  it("test_wheel_model_result_carries_article", async () => {
+    mockFetch(() => ({
+      status: 200,
+      body: { data: modelDto, meta: { seo: null }, article: "<p>W</p>" },
+    }));
+    const withArticle = await getModelCard({
+      category: "wheels",
+      brandSlug: "hankook",
+      modelSlug: "kinergy",
+    });
+
+    mockFetch(() => ({
+      status: 200,
+      body: { data: modelDto, meta: { seo: null } },
+    }));
+    const withoutArticle = await getModelCard({
+      category: "wheels",
+      brandSlug: "hankook",
+      modelSlug: "kinergy",
+    });
+
+    expect(withArticle?.article).toEqual({ contentHtml: "<p>W</p>" });
     expect(withoutArticle?.article).toBeNull();
   });
 
@@ -197,7 +234,7 @@ describe("article в корне ответа", () => {
     mockFetch((url) =>
       url.includes("/reference/store")
         ? { status: 200, body: { data: storeDto } }
-        : { status: 200, body: { data: tireDto, meta: { seo: null }, article: { body: "<p>P</p>" } } },
+        : { status: 200, body: { data: tireDto, meta: { seo: null }, article: "<p>P</p>" } },
     );
     const withArticle = await getProduct(route, "chelyabinsk");
 

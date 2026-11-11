@@ -1,8 +1,8 @@
-// Адаптер блока статьи: article из корня ответа → данные рендера.
-import type { ArticleBlockData, ArticleBlockDto } from "@/shared/types/articleBlock";
+// Адаптер блока статьи: article (HTML-строка) из корня ответа → данные рендера.
+import type { ArticleBlockData } from "@/shared/types/articleBlock";
 
-/** Нет объекта article (поле отсутствует или null) — блока нет. */
-export function toArticleBlock(dto?: ArticleBlockDto | null): ArticleBlockData | null {
-  if (!dto) return null;
-  return { contentHtml: dto.body };
+/** Нет текста (ключа нет, null или пустая строка) — блока нет. */
+export function toArticleBlock(article?: string | null): ArticleBlockData | null {
+  if (!article) return null;
+  return { contentHtml: article };
 }

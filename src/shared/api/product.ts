@@ -17,7 +17,6 @@ import type {
 import { decimal } from "@/shared/lib/decimal";
 import { PRODUCT_PLACEHOLDER } from "@/shared/lib/productImage";
 import { toArticleBlock } from "@/shared/lib/articleBlock";
-import { mockArticleIfAbsent } from "@/data/articleBlock";
 import type { ProductParam } from "@/shared/types/product";
 import type { ArticleBlockData } from "@/shared/types/articleBlock";
 
@@ -107,7 +106,7 @@ export async function getProduct(
   return {
     product: toProductDetail(body.data, store),
     seo: body.meta.seo ?? null,
-    article: toArticleBlock(mockArticleIfAbsent(body.article)),
+    article: toArticleBlock(body.article),
   };
 }
 

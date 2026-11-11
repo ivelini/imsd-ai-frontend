@@ -101,3 +101,17 @@
 
 ## [2026-11-07] ingest | Блок статьи в зонах витрины (article в корне ответа)
 - Updated: catalog-live-api.md (раздел «Блок статьи в зонах»: контракт article, ядро shared/, мок только в dev, See Also)
+
+## [2026-11-11] ingest | Модель дисков на живом API и адреса карточек с модельным сегментом
+- Updated: catalog-live-api.md (раздел «Модель дисков»: эндпоинт, маршруты `/wheels/{brand}/{model}` и трёхсегментная карточка, общие ModelCard*-функции, activeDiameter, productUrl/modelUrl/modelCrumb, исправление срезания префикса слага; overview, карточка товара, See Also)
+- Updated: project-architecture.md (overview, роуты, «Живое», ADR: 0007 superseded в части дисков, 0011)
+- Updated: adr-practice.md (индекс 0001–0011, 0007/0010/0011)
+- Updated: model-sizes-pagination.md (механика общая с моделью дисков)
+- Updated: index.md
+
+## [2026-11-11] ingest | Блок статьи: тексты маршрутов, контракт-строка, снятие мока
+- Updated: article-block-zones.md (контракт `article?: string`, 8 зон, dev-мок снят, h2 общей типографикой, проверки 11.11)
+- Updated: catalog-live-api.md (раздел «Блок статьи»: строка из текстов маршрутов, ArticleBlockDto удалён)
+- Updated: project-architecture.md (overview, ADR 0010 обновлён)
+- Updated: adr-practice.md (0010 обновлён)
+- Updated: index.md

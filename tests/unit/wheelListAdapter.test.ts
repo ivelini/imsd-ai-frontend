@@ -123,7 +123,7 @@ describe("toWheelProduct", () => {
     expect(p.title).toBe(baseDto.name);
     expect(p.sizeSlug).toBe(baseDto.slug);
     // короткий слаг модели — как у шин (полный «ls-367» срезается префиксом бренда)
-    expect(p.modelSlug).toBe("367");
+    expect(p.modelSlug).toBe("ls-367");
     expect(p.brandName).toBe("LS");
     // origin → параметры карточки (три записи, как у шин)
     expect(p.parameters).toHaveLength(3);

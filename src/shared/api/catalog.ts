@@ -5,21 +5,21 @@ import { PRODUCT_PLACEHOLDER } from "@/shared/lib/productImage";
 import { appendCityParam } from "@/shared/lib/cityUrl";
 import { decimal } from "@/shared/lib/decimal";
 import { toArticleBlock } from "@/shared/lib/articleBlock";
-import { mockArticleIfAbsent } from "@/data/articleBlock";
 import type {
   BrandLink,
   CatalogStartCard,
   CatalogStartData,
   FilterOptions,
   FilterState,
+  ModelCardData,
+  ModelCardDto,
+  ModelCardResponseDto,
+  ProductBase,
   TireFilterValuesDto,
   TireListItemDto,
   TireListDto,
   TireListResult,
   TireListSeo,
-  TireModelData,
-  TireModelDto,
-  TireModelResponseDto,
   TireProduct,
   WheelFilterValuesDto,
   WheelListItemDto,
@@ -256,20 +256,44 @@ export async function getCatalogProducts(
     page: body.meta.current_page,
     perPage: body.meta.per_page,
     seo: body.meta.seo ?? null,
-    article: toArticleBlock(mockArticleIfAbsent(body.article)),
+    article: toArticleBlock(body.article),
   };
 }
 
-// --- Модель шины: GET /api/catalog/tire-models/{brand}/{model} + размеры листингом ---
+// --- Карточка модели шин и дисков: GET /api/catalog/{tire|wheel}-models/{brand}/{model} ---
 
 /** Размеров тянем за один заход: вкладка диаметра целиком (листинг допускает до 100). */
 const MODEL_SIZES_PER_PAGE = 100;
 
+/** Категория → сегмент эндпоинта карточки модели; листинг размеров — по имени категории. */
+const MODEL_CARD_SEGMENTS = {
+  tires: "tire-models",
+  wheels: "wheel-models",
+} as const;
+
+export interface ModelCardInput {
+  category: "tires" | "wheels";
+  brandSlug: string;
+  modelSlug: string;
+  city?: string;
+}
+
+export interface ModelSizesInput extends ModelCardInput {
+  /** r-ключ вкладки (r17); в query уходит число. */
+  diameter?: string;
+}
+
+export interface ModelCardResult {
+  model: ModelCardData;
+  seo: TireListSeo | null;
+  article: ArticleBlockData | null;
+}
+
 /**
- * Адаптер DTO модели → TireModelData: диаметры бэка («17») — r-ключами вкладок
+ * Адаптер DTO модели → ModelCardData: диаметры бэка («17») — r-ключами вкладок
  * (?diameter=r17); параметры и описание — как отдал бэк (пустое страница скрывает).
  */
-export function toTireModel(dto: TireModelDto): TireModelData {
+export function toModelCard(dto: ModelCardDto): ModelCardData {
   return {
     slug: dto.slug,
     name: dto.name,
@@ -287,60 +311,53 @@ export function toTireModel(dto: TireModelDto): TireModelData {
   };
 }
 
-/** Модель шины: 404 бэка → null (страница отдаёт notFound). */
-export async function getTireModel(
-  brandSlug: string,
-  modelSlug: string,
-  city?: string,
-): Promise<{
-  model: TireModelData;
-  seo: TireListSeo | null;
-  article: ArticleBlockData | null;
-} | null> {
-  const query = cityQuery(city);
-  const res = await fetch(`${apiBase()}/catalog/tire-models/${brandSlug}/${modelSlug}${query}`);
+/** Путь карточки модели: у шин и дисков — зеркальные эндпоинты бэка. */
+export function modelCardPath(input: ModelCardInput): string {
+  const segment = MODEL_CARD_SEGMENTS[input.category];
+  return `/catalog/${segment}/${input.brandSlug}/${input.modelSlug}${cityQuery(input.city)}`;
+}
+
+/** Карточка модели: 404 бэка → null (страница отдаёт notFound). */
+export async function getModelCard(input: ModelCardInput): Promise<ModelCardResult | null> {
+  const res = await fetch(`${apiBase()}${modelCardPath(input)}`);
   if (res.status === 404) return null;
   if (!res.ok) {
-    throw new Error(`getTireModel: HTTP ${res.status}`);
+    throw new Error(`getModelCard: HTTP ${res.status}`);
   }
-  const body = (await res.json()) as TireModelResponseDto;
+  const body = (await res.json()) as ModelCardResponseDto;
   return {
-    model: toTireModel(body.data),
+    model: toModelCard(body.data),
     seo: body.meta.seo ?? null,
-    article: toArticleBlock(mockArticleIfAbsent(body.article)),
+    article: toArticleBlock(body.article),
   };
 }
 
-/** Query размеров модели: короткий слаг + бренд + диаметр числом (r18 → 18) + город. */
-export function toModelSizesQuery(
-  modelSlug: string,
-  brandSlug: string,
-  diameter?: string,
-  city?: string,
-): string {
+/** URL размеров модели: листинг категории с фильтрами модели и диаметра, город в query. */
+export function modelSizesUrl(input: ModelSizesInput): string {
   const params = new URLSearchParams();
-  if (modelSlug) params.append("model", modelSlug);
-  if (brandSlug) params.append("brand", brandSlug);
-  if (diameter) params.append("diameter[]", diameter.replace(/^r/i, "").toUpperCase());
-  if (city) params.append("city", city);
+  if (input.modelSlug) params.append("model", input.modelSlug);
+  if (input.brandSlug) params.append("brand", input.brandSlug);
+  // Бэк ждёт диаметр числом: r-префикс вкладки (r18) срезается
+  if (input.diameter) params.append("diameter[]", input.diameter.replace(/^r/i, "").toUpperCase());
+  if (input.city) params.append("city", input.city);
+  params.append("per_page", String(MODEL_SIZES_PER_PAGE));
   // URLSearchParams кодирует [] в %5B%5D — бэк ждёт каноничный вид diameter[]= (PHP parse_str)
-  return params.toString().replace(/%5B/g, "[").replace(/%5D/g, "]");
+  const query = params.toString().replace(/%5B/g, "[").replace(/%5D/g, "]");
+  return `/catalog/${input.category}?${query}`;
 }
 
 /** Типоразмеры модели одной вкладки диаметра: живой листинг с фильтрами модели. */
-export async function getTireModelSizes(
-  brandSlug: string,
-  modelSlug: string,
-  diameter?: string,
-  city?: string,
-): Promise<TireProduct[]> {
-  const query = toModelSizesQuery(modelSlug, brandSlug, diameter, city);
-  const res = await fetch(`${apiBase()}/catalog/tires?${query}&per_page=${MODEL_SIZES_PER_PAGE}`);
+export async function getModelSizes(input: ModelSizesInput): Promise<ProductBase[]> {
+  const res = await fetch(`${apiBase()}${modelSizesUrl(input)}`);
   if (!res.ok) {
-    throw new Error(`getTireModelSizes: HTTP ${res.status}`);
+    throw new Error(`getModelSizes: HTTP ${res.status}`);
   }
-  const body = (await res.json()) as TireListDto;
-  return body.data.map(toTireProduct);
+  if (input.category === "tires") {
+    const body = (await res.json()) as TireListDto;
+    return body.data.map(toTireProduct);
+  }
+  const body = (await res.json()) as WheelListDto;
+  return body.data.map(toWheelProduct);
 }
 
 // --- Диски (живые: GET /api/catalog/wheels, GET /api/reference/filter/wheel) ---
@@ -425,8 +442,8 @@ export function toWheelProduct(dto: WheelListItemDto): WheelProduct {
     slug: dto.slug,
     brandName: dto.brand.name,
     brandSlug: dto.brand.slug,
-    // как у шин: короткий слаг модели (поле общее; у диска модель в слаг позиции не входит)
-    modelSlug: toShortModelSlug(dto.model?.slug, dto.brand.slug),
+    // канонический слаг модели листинга; префикс бренда не срезаем — у LS модель «ls-367»
+    modelSlug: dto.model?.slug ?? "",
     modelName: dto.model?.name ?? dto.name,
     width,
     diameter,
@@ -474,6 +491,6 @@ export async function getWheelsProducts(
     page: body.meta.current_page,
     perPage: body.meta.per_page,
     seo: body.meta.seo ?? null,
-    article: toArticleBlock(mockArticleIfAbsent(body.article)),
+    article: toArticleBlock(body.article),
   };
 }

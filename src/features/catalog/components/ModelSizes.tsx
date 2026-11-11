@@ -4,7 +4,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import type { TireProduct } from "@/features/catalog/types";
+import type { ProductBase } from "@/features/catalog/types";
 import { ProductCard } from "./ProductCard";
 
 const PAGE_SIZE = 24;
@@ -12,8 +12,8 @@ const PAGE_SIZE = 24;
 interface ModelSizesProps {
   /** Вкладки диаметров: value — r-ключ (r17), count — сколько размеров у бэка. */
   diameters: { value: string; count: number }[];
-  /** Размеры активного диаметра (живой листинг). */
-  sizes: TireProduct[];
+  /** Размеры активного диаметра (живой листинг; шины и диски). */
+  sizes: ProductBase[];
   /** Активный диаметр из URL; на смене родитель монтирует компонент заново (key). */
   diameter: string;
   cityLabel?: string;

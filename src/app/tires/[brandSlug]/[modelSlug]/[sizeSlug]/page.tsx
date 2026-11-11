@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { getProduct } from "@/shared/api/data";
 import { appendCityParam } from "@/shared/lib/cityUrl";
+import { modelCrumb } from "@/features/catalog/lib/productUrl";
 import { Breadcrumbs } from "@/shared/layout/Breadcrumbs";
 import { Badges } from "@/shared/ui/Badge";
 import { ProductGallery } from "@/features/product/components/ProductGallery";
@@ -46,6 +47,9 @@ export default async function ProductPage({ params, searchParams }: PageProps) {
   if (!result) notFound();
   const { product } = result;
 
+  // Модель — страница модели; шина без модели крошку не получает
+  const modelBreadcrumb = modelCrumb(product, cityValue ?? "");
+
   const breadcrumbs = [
     { label: "Главная", href: appendCityParam("/", cityValue ?? "") },
     { label: "Каталог шин", href: appendCityParam("/catalog/tires", cityValue ?? "") },
@@ -54,18 +58,7 @@ export default async function ProductPage({ params, searchParams }: PageProps) {
       label: product.brandName,
       href: appendCityParam(`/catalog/tires/${product.brandSlug}`, cityValue ?? ""),
     },
-    // Модель — страница модели; шина без модели крошку не получает
-    ...(product.modelName && product.modelSlug
-      ? [
-          {
-            label: product.modelName,
-            href: appendCityParam(
-              `/tires/${product.brandSlug}/${product.modelSlug}`,
-              cityValue ?? "",
-            ),
-          },
-        ]
-      : []),
+    ...(modelBreadcrumb ? [modelBreadcrumb] : []),
     { label: product.sizeTitle },
   ];
 
