@@ -4,6 +4,7 @@
 
 import { useUIStore } from "@/stores/useUIStore";
 import { useGeo } from "@/shared/layout/api/useGeo";
+import { effectiveCitySlug } from "@/shared/lib/cityUrl";
 
 export function useCity() {
   const cityValue = useUIStore((s) => s.cityValue);
@@ -11,14 +12,15 @@ export function useCity() {
   const { data: geo } = useGeo();
 
   // null = город не выбран (по умолчанию — дефолт города из API)
-  const slug = cityValue ?? geo?.defaultCityValue ?? "";
+  const citySlug = effectiveCitySlug(cityValue, geo?.defaultCityValue);
 
   const cityLabel = geo
-    ? (geo.cities.find((c) => c.value === slug)?.label ?? geo.defaultCity)
+    ? (geo.cities.find((c) => c.value === citySlug)?.label ?? geo.defaultCity)
     : "";
 
   return {
     cityValue, // null если не выбран, иначе slug
+    citySlug, // город, который видит посетитель: выбранный или дефолт geo
     cityLabel,
     setGeoOpen: () => setGeoOpen(true),
     isReady: !!geo,

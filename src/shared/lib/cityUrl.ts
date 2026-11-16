@@ -23,6 +23,17 @@ export function resolveCityValue(
 }
 
 /**
+ * Город, который видит посетитель: выбранный (URL/стор) или дефолт из geo.
+ * Пустая строка — город ещё не известен (geo не загружена): в запрос не передаётся.
+ */
+export function effectiveCitySlug(
+  cityValue: string | null,
+  defaultSlug: string | undefined,
+): string {
+  return cityValue ?? defaultSlug ?? "";
+}
+
+/**
  * Добавить city параметр к URL-строке.
  * Если город не выбран (cityValue пуст) — не добавляем.
  * Если выбран (даже Челябинск) — добавляем всегда.

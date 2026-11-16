@@ -115,3 +115,26 @@
 - Updated: project-architecture.md (overview, ADR 0010 обновлён)
 - Updated: adr-practice.md (0010 обновлён)
 - Updated: index.md
+
+## [2026-11-13] ingest | Публичный чат (ИИ-ассистент): живой API
+- Updated: chat-live-api.md (новая статья: контракт, клиентский поток, ошибки, фронт, ловушки, дефект бэка)
+- Updated: project-architecture.md (overview, слои, «Ключевые роуты», «Данные и состояние», See Also)
+- Updated: index.md
+
+## [2026-11-13] ingest | Чат: передача выбранного города сайта
+- Updated: chat-live-api.md (город: `city` слагом в каждом POST, `effectiveCitySlug`/`useCity().citySlug`, `rememberCity`, смена города без сброса; дефект пустых реплик помечен исправленным)
+- Updated: project-architecture.md (overview и «Данные и состояние»: город в POST)
+- Updated: index.md
+
+## [2026-11-16] ingest | Чат: кликабельные варианты ответа (options)
+- Updated: chat-live-api.md (контракт `options: [{label, text}]`, правило последней реплики и клика, `lastOptions`, чипы `.chat-options`)
+- Updated: project-architecture.md (overview и «Данные и состояние»: options с 16.11)
+- Updated: index.md
+
+## [2026-11-16] ingest | Чат: варианты-ссылки на каталог (options.url)
+- Updated: chat-live-api.md (`url`-вариант: router.push, refresh на текущем адресе (`isCurrentLocation`), окно чата остаётся, `dismissedMessageId`; файлы и тесты)
+- Updated: index.md
+
+## [2026-11-16] ingest | Чат: синхронизация после архитектурного ревью
+- Updated: chat-live-api.md (город передаётся, дефект пустых реплик помечен исправленным, `fetchJson`/`ApiErrorPayload`, `useChatMessages(token, onSessionExpired)`, `visibleOptions`, окно отдельным чанком, ADR 0012)
+- Updated: index.md

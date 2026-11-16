@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./style.css";
 import { getNav } from "@/shared/api/data";
+import { ChatWidget } from "@/features/chat/components/ChatWidget";
 import { ClientLayout } from "@/shared/layout/ClientLayout";
 
 import { CatalogMenu } from "@/shared/layout/CatalogMenu";
@@ -34,7 +35,7 @@ export default async function RootLayout({
               {/* Бейджи страницы выводит сама страница: если в её data пришёл badges */}
               {children}
               <Footer nav={nav} />
-
+              <ChatWidget />
             </div>
           </div>
         </ClientLayout>

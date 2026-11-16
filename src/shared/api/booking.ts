@@ -1,7 +1,7 @@
 // Запись на шиномонтаж: слоты, каталог услуг, выдача кода, подтверждение, справочник.
 // Контракт сверен с кодом бэка 30.09.2026 (ТЗ booking-client-api-preparation выполнено),
 // источник истины — ../backend/documentations/scramble/public-api.json.
-import { apiBase } from "./base";
+import { fetchJson } from "./http";
 import type { BookingServiceDto } from "@/features/booking/types";
 import type { ConfirmPayload } from "@/features/booking/lib/payload";
 
@@ -64,40 +64,12 @@ export interface BookingDto {
   items?: BookingItemDto[];
 }
 
-/**
- * Ошибка бэка с телом ответа. Несёт статус и `code` доменного отказа —
- * состояние экрана выбирает `mapBookingError`, а не текст сообщения.
- */
-export class BookingApiError extends Error {
-  readonly status: number;
-  readonly body: unknown;
-
-  constructor(status: number, body: unknown) {
-    super(`booking API: HTTP ${status}`);
-    this.name = "BookingApiError";
-    this.status = status;
-    this.body = body;
-  }
-}
-
+// Ошибка бэка (ApiError) несёт статус и `code` доменного отказа —
+// состояние экрана выбирает `mapBookingError`, а не текст сообщения.
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
-  const res = await fetch(`${apiBase()}${path}`, init);
-  const body = await readJson(res);
-
-  if (!res.ok) {
-    throw new BookingApiError(res.status, body);
-  }
+  const body = await fetchJson(path, init);
 
   return (body as { data: T }).data;
-}
-
-async function readJson(res: Response): Promise<unknown> {
-  try {
-    return await res.json();
-  } catch {
-    // 500 от прокси приходит HTML — тело не должно ронять разбор
-    return null;
-  }
 }
 
 function post<T>(path: string, payload: unknown): Promise<T> {
