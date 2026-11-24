@@ -3,7 +3,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { BookingAlert } from "./BookingAlert";
+import { Alert } from "@/shared/ui/Alert";
 import { BookingSteps } from "./BookingSteps";
 import { BookingSummary } from "./BookingSummary";
 import { useBookingCatalog } from "@/features/booking/api/useBookingCatalog";
@@ -69,7 +69,7 @@ export function BookingDetailsStep() {
 
           {error && (
             <div className="booking-blk">
-              <BookingAlert title={errorTitle(error)} text={error.message} />
+              <Alert title={errorTitle(error)} text={error.message} />
             </div>
           )}
 

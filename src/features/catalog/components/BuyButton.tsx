@@ -3,6 +3,7 @@
 // SSR и первый клиентский рендер — серая заглушка (одинаково). Без текста,
 // чтобы не было мигания «Купить»→«Убрать». После mount — правильное состояние.
 import { useCartItemActions } from "@/features/cart/api/useCartItemActions";
+import { toItemableType } from "@/features/cart/lib/itemable";
 import { CartPopup } from "@/features/cart/components/CartPopup";
 import { ConfirmRemovePopup } from "@/shared/ui/ConfirmRemovePopup";
 import type { ProductBase } from "@/features/catalog/types";
@@ -20,7 +21,7 @@ export function BuyButton({ product }: { product: ProductBase }) {
     setPopupOpen,
     setConfirmOpen,
   } = useCartItemActions(
-    { id: product.id, name: product.title, price: product.price ?? 0, image: product.image },
+    { itemableType: toItemableType(product.category), itemableId: product.id },
     1,
   );
 

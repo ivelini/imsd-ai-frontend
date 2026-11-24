@@ -1,6 +1,7 @@
-// Статус заказа (фаза 4)
+// Статус заказа (24.11.2026): публичного поиска по номеру у бэка нет —
+// страница объясняет, где искать статус, и не показывает мок-данные.
+import Link from "next/link";
 import { Breadcrumbs } from "@/shared/layout/Breadcrumbs";
-import { OrderStatusPage } from "@/features/checkout/components/OrderStatusPage";
 
 export default function Page() {
   return (
@@ -8,7 +9,18 @@ export default function Page() {
       <Breadcrumbs
         crumbs={[{ label: "Главная", href: "/" }, { label: "Статус заказа" }]}
       />
-      <OrderStatusPage />
+      <section className="order-section container">
+        <h2>Статус заказа</h2>
+        <p className="order-status-hint">
+          Статус заказа отображается на странице заказа сразу после оформления.
+        </p>
+        <p className="order-status-hint">
+          Поиск заказа по номеру появится вместе с личным кабинетом.
+        </p>
+        <Link href="/cart" className="primary-button">
+          Перейти в корзину
+        </Link>
+      </section>
     </>
   );
 }

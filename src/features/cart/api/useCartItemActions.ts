@@ -6,30 +6,33 @@ import { useState, useSyncExternalStore } from "react";
 import { useAddToCart } from "@/features/cart/api/useAddToCart";
 import { useRemoveFromCart } from "@/features/cart/api/useRemoveFromCart";
 import { useCart } from "@/features/cart/api/useCart";
-import type { CartAddPayload } from "@/shared/api/data";
+import {
+  findCartItemByProduct,
+  type CartProductRef,
+} from "@/features/cart/lib/itemable";
 
 // Пустая подписка: «готово» — не событие внешнего мира, а факт клиента
 const emptySubscribe = () => () => {};
 
-export function useCartItemActions(item: CartAddPayload, quantity: number) {
+export function useCartItemActions(item: CartProductRef, quantity: number) {
   const [popupOpen, setPopupOpen] = useState(false);
   const [confirmOpen, setConfirmOpen] = useState(false);
   const { mutate: add, isPending } = useAddToCart();
   const { mutate: remove } = useRemoveFromCart();
-  const { data: items } = useCart();
+  const { data: cart } = useCart();
 
   // false при SSR и гидратации, true — на клиенте: данные корзины рендерятся после гидратации
   const ready = useSyncExternalStore(emptySubscribe, () => true, () => false);
 
-  const cartItem = items?.find((i) => i.id === item.id);
+  const cartItem = cart ? findCartItemByProduct(cart.items, item) : undefined;
   const isInCart = ready && !!cartItem;
 
   const handleAdd = () => {
-    add({ item, quantity }, { onSuccess: () => setPopupOpen(true) });
+    add({ ref: item, quantity }, { onSuccess: () => setPopupOpen(true) });
   };
 
   const handleRemove = () => {
-    remove(item.id);
+    if (cartItem) remove(cartItem.id);
     setConfirmOpen(false);
   };
 

@@ -2,6 +2,7 @@
 // Количество + кнопка «Добавить в корзину»/«Убрать» + попапы (фаза 3, 04.08.2026)
 import { useState } from "react";
 import { useCartItemActions } from "@/features/cart/api/useCartItemActions";
+import { toItemableType } from "@/features/cart/lib/itemable";
 import { CartPopup } from "@/features/cart/components/CartPopup";
 import { ConfirmRemovePopup } from "@/shared/ui/ConfirmRemovePopup";
 import type { ProductDetailData } from "../types";
@@ -20,7 +21,7 @@ export function AddToCartBlock({ product }: { product: ProductDetailData }) {
     setPopupOpen,
     setConfirmOpen,
   } = useCartItemActions(
-    { id: product.id, name: product.title, price: product.price ?? 0, image: product.image },
+    { itemableType: toItemableType(product.category), itemableId: product.id },
     quantity,
   );
 

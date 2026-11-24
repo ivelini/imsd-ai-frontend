@@ -1,54 +1,178 @@
 "use client";
-// Оформление заказа: .order_row → .order_form (шаги 1–3) + .order_total (фаза 4)
-// Состояния мокапа (.active у способа получения/оплаты) — контролируемый state.
-// Сабмит: мок createOrder → очистка корзины → редирект на /order/[id].
+// Оформление заказа: справочник с сервера, корзина и точки выдачи — живые (24.11.2026).
+// «Оформить заказ»: проверка формы и корзины → черновик в sessionStorage → SMS-код →
+// шаг /checkout/code. Позиции на сервер не уходят — он берёт их из корзины.
 import { useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useCart } from "@/features/cart/api/useCart";
 import { useCity } from "@/shared/layout/api/useCity";
-import { useCreateOrder } from "@/features/checkout/api/useCreateOrder";
-import type { CheckoutOptions } from "@/features/checkout/types";
+import { useDeliveryPoints } from "@/features/checkout/api/useDeliveryPoints";
+import { useIssueCheckoutCode } from "@/features/checkout/api/useIssueCheckoutCode";
+import { createCheckoutDraft, joinCustomerName, setCodeIssued } from "@/features/checkout/lib/draft";
+import { draftStore } from "@/features/checkout/lib/draftStore";
+import { mapCheckoutError, toErrorResponse } from "@/features/checkout/lib/errors";
 import { formatPrice } from "@/shared/lib/money";
+import { CHECKOUT_AGREEMENT } from "@/data/checkout";
+import type {
+  CheckoutFormInput,
+  CheckoutReference,
+  DeliveryPoint,
+} from "@/features/checkout/types";
+
+// Иконки способов получения — ассеты витрины, не данные бэка
+const DELIVERY_ICONS: Record<string, string> = {
+  pickup: "/assets/img/delivery_1.svg",
+  courier: "/assets/img/delivery_2.svg",
+};
 
 
 interface CheckoutPageProps {
-  options: CheckoutOptions;
-  /** Пункты .order_total_list: бенефиты корзины (готовые строки от «бэка») */
-  benefits: string[];
+  reference: CheckoutReference;
 }
 
-export function CheckoutPage({ options, benefits }: CheckoutPageProps) {
+export function CheckoutPage({ reference }: CheckoutPageProps) {
   const router = useRouter();
-  const { data: items = [], isLoading } = useCart();
-  const { cityLabel } = useCity();
-  const { mutate: createOrder, isPending } = useCreateOrder();
+  const { data: cart, isLoading } = useCart();
+  const { citySlug, cityLabel } = useCity();
+  const { data: points = [], isLoading: pointsLoading } = useDeliveryPoints(citySlug);
+  const issueCode = useIssueCheckoutCode();
 
-  // Шаг 1 — получатель (без RHF/Zod до API, см. решение 05.08.2026)
+  // Шаг 1 — данные получателя; отдельные поля склеиваются в customer_name
   const [lastName, setLastName] = useState("");
   const [firstName, setFirstName] = useState("");
   const [middleName, setMiddleName] = useState("");
   const [phone, setPhone] = useState("+7(");
   const [email, setEmail] = useState("");
 
-  // Шаг 2 — способ получения, шаг 3 — оплата
-  const [deliveryId, setDeliveryId] = useState<string>(options.delivery[0]?.id ?? "pickup");
-  const [deliveryAddress, setDeliveryAddress] = useState("");
-  const [paymentId, setPaymentId] = useState<string>(options.payment[0]?.id ?? "cash");
+  // Шаг 2 — способ получения: точка самовывоза или структурированный адрес курьера
+  const [deliveryType, setDeliveryType] = useState(reference.delivery[0]?.value ?? "");
+  const [pickupPointId, setPickupPointId] = useState<number | null>(null);
+  // Город курьера до правки — город сайта из шапки (null = пользователь ещё не правил)
+  const [addressCity, setAddressCity] = useState<string | null>(null);
+  const [addressStreet, setAddressStreet] = useState("");
+  const [addressHouse, setAddressHouse] = useState("");
+  const [addressApartment, setAddressApartment] = useState("");
+
+  // Шаг 3 — способ оплаты из справочника
+  const [paymentMethod, setPaymentMethod] = useState(reference.payment[0]?.value ?? "");
+  const [error, setError] = useState<string | null>(null);
 
   if (isLoading) return null;
 
-  const total = items.reduce((sum, i) => sum + i.price * i.quantity, 0);
+  const items = cart?.items ?? [];
 
-  const handleSubmit = () => {
-    if (isPending) return;
-    createOrder(
+  if (items.length === 0) {
+    return (
+      <section className="order-section container">
+        <h2>Оформление заказа</h2>
+        <div className="cart-empty">
+          <p className="cart-empty-text">В корзине пока пусто</p>
+          <Link className="primary-button cart-empty-button" href="/catalog/tires">
+            Перейти в каталог
+          </Link>
+        </div>
+      </section>
+    );
+  }
+
+  const selected = reference.delivery.find((method) => method.value === deliveryType);
+  const requiresPickup = selected?.requiresPickupPoint ?? false;
+  const requiresAddress = selected?.requiresAddress ?? false;
+  const paymentUnavailable = reference.payment.length === 0;
+  const addressCityValue = addressCity ?? cityLabel;
+  // Выбранная точка: явный выбор из списка, иначе единственная точка города.
+  // Точки, пропавшей из списка (смена города), не доверяем — выбор сбрасывается.
+  const chosenPoint =
+    points.find((point) => point.id === pickupPointId) ??
+    (points.length === 1 ? points[0] : null);
+
+  const selectDelivery = (value: string) => {
+    setDeliveryType(value);
+    // Точка принадлежит городу и способу получения — при смене её не переиспользуем
+    setPickupPointId(null);
+  };
+
+  const selectPoint = (point: DeliveryPoint) => {
+    setPickupPointId(point.id);
+  };
+
+  const validate = (customerName: string): string | null => {
+    if (customerName === "") return "Укажите имя получателя";
+    if (phone.trim() === "") return "Укажите телефон";
+    if (items.some((item) => !item.available)) {
+      return "Некоторые товары недоступны в выбранном городе — вернитесь в корзину";
+    }
+    if (requiresPickup && pointsLoading) return "Подождите, загружаем точки самовывоза";
+    if (requiresPickup && chosenPoint === null) return "Выберите точку самовывоза";
+    if (
+      requiresAddress &&
+      (addressCityValue.trim() === "" ||
+        addressStreet.trim() === "" ||
+        addressHouse.trim() === "")
+    ) {
+      return "Заполните город, улицу и дом";
+    }
+    if (paymentMethod === "") return "Нет доступного способа оплаты";
+
+    return null;
+  };
+
+  const submit = () => {
+    setError(null);
+    if (issueCode.isPending) return;
+
+    const customerName = joinCustomerName({ lastName, firstName, middleName });
+    const problem = validate(customerName);
+
+    if (problem !== null) {
+      setError(problem);
+      return;
+    }
+
+    const input: CheckoutFormInput = {
+      lastName,
+      firstName,
+      middleName,
+      phone,
+      email,
+      deliveryType,
+      pickupPointId: requiresPickup ? (chosenPoint?.id ?? null) : null,
+      pickupPointAddress: requiresPickup ? (chosenPoint?.address ?? null) : null,
+      deliveryAddress: requiresAddress
+        ? {
+            city: addressCityValue,
+            street: addressStreet,
+            house: addressHouse,
+            apartment: addressApartment,
+            comment: "",
+          }
+        : null,
+      paymentMethod,
+    };
+    const draft = createCheckoutDraft(input, crypto.randomUUID(), citySlug);
+    draftStore.write(draft);
+
+    issueCode.mutate(
+      { phone: draft.phone, key: draft.idempotencyKey },
       {
-        recipient: { lastName, firstName, middleName, phone, email },
-        deliveryMethodId: deliveryId,
-        deliveryAddress,
-        paymentMethodId: paymentId,
+        onSuccess: ({ retryAfter }) => {
+          draftStore.write(setCodeIssued(draft, retryAfter, Date.now()));
+          router.push("/checkout/code");
+        },
+        onError: (cause) => {
+          const result = mapCheckoutError(toErrorResponse(cause));
+
+          // Код уже высылали — не теряем попытку: переходим к вводу с таймером
+          if (result.state === "cooldown" && result.retryAfter !== undefined) {
+            draftStore.write(setCodeIssued(draft, result.retryAfter, Date.now()));
+            router.push("/checkout/code");
+            return;
+          }
+
+          setError(result.message);
+        },
       },
-      { onSuccess: (order) => router.push(`/order/${order.id}`) },
     );
   };
 
@@ -123,52 +247,95 @@ export function CheckoutPage({ options, benefits }: CheckoutPageProps) {
               <span>Ваш город</span>
               <b>{cityLabel}</b>
             </div>
-            {options.delivery.map((method) => (
+            {reference.delivery.map((method) => (
               <div
-                key={method.id}
-                className={`order_form_delivery_item${deliveryId === method.id ? " active" : ""}`}
-                onClick={() => setDeliveryId(method.id)}
+                key={method.value}
+                className={`order_form_delivery_item${deliveryType === method.value ? " active" : ""}`}
+                onClick={() => selectDelivery(method.value)}
               >
                 <div className="order_form_delivery_item_img">
-                  <img src={method.icon} alt="" />
+                  {DELIVERY_ICONS[method.value] && (
+                    <img src={DELIVERY_ICONS[method.value]} alt="" />
+                  )}
                 </div>
                 <div className="order_form_delivery_item_cont">
-                  <div className="order_form_delivery_item_title">
-                    {method.title}
-                    {method.highlight && <span>{method.highlight}</span>}
-                    {method.titleAfter}
-                  </div>
-                  {method.points && (
-                    <div className="order_form_delivery_item_list">
-                      {method.points.map((point, i) => (
-                        <div key={point}>
-                          <img
-                            src={
-                              deliveryId === method.id && i === 0
-                                ? "/assets/img/order_check_a.svg"
-                                : "/assets/img/order_check.svg"
-                            }
-                            alt=""
-                          />
-                          <span>{point}</span>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                  {method.inputPlaceholder && (
-                    <div className="order_form_delivery_item_input">
-                      <input
-                        type="text"
-                        placeholder={method.inputPlaceholder}
-                        value={deliveryId === method.id ? deliveryAddress : ""}
-                        onChange={(e) => setDeliveryAddress(e.target.value)}
-                      />
-                      {method.inputPrompt && (
-                        <div className="order_form_delivery_item_input_prompt">
-                          {method.inputPrompt}
+                  <div className="order_form_delivery_item_title">{method.label}</div>
+
+                  {method.requiresPickupPoint && deliveryType === method.value && (
+                    <>
+                      {pointsLoading && (
+                        <div className="order_form_delivery_item_list">
+                          <div><span>Загружаем точки самовывоза…</span></div>
                         </div>
                       )}
-                    </div>
+                      {!pointsLoading && points.length === 0 && (
+                        <div className="order_form_delivery_item_input_prompt">
+                          Самовывоз в этом городе недоступен — выберите курьерскую доставку
+                        </div>
+                      )}
+                      {points.length > 0 && (
+                        <div className="order_form_delivery_item_list">
+                          {points.map((point) => (
+                            <div key={point.id} onClick={() => selectPoint(point)}>
+                              <img
+                                src={
+                                  chosenPoint?.id === point.id
+                                    ? "/assets/img/order_check_a.svg"
+                                    : "/assets/img/order_check.svg"
+                                }
+                                alt=""
+                              />
+                              <span>
+                                {point.address}
+                                {point.workHours ? ` (${point.workHours})` : ""}
+                              </span>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </>
+                  )}
+
+                  {method.requiresAddress && deliveryType === method.value && (
+                    <>
+                      <div className="order_form_details_row">
+                        <div className="order_form_details_input">
+                          <input
+                            type="text"
+                            placeholder="Город*"
+                            value={addressCityValue}
+                            onChange={(e) => setAddressCity(e.target.value)}
+                          />
+                        </div>
+                        <div className="order_form_details_input">
+                          <input
+                            type="text"
+                            placeholder="Улица*"
+                            value={addressStreet}
+                            onChange={(e) => setAddressStreet(e.target.value)}
+                          />
+                        </div>
+                        <div className="order_form_details_input">
+                          <input
+                            type="text"
+                            placeholder="Дом*"
+                            value={addressHouse}
+                            onChange={(e) => setAddressHouse(e.target.value)}
+                          />
+                        </div>
+                      </div>
+                      <div className="order_form_details_input">
+                        <input
+                          type="text"
+                          placeholder="Квартира"
+                          value={addressApartment}
+                          onChange={(e) => setAddressApartment(e.target.value)}
+                        />
+                      </div>
+                      <div className="order_form_delivery_item_input_prompt">
+                        *Позвоним, что бы согласовать детали заказа (обязательно)
+                      </div>
+                    </>
                   )}
                 </div>
               </div>
@@ -178,15 +345,15 @@ export function CheckoutPage({ options, benefits }: CheckoutPageProps) {
           {/* Шаг 3 — Способ оплаты */}
           <div className="order_form_in order_form_method">
             <div className="order_form_title"><span>3</span> Способ оплаты</div>
-            {options.payment.map((method) => (
+            {reference.payment.map((method) => (
               <div
-                key={method.id}
-                className={`order_form_method_item${paymentId === method.id ? " active" : ""}`}
-                onClick={() => setPaymentId(method.id)}
+                key={method.value}
+                className={`order_form_method_item${paymentMethod === method.value ? " active" : ""}`}
+                onClick={() => setPaymentMethod(method.value)}
               >
                 <img
                   src={
-                    paymentId === method.id
+                    paymentMethod === method.value
                       ? "/assets/img/order_check_a.svg"
                       : "/assets/img/order_check.svg"
                   }
@@ -196,19 +363,27 @@ export function CheckoutPage({ options, benefits }: CheckoutPageProps) {
               </div>
             ))}
 
-            <div className="order_form_method_btn">
-              <button
-                type="submit"
-                className="order_form_method_btn_submit"
-                onClick={handleSubmit}
-              >
-                Оформить заказ
-              </button>
+            {paymentUnavailable ? (
               <div className="order_form_method_btn_info">
-                <img src="/assets/img/order_check_a.svg" alt="" />
-                <span>{options.agreement}</span>
+                Оформление временно недоступно: способы оплаты не настроены.
               </div>
-            </div>
+            ) : (
+              <div className="order_form_method_btn">
+                {error !== null && <p className="order-form-error">{error}</p>}
+                <button
+                  type="submit"
+                  className="order_form_method_btn_submit"
+                  onClick={submit}
+                  disabled={issueCode.isPending}
+                >
+                  Оформить заказ
+                </button>
+                <div className="order_form_method_btn_info">
+                  <img src="/assets/img/order_check_a.svg" alt="" />
+                  <span>{CHECKOUT_AGREEMENT}</span>
+                </div>
+              </div>
+            )}
           </div>
         </div>
 
@@ -216,14 +391,14 @@ export function CheckoutPage({ options, benefits }: CheckoutPageProps) {
         <div className="order_total">
           <div className="order_total_top">
             <div className="order_total_top_title">К оплате</div>
-            <div className="order_total_top_price">{formatPrice(total)}</div>
+            <div className="order_total_top_price">{formatPrice(cart?.subtotal ?? 0)}</div>
           </div>
           <div className="order_total_list">
-            {items.map((item, i) => (
+            {items.map((item) => (
               <div key={item.id}>
-                <span>{benefits[i] ?? ""}</span>
+                <span>{item.name}</span>
                 <span>
-                  {item.quantity}шт. х {formatPrice(item.price)}
+                  {item.quantity}шт. х {item.price !== null ? formatPrice(item.price) : "—"}
                 </span>
               </div>
             ))}

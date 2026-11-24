@@ -6792,3 +6792,23 @@ a.chat-option {
   align-items: center;
   text-decoration: none;
 }
+
+/* ===== Корзина и оформление: живые состояния (24.11.2026) ===== */
+/* Предупреждение под итогом корзины: позиция недоступна в выбранном городе. */
+.cart-total-warning {
+  margin: 12px 0 0;
+  color: var(--color-red);
+  font-size: 13px;
+  line-height: 1.4;
+}
+/* Ошибка формы оформления перед кнопкой «Оформить заказ». */
+.order-form-error {
+  margin: 12px 0 0;
+  color: var(--color-red);
+  font-size: 13px;
+  line-height: 1.4;
+}
+/* Шаг кода: действия под OTP-полем стоят столбиком, как на шаге записи. */
+.code-card > .primary-button {
+  margin-top: 12px;
+}

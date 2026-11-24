@@ -1,39 +1,30 @@
-// Мутация: добавить в корзину (03.08.2026)
+// Мутация: добавить товар в корзину — ответ сервера (вся корзина) кладём в кеш
 "use client";
 
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { addToCart, type CartAddPayload } from "@/shared/api/data";
+import { addCartItem } from "@/shared/api/data";
 import { queryKeys } from "@/shared/api/queryKeys";
-import type { CartItem } from "@/features/cart/types";
+import { useCity } from "@/shared/layout/api/useCity";
+import type { CartProductRef } from "@/features/cart/lib/itemable";
+
+interface AddToCartVars {
+  ref: CartProductRef;
+  quantity: number;
+}
 
 export function useAddToCart() {
   const qc = useQueryClient();
+  const { citySlug } = useCity();
 
   return useMutation({
-    mutationFn: (args: { item: CartAddPayload; quantity?: number }) =>
-      addToCart(args.item, args.quantity),
+    mutationFn: ({ ref, quantity }: AddToCartVars) =>
+      addCartItem(
+        { itemableType: ref.itemableType, itemableId: ref.itemableId, quantity },
+        citySlug,
+      ),
 
-    onMutate: async ({ item, quantity = 1 }) => {
-      await qc.cancelQueries({ queryKey: queryKeys.cart.items });
-      const prev = qc.getQueryData<CartItem[]>(queryKeys.cart.items) ?? [];
-      const optimistic: CartItem = { ...item, quantity };
-      const existing = prev.findIndex((i) => i.id === item.id);
-      const next =
-        existing >= 0
-          ? prev.map((i, idx) =>
-              idx === existing ? { ...i, quantity: i.quantity + quantity } : i,
-            )
-          : [...prev, optimistic];
-      qc.setQueryData(queryKeys.cart.items, next);
-      return { prev };
-    },
-
-    onError: (_err, _args, ctx) => {
-      if (ctx?.prev) qc.setQueryData(queryKeys.cart.items, ctx.prev);
-    },
-
-    onSettled: () => {
-      qc.invalidateQueries({ queryKey: queryKeys.cart.items });
+    onSuccess: (cart) => {
+      qc.setQueryData(queryKeys.cart.items(citySlug), cart);
     },
   });
 }

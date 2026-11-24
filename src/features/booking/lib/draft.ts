@@ -1,5 +1,5 @@
 /**
- * Черновик записи: полнота, смена времени, кулдаун кода.
+ * Черновик записи: полнота и смена времени.
  * Хранилище черновика — отдельно (draftStore): здесь только чистые переходы.
  */
 import type { BookingDraft } from "@/features/booking/types";
@@ -32,18 +32,4 @@ export function setTime(draft: BookingDraft, date: string, hour: number | null):
   if (draft.date === date && draft.hour === hour) return draft;
 
   return { ...draft, date, hour, codeIssuedAt: null };
-}
-
-export interface ResendCountdownInput {
-  issuedAt: number;
-  /** Длительность кулдауна из ответа бэка (`retry_after`), а не остаток */
-  retryAfter: number;
-  now: number;
-}
-
-/** Остаток до повторной отправки кода, в секундах; 0 — кнопка активна. */
-export function resendRemaining({ issuedAt, retryAfter, now }: ResendCountdownInput): number {
-  const elapsed = Math.floor((now - issuedAt) / 1000);
-
-  return Math.max(0, retryAfter - elapsed);
 }

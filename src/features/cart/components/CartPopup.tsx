@@ -1,5 +1,5 @@
 "use client";
-// Попап «Товар добавлен в корзину» (фаза 3, 04.08.2026)
+// Попап «Товар добавлен в корзину» (фаза 3, 04.08.2026; живой API 24.11.2026)
 // Переиспользуемый — страница товара, каталог
 import { useUpdateCartItem } from "@/features/cart/api/useUpdateCartItem";
 import { useEsc } from "@/shared/lib/useEsc";
@@ -39,26 +39,39 @@ export function CartPopup({ item, addedQuantity = 1, onClose }: CartPopupProps) 
           <div className="cart_popup_item_info">
             <div className="cart_popup_item_info_title">{item.name}</div>
             <div className="cart_popup_item_info_single">
-              {addedQuantity} шт. - <span>{formatPrice(item.price)}</span>
+              {addedQuantity} шт. -{" "}
+              <span>{item.price !== null ? formatPrice(item.price) : "—"}</span>
             </div>
           </div>
           <div className="cart_popup_item_quantity">
             <div className="cart_popup_item_quantity_in">
-              <div className="cart_popup_item_quantity_btn" onClick={() => changeQuantity({ id: item.id, delta: -1 })}>
+              <div
+                className="cart_popup_item_quantity_btn"
+                onClick={() =>
+                  changeQuantity({ lineId: item.id, quantity: Math.max(1, item.quantity - 1) })
+                }
+              >
                 <img src="/assets/img/popup_minus.svg" alt="" />
               </div>
               <div className="cart_popup_item_quantity_number">
                 <span>{item.quantity}</span>
               </div>
-              <div className="cart_popup_item_quantity_btn" onClick={() => changeQuantity({ id: item.id, delta: 1 })}>
+              <div
+                className="cart_popup_item_quantity_btn"
+                onClick={() => changeQuantity({ lineId: item.id, quantity: item.quantity + 1 })}
+              >
                 <img src="/assets/img/popup_plus.svg" alt="" />
               </div>
             </div>
-            <div className="cart_popup_item_info_av">
-              Наличие <span>{">"}12 шт.</span>
-            </div>
+            {item.countInStock !== null && (
+              <div className="cart_popup_item_info_av">
+                Наличие <span>{item.countInStock} шт.</span>
+              </div>
+            )}
           </div>
-          <div className="cart_popup_item_total">{formatPrice(item.price * item.quantity)}</div>
+          <div className="cart_popup_item_total">
+            {item.total !== null ? formatPrice(item.total) : "—"}
+          </div>
         </div>
         <div className="cart_popup_btns">
           <a href="#" className="cart_popup_btn cart_popup_btn_close" onClick={(e) => { e.preventDefault(); onClose(); }}>

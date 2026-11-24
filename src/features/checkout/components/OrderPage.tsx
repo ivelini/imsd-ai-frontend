@@ -1,61 +1,27 @@
 "use client";
-// Страница заказа /order/[id] (фаза 4). Макета в шаблоне нет — по образцу
-// корзины (.cart_item без кнопок) + блок данных получателя (.order-info).
-// Данные — useOrder (React Query, localStorage-мок).
+// Страница заказа /order/[id] из снимка ответа (sessionStorage): публичного чтения
+// заказа гостя нет. Другой id или чужой браузер — «заказ не найден».
 import Link from "next/link";
-import { useOrder } from "@/features/checkout/api/useOrder";
-import type { Order } from "@/features/checkout/types";
+import { useSyncExternalStore } from "react";
+import { snapshotStore } from "@/features/checkout/lib/draftStore";
 import { formatPrice } from "@/shared/lib/money";
 
 
-function OrderItems({ order }: { order: Order }) {
-  return (
-    <div className="cart_in">
-      {order.items.map((item) => (
-        <div className="cart_item" key={item.id}>
-          <div className="cart_item_img">
-            <img src={item.image} alt="" />
-          </div>
-          <div className="cart_item_info">
-            <div className="cart_item_info_title">{item.name}</div>
-            {item.code && (
-              <div className="cart_item_info_code">
-                Код товара: <span>{item.code}</span>
-              </div>
-            )}
-            <div className="cart_item_info_price">
-              <span>{item.price.toLocaleString("ru-RU")}</span> ₽ / шт.
-            </div>
-          </div>
-          <div className="cart_item_quantity">
-            <div className="cart_item_quantity_number">
-              <span>{item.quantity} шт.</span>
-            </div>
-          </div>
-          <div className="cart_item_total">
-            <div className="cart_item_total_price">
-              {formatPrice(item.price * item.quantity)}
-            </div>
-          </div>
-        </div>
-      ))}
-    </div>
-  );
-}
-
 export function OrderPage({ id }: { id: string }) {
-  const { data: order, isLoading } = useOrder(id);
+  const snapshot = useSyncExternalStore(
+    snapshotStore.subscribe,
+    snapshotStore.getSnapshot,
+    snapshotStore.getServerSnapshot,
+  );
 
-  if (isLoading) return null;
-
-  if (!order) {
+  if (snapshot === null || snapshot.id !== id) {
     return (
       <section className="order-section container">
         <h2>Заказ не найден</h2>
         <div className="cart-empty">
           <p className="cart-empty-text">
-            Заказ не найден. Проверьте номер или{" "}
-            <Link href="/order-status">воспользуйтесь поиском по номеру</Link>.
+            Заказ открывается по ссылке сразу после оформления — в этой вкладке или в этом
+            браузере. Поиск по номеру появится вместе с личным кабинетом.
           </p>
           <Link className="primary-button cart-empty-button" href="/catalog/tires">
             Перейти в каталог
@@ -65,30 +31,40 @@ export function OrderPage({ id }: { id: string }) {
     );
   }
 
-  const { recipient: r } = order;
-
   return (
     <section className="order-section container">
-      <h2>Заказ {order.number}</h2>
+      <h2>Заказ №{snapshot.id}</h2>
       <div className="order-status">
-        Статус: <b>{order.status}</b>
+        Статус: <b>Заказ оформлен</b>
       </div>
       <div className="order_row">
-        <OrderItems order={order} />
+        <div className="order-info">
+          <h3>Состав заказа</h3>
+          <dl>
+            {snapshot.items.map((item, index) => (
+              <div key={index}>
+                <dt>{item.name}</dt>
+                <dd>
+                  {item.quantity} шт. × {formatPrice(item.unitPrice)}
+                </dd>
+              </div>
+            ))}
+          </dl>
+        </div>
         <div className="order_total">
           <div className="order_total_top">
             <div className="order_total_top_title">К оплате</div>
-            <div className="order_total_top_price">{formatPrice(order.total)}</div>
+            <div className="order_total_top_price">{formatPrice(snapshot.total)}</div>
           </div>
           <div className="order_total_list">
-            {order.items.map((item) => (
-              <div key={item.id}>
-                <span>{item.name}</span>
-                <span>
-                  {item.quantity}шт. х {formatPrice(item.price)}
-                </span>
-              </div>
-            ))}
+            <div>
+              <span>Товары</span>
+              <span>{formatPrice(snapshot.subtotal)}</span>
+            </div>
+            <div>
+              <span>Доставка</span>
+              <span>{formatPrice(snapshot.deliveryCost)}</span>
+            </div>
           </div>
         </div>
       </div>
@@ -97,34 +73,41 @@ export function OrderPage({ id }: { id: string }) {
         <dl>
           <div>
             <dt>ФИО</dt>
-            <dd>
-              {[r.lastName, r.firstName, r.middleName].filter(Boolean).join(" ") || "—"}
-            </dd>
+            <dd>{snapshot.customer.name || "—"}</dd>
           </div>
           <div>
             <dt>Телефон</dt>
-            <dd>{r.phone}</dd>
+            <dd>{snapshot.customer.phone}</dd>
           </div>
           <div>
             <dt>E-Mail</dt>
-            <dd>{r.email || "—"}</dd>
+            <dd>{snapshot.customer.email || "—"}</dd>
           </div>
           <div>
             <dt>Способ получения</dt>
-            <dd>{order.deliveryLabel}</dd>
+            <dd>{snapshot.deliveryLabel}</dd>
           </div>
-          {order.deliveryAddress && (
+          {snapshot.pickupAddress !== null && (
+            <div>
+              <dt>Адрес точки</dt>
+              <dd>{snapshot.pickupAddress}</dd>
+            </div>
+          )}
+          {snapshot.deliveryAddress !== null && (
             <div>
               <dt>Адрес</dt>
-              <dd>{order.deliveryAddress}</dd>
+              <dd>{snapshot.deliveryAddress}</dd>
             </div>
           )}
           <div>
             <dt>Оплата</dt>
-            <dd>{order.paymentLabel}</dd>
+            <dd>{snapshot.paymentLabel}</dd>
           </div>
         </dl>
       </div>
+      <Link href="/catalog/tires" className="primary-button">
+        Продолжить покупки
+      </Link>
     </section>
   );
 }

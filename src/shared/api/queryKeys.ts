@@ -21,10 +21,11 @@ export const queryKeys = {
     },
   },
   cart: {
-    items: ["cart", "items"] as const,
+    items: (city: string) => ["cart", "items", city] as const,
   },
   checkout: {
-    order: ["checkout", "order"] as const,
+    reference: ["checkout", "reference"] as const,
+    deliveryPoints: (city: string) => ["checkout", "delivery-points", city] as const,
   },
   auth: {
     session: ["auth", "session"] as const,

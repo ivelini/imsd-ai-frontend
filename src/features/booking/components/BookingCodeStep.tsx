@@ -4,15 +4,16 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { BookingAlert } from "./BookingAlert";
 import { BookingSteps } from "./BookingSteps";
+import { Alert } from "@/shared/ui/Alert";
+import { OtpCodeInput } from "@/shared/ui/OtpCodeInput";
 import { useBookingCatalog } from "@/features/booking/api/useBookingCatalog";
 import { useBookingDraft } from "@/features/booking/api/useBookingDraft";
 import { useBookingReference } from "@/features/booking/api/useBookingReference";
 import { useConfirmBooking } from "@/features/booking/api/useConfirmBooking";
 import { useIssueBookingCode } from "@/features/booking/api/useIssueBookingCode";
 import { formatDayShort } from "@/features/booking/lib/dates";
-import { resendRemaining } from "@/features/booking/lib/draft";
+import { formatCountdown, resendRemaining } from "@/shared/lib/countdown";
 import {
   mapBookingError,
   toErrorResponse,
@@ -95,23 +96,10 @@ export function BookingCodeStep() {
             Мы отправили SMS с кодом на номер <span className="code-phone">{draft.phone}</span>
           </p>
         ) : (
-          <BookingAlert title={alertTitle(error)} text={alertText(error, draft.hour, reference?.code_ttl_min)} />
+          <Alert title={alertTitle(error)} text={alertText(error, draft.hour, reference?.code_ttl_min)} />
         )}
 
-        <div className="otp-inputs">
-          {digits.map((digit, index) => (
-            <input
-              key={index}
-              className={error === null ? "otp-digit" : "otp-digit otp-digit--error"}
-              type="text"
-              inputMode="numeric"
-              maxLength={1}
-              value={digit}
-              aria-label={`Цифра кода ${index + 1}`}
-              onChange={(event) => setDigits(replaceDigit(digits, index, event.target.value))}
-            />
-          ))}
-        </div>
+        <OtpCodeInput digits={digits} onChange={setDigits} hasError={error !== null} />
 
         {error === null ? (
           <>
@@ -176,17 +164,6 @@ export function BookingCodeStep() {
       </div>
     </section>
   );
-}
-
-function replaceDigit(digits: string[], index: number, value: string): string[] {
-  const next = [...digits];
-  next[index] = value.replace(/\D/g, "").slice(0, 1);
-
-  return next;
-}
-
-function formatCountdown(seconds: number): string {
-  return `${Math.floor(seconds / 60)}:${String(seconds % 60).padStart(2, "0")}`;
 }
 
 /** Заголовок отказа: у двух состояний шага 4 он свой, остальные — общий. */

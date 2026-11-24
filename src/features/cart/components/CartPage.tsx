@@ -1,5 +1,5 @@
 "use client";
-// Страница корзины: .cart_row → .cart_in + .cart_total (фаза 4)
+// Страница корзины: .cart_row → .cart_in + .cart_total (фаза 4; живой API 24.11.2026)
 // Данные — React Query (useCart), мутации +/− и удаление — в CartItemRow.
 // Пустое состояние — нет в мокапе, сделано по образцу (см. style.css .cart-empty).
 import Link from "next/link";
@@ -14,7 +14,8 @@ interface CartPageProps {
 }
 
 export function CartPage({ benefits }: CartPageProps) {
-  const { data: items = [], isLoading } = useCart();
+  const { data: cart, isLoading } = useCart();
+  const items = cart?.items ?? [];
 
   if (isLoading) return null;
 
@@ -32,7 +33,7 @@ export function CartPage({ benefits }: CartPageProps) {
     );
   }
 
-  const total = items.reduce((sum, i) => sum + i.price * i.quantity, 0);
+  const hasUnavailable = items.some((item) => !item.available);
 
   return (
     <section className="cart-section container">
@@ -46,7 +47,7 @@ export function CartPage({ benefits }: CartPageProps) {
         <div className="cart_total">
           <div className="cart_total_top">
             <div className="cart_total_top_title">Итого</div>
-            <div className="cart_total_top_price">{formatPrice(total)}</div>
+            <div className="cart_total_top_price">{formatPrice(cart?.subtotal ?? 0)}</div>
           </div>
           <div className="cart_total_list">
             {benefits.map((b) => (
@@ -56,6 +57,11 @@ export function CartPage({ benefits }: CartPageProps) {
               </div>
             ))}
           </div>
+          {hasUnavailable && (
+            <p className="cart-total-warning">
+              Некоторые товары недоступны в выбранном городе — уберите их, чтобы оформить заказ.
+            </p>
+          )}
           <Link href="/checkout" className="cart_total_next">
             Оформить заказ
           </Link>

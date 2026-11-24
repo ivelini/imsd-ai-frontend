@@ -1,5 +1,5 @@
 "use client";
-// Строка товара в корзине: .cart_item (фаза 4)
+// Строка товара в корзине: .cart_item (фаза 4; живой API 24.11.2026)
 // В мокапе +/- и «Удалить» — div'ы, здесь кнопки (семантизация без смены классов)
 import { useUpdateCartItem } from "@/features/cart/api/useUpdateCartItem";
 import { useRemoveFromCart } from "@/features/cart/api/useRemoveFromCart";
@@ -8,8 +8,9 @@ import { formatPrice } from "@/shared/lib/money";
 
 
 export function CartItemRow({ item }: { item: CartItem }) {
-  const { mutate: changeQuantity } = useUpdateCartItem();
-  const { mutate: remove } = useRemoveFromCart();
+  const { mutate: changeQuantity, isPending: isUpdating } = useUpdateCartItem();
+  const { mutate: remove, isPending: isRemoving } = useRemoveFromCart();
+  const busy = isUpdating || isRemoving;
 
   return (
     <div className="cart_item">
@@ -18,22 +19,27 @@ export function CartItemRow({ item }: { item: CartItem }) {
       </div>
       <div className="cart_item_info">
         <div className="cart_item_info_title">{item.name}</div>
-        {item.code || item.availability ? (
+        {item.countInStock !== null || !item.available ? (
           <div className="cart_item_info_more">
-            {item.code && (
-              <div className="cart_item_info_code">
-                Код товара: <span>{item.code}</span>
-              </div>
-            )}
-            {item.availability && (
-              <div className="cart_item_info_av">
-                Наличие <span>{item.availability}</span>
-              </div>
-            )}
+            <div className="cart_item_info_av">
+              {item.available ? (
+                <>
+                  Наличие <span>{item.countInStock} шт.</span>
+                </>
+              ) : (
+                "Нет в наличии в выбранном городе"
+              )}
+            </div>
           </div>
         ) : null}
         <div className="cart_item_info_price">
-          <span>{item.price.toLocaleString("ru-RU")}</span> ₽
+          {item.price !== null ? (
+            <>
+              <span>{item.price.toLocaleString("ru-RU")}</span> ₽
+            </>
+          ) : (
+            "Цена недоступна в этом городе"
+          )}
         </div>
       </div>
 
@@ -41,7 +47,8 @@ export function CartItemRow({ item }: { item: CartItem }) {
         <div className="cart_item_quantity_in">
           <button
             className="cart_item_quantity_btn"
-            onClick={() => changeQuantity({ id: item.id, delta: -1 })}
+            onClick={() => changeQuantity({ lineId: item.id, quantity: item.quantity - 1 })}
+            disabled={busy || item.quantity <= 1}
             aria-label="Уменьшить количество"
           >
             <img src="/assets/img/cart_minus.svg" alt="" />
@@ -51,7 +58,8 @@ export function CartItemRow({ item }: { item: CartItem }) {
           </div>
           <button
             className="cart_item_quantity_btn"
-            onClick={() => changeQuantity({ id: item.id, delta: 1 })}
+            onClick={() => changeQuantity({ lineId: item.id, quantity: item.quantity + 1 })}
+            disabled={busy}
             aria-label="Увеличить количество"
           >
             <img src="/assets/img/cart_plus.svg" alt="" />
@@ -60,11 +68,12 @@ export function CartItemRow({ item }: { item: CartItem }) {
       </div>
       <div className="cart_item_total">
         <div className="cart_item_total_price">
-          {formatPrice(item.price * item.quantity)}
+          {item.total !== null ? formatPrice(item.total) : "—"}
         </div>
         <button
           className="cart_item_total_delete"
           onClick={() => remove(item.id)}
+          disabled={busy}
         >
           Удалить <img src="/assets/img/cart_delete.svg" alt="" />
         </button>

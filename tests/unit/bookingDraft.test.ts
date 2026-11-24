@@ -2,7 +2,7 @@
 // (тест-лист плана booking-react-port, тесты 12–14)
 import { describe, expect, it } from "vitest";
 
-import { isComplete, resendRemaining, setTime } from "@/features/booking/lib/draft";
+import { isComplete, setTime } from "@/features/booking/lib/draft";
 import type { BookingDraft } from "@/features/booking/types";
 
 const empty: BookingDraft = {
@@ -43,15 +43,5 @@ describe("setTime (смена времени записи)", () => {
     expect(next.codeIssuedAt).toBeNull();
     expect(next.date).toBe("2026-09-17");
     expect(next.hour).toBe(11);
-  });
-});
-
-describe("resendRemaining (остаток до повторной отправки кода)", () => {
-  it("test_resend_countdown_uses_backend_retry_after", () => {
-    // retry_after бэка — длительность кулдауна от момента выдачи, а не остаток
-    const issuedAt = 1_700_000_000_000;
-
-    expect(resendRemaining({ issuedAt, retryAfter: 60, now: issuedAt + 45_000 })).toBe(15);
-    expect(resendRemaining({ issuedAt, retryAfter: 60, now: issuedAt + 61_000 })).toBe(0);
   });
 });

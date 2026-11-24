@@ -52,6 +52,11 @@ export async function fetchJson(path: string, init?: RequestInit): Promise<unkno
   return body;
 }
 
+/** Ответ API в обёртке `{data: …}`: домены берут полезную часть, обёртку не тащат на экран. */
+export function unwrapData<T>(body: unknown): T {
+  return (body as { data: T }).data;
+}
+
 /** Исключение запроса → ответ для разбора: не-API ошибка (сеть, отмена) сводится к «неизвестно». */
 export function toErrorResponse(error: unknown): ApiErrorResponse {
   if (error instanceof ApiError) {

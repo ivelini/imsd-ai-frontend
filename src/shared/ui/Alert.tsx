@@ -1,10 +1,10 @@
-// Алерт отказа записи: заголовок и текст зависят от состояния экрана
-interface BookingAlertProps {
+// Алерт отказа: заголовок и текст зависят от состояния экрана
+interface AlertProps {
   title: string;
   text: string;
 }
 
-export function BookingAlert({ title, text }: BookingAlertProps) {
+export function Alert({ title, text }: AlertProps) {
   return (
     <div className="alert alert--error">
       <img src="/assets/img/warning.svg" alt="" />

@@ -3,7 +3,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { BookingAlert } from "./BookingAlert";
+import { Alert } from "@/shared/ui/Alert";
 import { BookingSteps } from "./BookingSteps";
 import { BookingSummary } from "./BookingSummary";
 import { useBookingCatalog } from "@/features/booking/api/useBookingCatalog";
@@ -84,7 +84,7 @@ export function BookingServicesStep() {
         <div className="booking-form">
           {pricingMissing && (
             <div className="booking-blk">
-              <BookingAlert
+              <Alert
                 title="Нет цены для выбранных параметров"
                 text="Для этой пары радиуса и типа автомобиля прайс не задан — выберите другие параметры."
               />

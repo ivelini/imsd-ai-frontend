@@ -138,3 +138,9 @@
 ## [2026-11-16] ingest | Чат: синхронизация после архитектурного ревью
 - Updated: chat-live-api.md (город передаётся, дефект пустых реплик помечен исправленным, `fetchJson`/`ApiErrorPayload`, `useChatMessages(token, onSessionExpired)`, `visibleOptions`, окно отдельным чанком, ADR 0012)
 - Updated: index.md
+
+## [2026-11-24] ingest | Корзина и оформление заказа на живом API
+- New: cart-checkout-live-api.md (корзина гостя по X-Device-Id, ответ — вся корзина, адаптер toCartView; справочник и точки города; двухшаговый поток с SMS-кодом и Idempotency-Key; черновик и снимок в sessionStorage; отказы по checkout.*; /order-status — подсказка; общие OTP/Alert/кулдаун в shared)
+- Updated: project-architecture.md (overview, «Ключевые роуты», «Данные и состояние», See Also, Sources/Raw)
+- Updated: booking-domain.md (общие части шага кода в shared, See Also)
+- Updated: index.md
