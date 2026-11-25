@@ -10,7 +10,7 @@ import type {
   DeliveryPointDto,
   OrderDto,
 } from "@/features/checkout/types";
-import { fetchJson, unwrapData } from "./http";
+import { authHeaders, fetchJson, unwrapData } from "./http";
 
 function jsonHeaders(): HeadersInit {
   return { Accept: "application/json", "Content-Type": "application/json" };
@@ -59,7 +59,7 @@ export async function issueCheckoutCode(
 ): Promise<{ retryAfter: number }> {
   const body = await fetchJson("/checkout/code", {
     method: "POST",
-    headers: { ...jsonHeaders(), "Idempotency-Key": idempotencyKey },
+    headers: { ...jsonHeaders(), ...authHeaders(), "Idempotency-Key": idempotencyKey },
     body: JSON.stringify({ phone }),
   });
   const data = unwrapData<{ retry_after: number }>(body);
@@ -76,6 +76,7 @@ export async function confirmCheckout(
     method: "POST",
     headers: {
       ...jsonHeaders(),
+      ...authHeaders(),
       "Idempotency-Key": idempotencyKey,
       "X-Device-Id": browserDeviceId(),
     },

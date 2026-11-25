@@ -144,3 +144,9 @@
 - Updated: project-architecture.md (overview, «Ключевые роуты», «Данные и состояние», See Also, Sources/Raw)
 - Updated: booking-domain.md (общие части шага кода в shared, See Also)
 - Updated: index.md
+
+## [2026-11-24] ingest | Личный кабинет на живом API: регистрация, вход, сброс пароля, профиль
+- New: account-auth-live-api.md (регистрация с SMS-кодом, вход по телефону, выход; восстановление пароля по SMS и ссылке `/reset-password?token&email`; профиль: ФИО/e-mail, телефон по коду, уведомления; Sanctum Bearer `auth-token` в localStorage/sessionStorage, 401 → сброс; слияние гостевой корзины, Bearer в корзине и checkout; словарь подписей уведомлений — долг бэка)
+- Updated: project-architecture.md (overview, «Ключевые роуты», «Данные и состояние», See Also, Sources/Raw)
+- Updated: cart-checkout-live-api.md (владелец корзины: Bearer → аккаунт, слияние при входе; See Also, Sources/Raw)
+- Updated: index.md

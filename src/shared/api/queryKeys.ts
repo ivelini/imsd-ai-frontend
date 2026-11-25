@@ -42,6 +42,6 @@ export const queryKeys = {
     messages: (token: string | null) => [...chatMessagesKey, token] as const,
   },
   account: {
-    // placeholder для будущих хуков ЛК
+    notifications: ["account", "notification-settings"] as const,
   },
 } as const;

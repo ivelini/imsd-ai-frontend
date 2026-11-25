@@ -4321,6 +4321,55 @@ input[type="checkbox"] {
 	min-width:120px;
 	display: block;
 }
+.order-status {
+	margin: 0 0 20px;
+	font-size: 16px;
+	color: var(--color-text);
+}
+.order-status b {
+	color: var(--color-red);
+	font-weight: 600;
+}
+.order-info {
+	margin: 40px 0 0;
+	max-width: 640px;
+}
+.order-info h3 {
+	font-size: 20px;
+	font-weight: 700;
+	color: var(--color-text-dark);
+	margin: 0 0 16px;
+}
+.order-info dl {
+	margin: 0;
+	border-top: 1px solid var(--color-border-soft);
+}
+.order-info dl > div {
+	display: flex;
+	justify-content: space-between;
+	gap: 24px;
+	padding: 12px 0;
+	border-bottom: 1px solid var(--color-border-soft);
+}
+.order-info dt {
+	color: var(--color-gray);
+	font-size: 14px;
+}
+.order-info dd {
+	margin: 0;
+	font-size: 14px;
+	color: var(--color-text);
+	text-align: right;
+}
+@media (max-width: 639px) {
+	.order-info dl > div {
+		flex-direction: column;
+		gap: 2px;
+	}
+	.order-info dd {
+		text-align: left;
+	}
+}
 @media (max-width: 1365px) {
 	.order_row {
 		flex-wrap:wrap;
@@ -4488,6 +4537,16 @@ input[type="checkbox"] {
 	font-size: 14px;
 	color: var(--color-gray);
 	margin: 6px 0 0;
+}
+/* Код из SMS внутри карточки входа: возвращает размеры .otp-digit, снятые правилом .auth_field input */
+.auth_field .otp-inputs {
+	margin: 0;
+}
+.auth_field input.otp-digit {
+	flex: 0 0 56px;
+	width: 56px;
+	height: 60px;
+	padding: 0;
 }
 .auth_remember {
 	display: flex;
@@ -5663,10 +5722,12 @@ input[type="checkbox"] {
 .booking-card-phone:hover {
   text-decoration: underline;
 }
-.booking-card--done .booking-card-day {
+.booking-card--done .booking-card-day,
+.booking-card--cancelled .booking-card-day {
   color: var(--color-gray);
 }
-.booking-card--done .booking-card-price {
+.booking-card--done .booking-card-price,
+.booking-card--cancelled .booking-card-price {
   color: var(--color-gray);
 }
 .status-badge {
@@ -5686,12 +5747,14 @@ input[type="checkbox"] {
   border-radius: 50%;
   background: currentColor;
 }
-.status-badge--confirmed {
+.status-badge--confirmed,
+.status-badge--new {
   background: rgba(221, 6, 42, 0.07);
   color: var(--color-red-dark);
   border: 1px solid rgba(221, 6, 42, 0.25);
 }
-.status-badge--done {
+.status-badge--done,
+.status-badge--cancelled {
   background: var(--color-bg-soft);
   color: var(--color-gray);
   border: 1px solid var(--color-border-soft);
@@ -6303,5 +6366,408 @@ input[type="checkbox"] {
   }
   .chat-demo-title {
     font-size: 22px;
+  }
+}
+
+/* ===== Личный кабинет (user/account/*) — 24.11.2026 ===== */
+.account-section {
+  box-sizing: border-box;
+  width: 100%;
+  padding-top: 34px;
+  padding-bottom: 50px;
+}
+.account-section h2 {
+  font-size: 32px;
+  font-weight: 700;
+  color: var(--color-text-dark);
+  margin: 0;
+}
+.account-layout {
+  display: flex;
+  align-items: flex-start;
+  gap: 30px;
+  margin-top: 30px;
+}
+.account-menu {
+  flex: 0 0 260px;
+  width: 260px;
+  background: var(--color-white);
+  box-shadow: 0 0 20px var(--shadow-1);
+  border-radius: 5px;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+.account-menu-user {
+  padding: 20px;
+  border-bottom: 1px solid var(--color-border-soft);
+}
+.account-menu-name {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--color-text-dark);
+  margin: 0 0 4px;
+}
+.account-menu-phone {
+  font-size: 14px;
+  color: var(--color-gray);
+  margin: 0;
+}
+.account-menu-nav {
+  padding: 8px 0;
+}
+.account-menu-link {
+  display: block;
+  padding: 11px 20px;
+  font-size: 15px;
+  color: var(--color-text);
+  text-decoration: none;
+  border-left: 3px solid transparent;
+}
+.account-menu-link:hover {
+  color: var(--color-red);
+}
+.account-menu-link--active {
+  color: var(--color-red);
+  font-weight: 700;
+  border-left-color: var(--color-red);
+  background: rgba(221, 6, 42, 0.05);
+}
+.account-menu-logout {
+  display: block;
+  padding: 14px 20px;
+  font-size: 15px;
+  color: var(--color-gray);
+  text-decoration: none;
+  border-top: 1px solid var(--color-border-soft);
+}
+.account-menu-logout:hover {
+  color: var(--color-red);
+}
+.account-content {
+  flex: 1;
+  min-width: 0;
+}
+.account-card {
+  background: var(--color-white);
+  box-shadow: 0 0 20px var(--shadow-1);
+  border-radius: 5px;
+  padding: 24px;
+  margin: 0 0 20px;
+  box-sizing: border-box;
+}
+.account-card:last-child {
+  margin-bottom: 0;
+}
+.account-card-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--color-text-dark);
+  margin: 0 0 18px;
+}
+.account-fields-row {
+  display: flex;
+  gap: 20px;
+}
+.account-fields-row .auth_field {
+  flex: 1;
+  min-width: 0;
+}
+.account-phone-current {
+  font-size: 16px;
+  color: var(--color-text-dark);
+  margin: 0 0 18px;
+}
+.account-phone-note {
+  font-size: 14px;
+  color: var(--color-gray);
+}
+.account-notify {
+  margin: 0 0 18px;
+}
+.account-notify-row {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--color-border-soft);
+}
+.account-notify-row:last-child {
+  border-bottom: none;
+}
+.account-notify-name {
+  flex: 1;
+  font-size: 15px;
+  color: var(--color-text);
+}
+.account-notify-channel {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+  color: var(--color-gray);
+  cursor: pointer;
+}
+.account-notify-channel input[type="checkbox"] {
+  accent-color: var(--color-red);
+  cursor: pointer;
+}
+.account-orders {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.account-order {
+  background: var(--color-white);
+  box-shadow: 0 0 20px var(--shadow-1);
+  border-radius: 5px;
+  padding: 20px 24px;
+  box-sizing: border-box;
+}
+.account-order-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 0 0 8px;
+}
+.account-order-number {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--color-text-dark);
+}
+.account-order-date {
+  font-size: 14px;
+  font-weight: 400;
+  color: var(--color-gray);
+}
+.account-order-info {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 18px;
+  font-size: 14px;
+  color: var(--color-gray);
+  margin: 0 0 14px;
+}
+.account-order-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  border-top: 1px solid var(--color-border-soft);
+  padding-top: 14px;
+}
+.account-order-total {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--color-text-dark);
+}
+.account-order-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.account-order-actions .booking-btn-secondary {
+  height: 38px;
+  padding: 0 18px;
+  font-size: 13px;
+}
+.status-badge--progress {
+  background: rgba(255, 193, 10, 0.14);
+  color: #8a6500;
+  border: 1px solid rgba(255, 193, 10, 0.45);
+}
+.status-badge--complete {
+  background: rgba(23, 142, 66, 0.08);
+  color: #178e42;
+  border: 1px solid rgba(23, 142, 66, 0.28);
+}
+.booking-card-number {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--color-gray);
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  margin: 0 0 4px;
+}
+.account-list-actions {
+  margin-top: 20px;
+}
+.account-detail-head {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 14px;
+  margin: 0 0 20px;
+}
+.account-content .order_row {
+  margin-top: 0;
+}
+.account-content .order-info {
+  flex: 1;
+  max-width: none;
+  margin: 0;
+}
+.account-card .order-info {
+  margin: 0;
+  max-width: none;
+}
+.account-order-number a,
+.booking-card-number a {
+  color: inherit;
+  text-decoration: none;
+}
+.account-order-number a:hover,
+.booking-card-number a:hover {
+  color: var(--color-red);
+  text-decoration: underline;
+}
+.account-documents {
+  display: flex;
+  flex-direction: column;
+}
+.account-document {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--color-border-soft);
+  font-size: 14px;
+  text-decoration: none;
+}
+.account-document:last-child {
+  border-bottom: none;
+}
+.account-document-kind {
+  color: var(--color-red);
+  text-decoration: underline;
+}
+.account-document:hover .account-document-kind {
+  text-decoration: none;
+}
+.account-document-size {
+  flex: none;
+  font-size: 13px;
+  color: var(--color-gray);
+}
+.account-content .booking-summary {
+  flex: none;
+  width: 100%;
+}
+.account-booking-note {
+  margin: 16px 0 0;
+  font-size: 14px;
+  color: var(--color-gray);
+  line-height: 1.5;
+}
+.account-booking-note a {
+  color: var(--color-red);
+  font-weight: 700;
+  text-decoration: none;
+}
+.account-booking-note a:hover {
+  text-decoration: underline;
+}
+@media (max-width: 1023px) {
+  .account-layout {
+    flex-direction: column;
+    gap: 16px;
+    margin-top: 20px;
+  }
+  .account-menu {
+    flex: none;
+    width: 100%;
+    display: flex;
+    align-items: stretch;
+  }
+  .account-menu-user {
+    display: none;
+  }
+  .account-menu-nav {
+    display: flex;
+    flex: 1;
+    min-width: 0;
+    padding: 0;
+    overflow-x: auto;
+  }
+  .account-menu-link,
+  .account-menu-link--active {
+    border-left: none;
+    border-bottom: 3px solid transparent;
+  }
+  .account-menu-link {
+    padding: 13px 16px;
+    white-space: nowrap;
+  }
+  .account-menu-link--active {
+    border-bottom-color: var(--color-red);
+    background: none;
+  }
+  .account-menu-logout {
+    display: flex;
+    align-items: center;
+    flex: none;
+    padding: 0 16px;
+    border-top: none;
+    border-left: 1px solid var(--color-border-soft);
+  }
+}
+@media (max-width: 639px) {
+  .account-section {
+    padding-top: 20px;
+    padding-bottom: 40px;
+  }
+  .account-section h2 {
+    font-size: 24px;
+  }
+  .account-card {
+    padding: 18px 16px;
+  }
+  .account-fields-row {
+    flex-direction: column;
+    gap: 0;
+  }
+  .account-order {
+    padding: 16px;
+  }
+  .account-order-footer {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+  .account-notify-row {
+    flex-wrap: wrap;
+    gap: 8px 18px;
+  }
+  .account-notify-name {
+    flex: 1 1 100%;
+  }
+  .account-menu {
+    display: block;
+  }
+  .account-menu-nav {
+    display: block;
+    padding: 8px 0;
+    overflow: visible;
+  }
+  .account-menu-link,
+  .account-menu-link--active {
+    border-left: 3px solid transparent;
+    border-bottom: none;
+  }
+  .account-menu-link {
+    padding: 11px 16px;
+  }
+  .account-menu-link--active {
+    border-left-color: var(--color-red);
+    background: rgba(221, 6, 42, 0.05);
+  }
+  .account-menu-logout {
+    display: block;
+    padding: 14px 16px;
+    border-top: 1px solid var(--color-border-soft);
+    border-left: none;
   }
 }

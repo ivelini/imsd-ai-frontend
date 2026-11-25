@@ -1,12 +1,13 @@
-// Cart: живая корзина гостя (GET/POST/PATCH/DELETE /api/cart), контракт —
+// Cart: живая корзина (GET/POST/PATCH/DELETE /api/cart), контракт —
 // ../backend/documentations/api-maps/checkout-frontend.md, сверено с кодом 2026-11-24.
-// Корзина одна на устройство, город влияет только на цены — он есть в каждом запросе.
+// С Bearer-токеном бэк отдаёт корзину аккаунта, без — гостевую по X-Device-Id;
+// город влияет только на цены — он есть в каждом запросе.
 import type { CartItem, CartItemType, CartView } from "@/features/cart/types";
 import { CART_TOTAL_BENEFITS } from "@/data/cart";
 import { PRODUCT_PLACEHOLDER } from "@/shared/lib/productImage";
 import { browserDeviceId } from "@/shared/lib/deviceId";
 import { cityQuery, delay } from "./base";
-import { fetchJson, unwrapData } from "./http";
+import { authHeaders, fetchJson, unwrapData } from "./http";
 
 // ============================================================================
 // DTO бэкенда
@@ -83,7 +84,11 @@ export function toCartView(dto: CartDto): CartView {
 // ============================================================================
 
 function cartHeaders(): HeadersInit {
-  return { Accept: "application/json", "X-Device-Id": browserDeviceId() };
+  return {
+    Accept: "application/json",
+    "X-Device-Id": browserDeviceId(),
+    ...authHeaders(),
+  };
 }
 
 function jsonHeaders(): HeadersInit {

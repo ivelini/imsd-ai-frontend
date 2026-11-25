@@ -1,5 +1,6 @@
 // Общий транспорт API-слоя: разбор тела, ошибка со статусом и HTTP-запрос с отказом.
 // Вынесено по правилу двух: то же было в shared/api/booking.ts, понадобилось чату.
+import { browserAuthToken } from "@/shared/lib/authToken";
 import { apiBase } from "./base";
 
 /** Ответ бэка для разбора доменом: статус + тело (сеть и отмена — статус 0). */
@@ -38,6 +39,13 @@ export class ApiError extends Error {
     this.status = status;
     this.body = body;
   }
+}
+
+/** Заголовок Bearer для запросов аккаунта; на сервере и без токена — пусто. */
+export function authHeaders(): Record<string, string> {
+  const token = browserAuthToken();
+
+  return token === null ? {} : { Authorization: `Bearer ${token}` };
 }
 
 /** HTTP-запрос к API: тело разбирается всегда, не-2xx → ApiError. */

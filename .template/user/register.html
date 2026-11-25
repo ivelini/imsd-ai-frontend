@@ -531,14 +531,18 @@
               <input type="text" id="reg-name" placeholder="Имя" />
             </div>
             <div class="auth_field">
-              <label for="reg-phone">Телефон или E-mail*</label>
-              <input type="text" id="reg-phone" placeholder="Телефон или E-mail" />
-              <div class="auth_field_prompt">*На него отправим данные заказа и код подтверждения</div>
+              <label for="reg-phone">Телефон*</label>
+              <input type="tel" id="reg-phone" placeholder="Телефон" />
+              <div class="auth_field_prompt">На него отправим код подтверждения</div>
+            </div>
+            <div class="auth_field">
+              <label for="reg-email">E-mail</label>
+              <input type="email" id="reg-email" placeholder="E-mail" />
             </div>
             <div class="auth_field">
               <label for="reg-password">Пароль*</label>
               <input type="password" id="reg-password" placeholder="Пароль" />
-              <div class="auth_field_prompt">Минимум 6 символов</div>
+              <div class="auth_field_prompt">Минимум 8 символов</div>
             </div>
             <div class="auth_field">
               <label for="reg-password2">Повторите пароль*</label>
@@ -548,7 +552,19 @@
               <img src="../assets/img/order_check.svg" alt="" />
               <span>Согласен с Политикой конфиденциальности и Публичной офертой</span>
             </div>
-            <a href="#" class="auth_submit">Зарегистрироваться</a>
+            <div class="auth_field">
+              <label>Код из SMS</label>
+              <div class="otp-inputs">
+                <input class="otp-digit" type="text" inputmode="numeric" maxlength="1" aria-label="Первая цифра кода" />
+                <input class="otp-digit" type="text" inputmode="numeric" maxlength="1" aria-label="Вторая цифра кода" />
+                <input class="otp-digit" type="text" inputmode="numeric" maxlength="1" aria-label="Третья цифра кода" />
+                <input class="otp-digit" type="text" inputmode="numeric" maxlength="1" aria-label="Четвёртая цифра кода" />
+              </div>
+              <div class="auth_field_prompt">Код отправлен на номер +7 951 123-45-67</div>
+              <p class="code-timer">Отправить код повторно можно через <span class="code-timer-value">0:59</span></p>
+              <button class="code-resend code-resend--disabled" type="button" disabled>Отправить код повторно</button>
+            </div>
+            <a href="#" class="auth_submit">Завершить регистрацию</a>
             <div class="auth_switch">
               Уже есть аккаунт? Войти
             </div>

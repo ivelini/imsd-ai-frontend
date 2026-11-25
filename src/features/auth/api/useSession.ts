@@ -1,4 +1,4 @@
-// Хук чтения сессии (фаза 4) — мок в localStorage, при API — Laravel
+// Сессия клиента: GET /account/profile по Bearer-токену; нет токена или 401 — гость
 "use client";
 
 import { useQuery } from "@tanstack/react-query";

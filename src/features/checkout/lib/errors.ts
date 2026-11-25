@@ -3,9 +3,10 @@
  *
  * Разделение — по машинному коду (`checkout.*` бэка): тексты сообщений правятся
  * свободно, а отказы приходят одним статусом 422 и различаются только кодом.
+ * Общая форма разбора — `shared/api/domainError.ts`.
  */
-import type { ApiErrorPayload, ApiErrorResponse } from "@/shared/api/http";
-import { DEFAULT_API_ERROR_MESSAGE } from "@/shared/api/http";
+import { mapDomainError } from "@/shared/api/domainError";
+import type { ApiErrorResponse } from "@/shared/api/http";
 
 export type CheckoutErrorState =
   | "code_invalid"
@@ -44,21 +45,8 @@ const STATES_BY_CODE: Record<string, CheckoutErrorState> = {
   "checkout.idempotency_key_required": "idempotency_key_required",
 };
 
-export function mapCheckoutError({ body }: ApiErrorResponse): CheckoutErrorResult {
-  const payload = (body ?? {}) as ApiErrorPayload & { retry_after?: number };
-  const state = payload.code ? STATES_BY_CODE[payload.code] : undefined;
-
-  // Ошибки валидации приходят без машинного кода, а их `message` — технический ключ
-  // («validation.required»): на экран такое пускать нельзя
-  if (state === undefined && payload.errors !== undefined) {
-    return { state: "unknown", message: DEFAULT_API_ERROR_MESSAGE };
-  }
-
-  return {
-    state: state ?? "unknown",
-    message: payload.message ?? DEFAULT_API_ERROR_MESSAGE,
-    retryAfter: payload.retry_after,
-  };
+export function mapCheckoutError(response: ApiErrorResponse): CheckoutErrorResult {
+  return mapDomainError(response, STATES_BY_CODE);
 }
 
 /** Исключение запроса → ответ для разбора (общий хелпер транспорта) */
