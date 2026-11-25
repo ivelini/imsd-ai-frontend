@@ -150,3 +150,7 @@
 - Updated: project-architecture.md (overview, «Ключевые роуты», «Данные и состояние», See Also, Sources/Raw)
 - Updated: cart-checkout-live-api.md (владелец корзины: Bearer → аккаунт, слияние при входе; See Also, Sources/Raw)
 - Updated: index.md
+
+## [2026-11-25] ingest | Выкладка: health-check и basic-auth на витрине
+- Updated: project-architecture.md («Разработка»: health-check сокет + домен, 401 валиден при basic-auth; до 25.11 проверка валила релиз после переключения и блокировала очистку — релизы копились, диск заполнился; Sources/Raw)
+- Updated: index.md
