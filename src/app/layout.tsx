@@ -8,6 +8,7 @@ import { CatalogMenu } from "@/shared/layout/CatalogMenu";
 import { Footer } from "@/shared/layout/Footer";
 import { GeoPopup } from "@/shared/layout/GeoPopup";
 import { CityHydrator } from "@/shared/layout/client-islands/CityHydrator";
+import { FontPreload } from "@/shared/layout/client-islands/FontPreload";
 import { Header } from "@/shared/layout/Header";
 
 export const metadata: Metadata = {
@@ -25,6 +26,7 @@ export default async function RootLayout({
   return (
     <html lang="ru">
       <body>
+        <FontPreload />
         <ClientLayout>
           <CityHydrator />
           <div className="app">
